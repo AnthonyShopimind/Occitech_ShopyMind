@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <shopymind_adminform translate="title" module="shopymind">
+            <title>ShopyMind</title>
+            <sort_order>100</sort_order>
+            <action>shopymind/adminhtml_configuration</action>
+        </shopymind_adminform>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <catalog>
+                        <children>
+                            <shopymind_adminform>
+                                <title>My Form</title>
+                            </shopymind_adminform>
+                        </children>
+                    </catalog>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

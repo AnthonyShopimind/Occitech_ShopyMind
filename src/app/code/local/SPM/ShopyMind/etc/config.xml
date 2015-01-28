@@ -52,6 +52,13 @@
     </admin>
 
     <adminhtml>
+        <layout>
+            <updates>
+                <shopymind>
+                    <file>shopymind.xml</file>
+                </shopymind>
+            </updates>
+        </layout>
         <translate>
             <modules>
                 <spm_adminhtml>
@@ -61,39 +68,8 @@
                 </spm_adminhtml>
             </modules>
         </translate>
-
-        <menu>
-            <shopymind_adminform translate="title" module="shopymind">
-               <title>ShopyMind</title>
-               <sort_order>100</sort_order>
-               <action>shopymind/adminhtml_configuration</action>
-            </shopymind_adminform>
-        </menu>
-
-        <acl>
-            <resources>
-                <admin>
-                    <children>
-                        <catalog>
-                            <children>
-                                <shopymind_adminform>
-                                    <title>My Form</title>
-                                </shopymind_adminform>
-                            </children>
-                        </catalog>
-                    </children>
-                </admin>
-            </resources>
-        </acl>
-
-        <layout>
-            <updates>
-                <shopymind>
-                    <file>shopymind.xml</file>
-                </shopymind>
-            </updates>
-        </layout>
     </adminhtml>
+
     <frontend>
     <secure_url>
             <shopymind_ajax>/shopymind/index</shopymind_ajax>
