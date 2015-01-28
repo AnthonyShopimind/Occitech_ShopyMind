@@ -2,6 +2,11 @@
 
 Abandoned cart recovery and email marketing automation. This extension is the official integration of the [ShopyMind](http://www.shopymind.com/) service with Magento.
 
+## Builds statuses
+
+* Latest release: [![Master Branch](https://travis-ci.org/occitech/Occitech_ShopyMind.png?branch=master)](https://travis-ci.org/occitech/Occitech_ShopyMind) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/occitech/Occitech_ShopyMind/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/occitech/Occitech_ShopyMind/?branch=master)
+* Development branch: [![Master Branch](https://travis-ci.org/occitech/Occitech_ShopyMind.png?branch=develop)](https://travis-ci.org/occitech/Occitech_ShopyMind) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/occitech/Occitech_ShopyMind/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/occitech/Occitech_ShopyMind/?branch=develop)
+
 ## Installation
 
 Copy the content of the `src/` directory in your project root directory.

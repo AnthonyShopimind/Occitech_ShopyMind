@@ -1,0 +1,24 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+
+sudo: false
+
+env:
+  - MAGENTO_VERSION=1.5.1.0
+  - MAGENTO_VERSION=1.6.2.0
+  - MAGENTO_VERSION=1.7.0.2
+  - MAGENTO_VERSION=1.8.1.0
+  - MAGENTO_VERSION=1.9.1.0
+
+matrix:
+  fast_finish: true
+
+before_script:
+  - MAGE_CI_SETUP_ONLY=1 composer test ${MAGENTO_VERSION}
+
+script:
+  - composer test ${MAGENTO_VERSION}
