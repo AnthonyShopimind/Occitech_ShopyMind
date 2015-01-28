@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <SPM_ShopyMind>
+            <active>true</active>
+            <codePool>local</codePool>
+        </SPM_ShopyMind>
+    </modules>
+</config>

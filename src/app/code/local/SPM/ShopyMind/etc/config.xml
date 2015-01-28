@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <SPM_ShopyMind>
+            <version>1.1.3</version>
+        </SPM_ShopyMind>
+    </modules>
+
+    <global>
+   <resources>
+   <shopymind_setup>
+   <!-- ajout du setup pour le module. Le dossier SQL du module contiendra un dossier avec ce nom "scriptsql_setup"-->
+   <setup>
+   	<module>SPM_ShopyMind</module>
+   </setup>
+   <connection> <use>core_setup</use> </connection>
+   </shopymind_setup>
+   </resources>
+        <helpers>
+            <shopymind>
+                <class>SPM_ShopyMind_Helper</class>
+            </shopymind>
+        </helpers>
+        <models>
+                        <shopymind>
+                                <class>SPM_ShopyMind_Model</class>
+                        </shopymind>
+                </models>
+                <events>
+  <sales_order_invoice_pay>
+	<observers>
+	   <SPM_ShopyMind_Model_Observer>
+	       <type>singleton</type>
+	       <class>shopymind/observer</class>
+	       <method>newOrderObserver</method>
+           </SPM_ShopyMind_Model_Observer>
+       </observers>
+  </sales_order_invoice_pay>
+</events>
+    </global>
+
+    <admin>
+        <routers>
+            <shopymind>
+                <use>admin</use>
+                <args>
+                    <module>SPM_ShopyMind</module>
+                    <frontName>shopymind</frontName>
+                </args>
+            </shopymind>
+        </routers>
+    </admin>
+
+    <adminhtml>
+        <translate>
+            <modules>
+                <spm_adminhtml>
+                    <files>
+                        <shopymind>SPM_ShopyMind.csv</shopymind>
+                    </files>
+                </spm_adminhtml>
+            </modules>
+        </translate>
+
+        <menu>
+            <shopymind_adminform translate="title" module="shopymind">
+               <title>ShopyMind</title>
+               <sort_order>100</sort_order>
+               <action>shopymind/adminhtml_configuration</action>
+            </shopymind_adminform>
+        </menu>
+
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <catalog>
+                            <children>
+                                <shopymind_adminform>
+                                    <title>My Form</title>
+                                </shopymind_adminform>
+                            </children>
+                        </catalog>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+
+        <layout>
+            <updates>
+                <shopymind>
+                    <file>shopymind.xml</file>
+                </shopymind>
+            </updates>
+        </layout>
+    </adminhtml>
+    <frontend>
+    <secure_url>
+            <shopymind_ajax>/shopymind/index</shopymind_ajax>
+        </secure_url>
+    <layout>
+        <updates>
+            <shopymind>
+                <file>shopymind.xml</file>
+            </shopymind>
+        </updates>
+    </layout>
+</frontend>
+</config>
