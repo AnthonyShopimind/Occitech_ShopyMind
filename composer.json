@@ -4,6 +4,13 @@
   "homepage": "https://github.com/occitech/Occitech_ShopyMind",
   "minimum-stability": "stable",
   "license": "BSD-3-Clause",
+  "type": "magento-module",
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "http://packages.firegento.com"
+    }
+  ],
   "authors": [
     {
       "name": "Occitech Team",
@@ -14,8 +21,18 @@
       "email": "js.couvert@shopymind.com"
     }
   ],
+  "scripts": {
+    "test": "bin/test.sh $1 $2 $3"
+  },
   "require": {
     "php": ">=5.3",
     "ext-curl": "*"
+  },
+  "require-dev": {
+    "ecomdev/mage-ci": "dev-master",
+    "ecomdev/ecomdev_phpunit": "0.3.7"
+  },
+  "extra": {
+    "magento-root-dir": "test/"
   }
 }
