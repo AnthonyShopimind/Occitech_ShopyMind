@@ -109,7 +109,7 @@ class ShopymindClient_Callback {
             ), func_get_args());
         $return = array ();
         $mageVersion = Mage::getVersion();
-        if ($mageVersion >= 1.5) {
+        if (version_compare ($mageVersion, '1.5', '>')) {
             $results = Mage::getModel('sales/order_status')->getCollection()->addFieldToSelect('status')->addFieldToSelect('label')->getData();
         } else {
             $tablePrefix = Mage::getConfig()->getTablePrefix();
@@ -768,7 +768,7 @@ class ShopymindClient_Callback {
      * @param string $lang
      * @return boolean void
      */
-    public static function stopLangEmulation($lang) {
+    public static function stopLangEmulation() {
         if (self::$appEmulation === false)
             return;
         self::$appEmulation->stopEnvironmentEmulation(self::$initialEnvironmentInfo);
