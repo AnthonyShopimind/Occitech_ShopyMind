@@ -1,0 +1,21 @@
+{
+  "name": "occitech/shopymind",
+  "description": "Abandoned cart recovery and email marketing automation. This extension is the official integration of the ShopyMind service with Magento.",
+  "homepage": "https://github.com/occitech/Occitech_ShopyMind",
+  "minimum-stability": "stable",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Occitech Team",
+      "email": "contact@occitech.fr"
+    },
+    {
+      "name": "Couvert Jean-Sébastien",
+      "email": "js.couvert@shopymind.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.3",
+    "ext-curl": "*"
+  }
+}
