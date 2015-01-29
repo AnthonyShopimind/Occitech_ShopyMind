@@ -36,9 +36,17 @@
            </SPM_ShopyMind_Model_Observer>
        </observers>
   </sales_order_invoice_pay>
+    <admin_system_config_changed_section_shopymind_configuration>
+        <observers>
+            <spm_shopymind_model_observer>
+                <type>singleton</type>
+                <class>shopymind/observer</class>
+                <method>adminSystemConfigChangedSectionShopymindConfiguration</method>
+            </spm_shopymind_model_observer>
+        </observers>
+    </admin_system_config_changed_section_shopymind_configuration>
 </events>
     </global>
-
     <admin>
         <routers>
             <shopymind>
