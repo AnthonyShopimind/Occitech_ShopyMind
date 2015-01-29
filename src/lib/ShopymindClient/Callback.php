@@ -717,11 +717,16 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Récupération des de groupes de client
+     * Get customer groups
+     *
+     * The store id parameter is not used in Magento as Magento
+     * does not manage customer groups by store
+     *
+     * @param int $storeId Magento store id
      *
      * @return array
      */
-    public static function getCustomerGroups() {
+    public static function getCustomerGroups($storeId) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
