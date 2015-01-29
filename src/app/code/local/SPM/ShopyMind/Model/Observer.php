@@ -39,26 +39,30 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
 
     public function adminSystemConfigChangedSectionShopymindConfiguration(Varien_Event_Observer $observer)
     {
+        $this->updateDateOfBirthCustomerAttributeFrom($observer);
+    }
+
+    private function updateDateOfBirthCustomerAttributeFrom(Varien_Event_Observer $observer)
+    {
         list($scope, $scopeId) = $this->getScopeFromEvent($observer);
-        $showDateOfBirth = $this->isDateOfBirthRequiredForModule($observer) ? self::REQUIRED_CUSTOMER_DOB : self::OPTIONAL_CUSTOMER_DOB;
+        $isBirthDateRequired =  $this->isDateOfBirthRequiredForModule($observer);
+        $showDateOfBirth = $isBirthDateRequired ? self::REQUIRED_CUSTOMER_DOB : self::OPTIONAL_CUSTOMER_DOB;
+
         $Config = Mage::getModel('core/config');
         $Config->saveConfig(self::CUSTOMER_SHOW_DOB_CONFIG_PATH, $showDateOfBirth, $scope, $scopeId);
+
+        $EavEntity = Mage::getModel('eav/entity_setup', 'core_setup');
+        $customerEntityTypeId = Mage::getModel('customer/customer')->getEntityTypeId();
+        $dobSettings = array(
+            'is_required' => $isBirthDateRequired ? self::REQUIRED : self::OPTIONAL,
+            'is_visible' => true,
+        );
+
+        $EavEntity->updateAttribute($customerEntityTypeId, 'dob', $dobSettings);
+        $Config->reinit();
+        Mage::app()->reinitStores();
     }
 
-    public function isDateOfBirthRequiredForModule(Varien_Event_Observer $observer)
-    {
-        $store = null;
-        if (!is_null($observer->getStore())) {
-            $store = Mage::getModel('core/store')->load($observer->getStore(), 'code');
-        }
-
-        return Mage::getStoreConfig('shopymind/configuration/birthrequired', $store) == self::REQUIRED;
-    }
-
-    /**
-     * @param Varien_Event_Observer $observer
-     * @return array
-     */
     private function getScopeFromEvent(Varien_Event_Observer $observer)
     {
         if (!is_null($observer->getStore())) {
@@ -69,5 +73,15 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             $scopeId = 0;
         }
         return array($scope, $scopeId);
+    }
+
+    public function isDateOfBirthRequiredForModule(Varien_Event_Observer $observer)
+    {
+        $store = null;
+        if (!is_null($observer->getStore())) {
+            $store = Mage::getModel('core/store')->load($observer->getStore(), 'code');
+        }
+
+        return Mage::getStoreConfig('shopymind/configuration/birthrequired', $store) == self::REQUIRED;
     }
 }

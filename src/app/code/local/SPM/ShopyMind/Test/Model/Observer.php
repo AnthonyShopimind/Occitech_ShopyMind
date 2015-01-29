@@ -35,4 +35,25 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $event = $this->generateObserver(array('store' => 'default'), 'admin_system_config_changed_section_shopymind_configuration');
         $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
     }
+
+    public function testSaveShouldUpdateCustomerDobAttributeRequirement()
+    {
+        $Entity = $this->getModelMock('eav/entity_setup', array('updateAttribute'), false, array('core_setup'));
+        $Entity->expects($this->once())
+            ->method('updateAttribute')
+            ->with(
+                $this->equalTo(1),
+                $this->equalTo('dob'),
+                $this->equalTo(
+                    array(
+                        'is_required' => 0,
+                        'is_visible' => true,
+                    )
+                )
+            );
+
+        $this->replaceByMock('model', 'eav/entity_setup', $Entity);
+        $event = $this->generateObserver(array('store' => 'default'), 'admin_system_config_changed_section_shopymind_configuration');
+        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
+    }
 }
