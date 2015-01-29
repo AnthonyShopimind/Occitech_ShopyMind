@@ -131,17 +131,27 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Récupération de la liste des timezones de la boutique (des clients)
+     * Get store customers' timezones
      *
-     * @param string|false $lastUpdate
+     * Example of expected result:
+     * array(
+     *     array(
+     *         'country_code' => 'US',
+     *         'region_code' => 'GA',
+     *     )
+     * )
+     *
+     * @param int $storeId Magento store id
+     * @param string|false $lastUpdate Only get timezones for customers create since $lastUpdate
      * @return array
      */
-    public static function getTimezones($lastUpdate) {
+    public static function getTimezones($storeId, $lastUpdate) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
+
         $return = array ();
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
@@ -154,6 +164,7 @@ class ShopymindClient_Callback {
         LEFT JOIN `' . $tablePrefix . 'directory_country_region` c ON(c.`region_id` = b.`value`)
         WHERE (b.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR b.`attribute_id` IS NULL) AND ( a.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
         ' . ($lastUpdate ? ' AND d.`updated_at` >= "' . $lastUpdate . '"' : '') . '
+        AND d.store_id = ' . $storeId . '
         GROUP BY country_code,region_code';
         $results = $readConnection->fetchAll($query);
         if ($results && is_array($results) && sizeof($results)) {
