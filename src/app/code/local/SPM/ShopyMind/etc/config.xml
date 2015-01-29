@@ -52,24 +52,18 @@
     </admin>
 
     <adminhtml>
-        <layout>
-            <updates>
-                <shopymind>
-                    <file>shopymind.xml</file>
-                </shopymind>
-            </updates>
-        </layout>
         <translate>
             <modules>
-                <spm_adminhtml>
+                <shopymind_configuration>
                     <files>
                         <shopymind>SPM_ShopyMind.csv</shopymind>
                     </files>
-                </spm_adminhtml>
+                </shopymind_configuration>
             </modules>
         </translate>
-    </adminhtml>
 
+
+    </adminhtml>
     <frontend>
     <secure_url>
             <shopymind_ajax>/shopymind/index</shopymind_ajax>

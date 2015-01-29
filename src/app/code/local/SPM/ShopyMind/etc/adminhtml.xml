@@ -1,23 +1,31 @@
 <?xml version="1.0"?>
 <config>
     <menu>
-        <shopymind_adminform translate="title" module="shopymind">
+        <shopymind_configuration translate="title" module="shopymind">
             <title>ShopyMind</title>
             <sort_order>100</sort_order>
-            <action>shopymind/adminhtml_configuration</action>
-        </shopymind_adminform>
+            <action>adminhtml/system_config/edit/section/shopymind_configuration</action>
+        </shopymind_configuration>
     </menu>
     <acl>
         <resources>
+            <all>
+                <title>Allow Everything</title>
+            </all>
             <admin>
                 <children>
-                    <catalog>
+                    <system>
                         <children>
-                            <shopymind_adminform>
-                                <title>My Form</title>
-                            </shopymind_adminform>
+                            <config>
+                                <children>
+                                    <shopymind_configuration translate="title">
+                                        <title>Configuration ShopyMind</title>
+                                        <sort_order>100</sort_order>
+                                    </shopymind_configuration>
+                                </children>
+                            </config>
                         </children>
-                    </catalog>
+                    </system>
                 </children>
             </admin>
         </resources>
