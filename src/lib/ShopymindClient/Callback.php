@@ -177,15 +177,33 @@ class ShopymindClient_Callback {
 
     /**
      * Récupérer la liste des clients qui fêtent leur anniversaire
+     * Get customers having their bithday at the given date
      *
-     * Params : $dateReference = La date de référence à prendre en compte format envoyé : Y-m-d H:i:s
-     * $timezones = fuseaux horaires concernés par la demande format : array(array('country' => 'FR', 'region' => '13'), array('country' => 'US', 'region' => 'ny'))
-     * $nbDays = Nombre de jours de l'envoi avant la date anniv
-     * $generateVoucher = false | array('amount' => '', 'type' => '', 'nbDaysValidate' => '')
+     * Example of expected result:
+     * array(
+     *     array(
+     *         'customer' => array(
+     *             'id_customer' => '',
+     *             'last_name' => '',
+     *             'first_name' => '',
+     *             'email_address' => '',
+     *             'gender' => '', // 1 = man, 2 = woman, 0 = undefined ; might not be present
+     *             'locale' => '', // might not be present
+     *             'voucher_number' => '', // might not be present
+     *             // many other magento customer
+     *         )
+     *     )
+     * )
      *
-     * @return array
+     * @param int $storeId Magento store id
+     * @param string $dateReference Birthday date ; format: Y-m-d H:i:s
+     * @param array $timezones Timezones to use
+     * @param int $nbDays Minus delta for date reference
+     * @param bool $justCount Return the count instead of a list
+     *
+     * @return array|int
      */
-    public static function getBirthdayClients($dateReference, $timezones, $nbDays = 0, $justCount = false) {
+    public static function getBirthdayClients($storeId, $dateReference, $timezones, $nbDays = 0, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -208,6 +226,7 @@ class ShopymindClient_Callback {
          LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt` ON (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`) AND (`customer_default_billing_state_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR `customer_default_billing_state_jt`.`attribute_id` IS NULL)
          LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `customer_default_billing_state_jt`.`value`)
         WHERE  DATE_FORMAT(`customer_birth_table`.`value`,"%m-%d") = "' . $birthDate . '" AND ' . $timezonesWhere . ' AND `customer_primary_table`.`is_active` = 1
+        AND `customer_primary_table`.`store_id` = ' . $storeId . '
         GROUP BY `customer_primary_table`.`entity_id`';
         $results = $readConnection->fetchAll($query);
 
