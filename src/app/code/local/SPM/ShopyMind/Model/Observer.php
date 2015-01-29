@@ -9,6 +9,14 @@
  * @version     $Id Observer.php 2014-12-17$
  */
 class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
+
+    const REQUIRED = 1;
+    const OPTIONAL = 0;
+
+    const CUSTOMER_SHOW_DOB_CONFIG_PATH = 'customer/address/dob_show';
+    const OPTIONAL_CUSTOMER_DOB = 'opt';
+    const REQUIRED_CUSTOMER_DOB = 'req';
+
     public function __construct() {
     }
     public function newOrderObserver($observer) {
@@ -28,5 +36,38 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             return substr($locale_shop, 0, 3) . $defaultBilling->getCountry();
         return $locale_shop;
     }
+
+    public function adminSystemConfigChangedSectionShopymindConfiguration(Varien_Event_Observer $observer)
+    {
+        list($scope, $scopeId) = $this->getScopeFromEvent($observer);
+        $showDateOfBirth = $this->isDateOfBirthRequiredForModule($observer) ? self::REQUIRED_CUSTOMER_DOB : self::OPTIONAL_CUSTOMER_DOB;
+        $Config = Mage::getModel('core/config');
+        $Config->saveConfig(self::CUSTOMER_SHOW_DOB_CONFIG_PATH, $showDateOfBirth, $scope, $scopeId);
+    }
+
+    public function isDateOfBirthRequiredForModule(Varien_Event_Observer $observer)
+    {
+        $store = null;
+        if (!is_null($observer->getStore())) {
+            $store = Mage::getModel('core/store')->load($observer->getStore(), 'code');
+        }
+
+        return Mage::getStoreConfig('shopymind/configuration/birthrequired', $store) == self::REQUIRED;
+    }
+
+    /**
+     * @param Varien_Event_Observer $observer
+     * @return array
+     */
+    private function getScopeFromEvent(Varien_Event_Observer $observer)
+    {
+        if (!is_null($observer->getStore())) {
+            $scope = 'stores';
+            $scopeId = Mage::getModel('core/store')->load($observer->getStore(), 'code')->getId();
+        } else {
+            $scope = 'default';
+            $scopeId = 0;
+        }
+        return array($scope, $scopeId);
+    }
 }
-?>

@@ -1,0 +1,39 @@
+scope:
+  website:
+    - website_id: 1
+      code: base
+      name: First Website
+      default_group_id: 1
+    - website_id: 2
+      code: second_website
+      name: Second Website
+      default_group_id: 2
+  group: # Initializes store groups
+    - group_id: 1
+      website_id: 1
+      name: First Store
+      default_store_id: 1
+      root_category_id: 2 # Default Category
+    - group_id: 2
+      website_id: 2
+      name: Second Store
+      default_store_id: 2
+      root_category_id: 2 # Default Category
+  store: # Initializes store views
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: default
+      name: First Store
+      is_active: 1
+    - store_id: 2
+      website_id: 2
+      group_id: 2
+      code: second_website_store
+      name: Second Store
+      is_active: 1
+
+config:
+  default/shopymind/configuration/birthrequired: '0'
+  stores/1/shopymind/configuration/birthrequired: '1'
+  default/customer/address/dob_show: 'opt'
