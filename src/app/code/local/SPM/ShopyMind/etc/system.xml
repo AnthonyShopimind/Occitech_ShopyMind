@@ -40,32 +40,37 @@
                             <label>API Key</label>
                             <frontend_type>text</frontend_type>
                             <config_path>shopymind/configuration/apiidentification</config_path>
-                            <sort_order>5</sort_order>
+                            <sort_order>1</sort_order>
+                            <validate>required-entry</validate>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
+                            <validate>required-entry</validate>
+                            <can_be_empty>0</can_be_empty>
                         </api_key>
                         <api_password translate="label">
                             <label>API Password</label>
                             <frontend_type>password</frontend_type>
                             <config_path>shopymind/configuration/apipassword</config_path>
-                            <sort_order>5</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
+                            <validate>required-entry</validate>
+                            <can_be_empty>0</can_be_empty>
                         </api_password>
-                        <birth_required>
+                        <birth_required translate="label comment">
                             <label>Date of birth is required ?</label>
+                            <comment><![CDATA[ Make the field date of birth required]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <config_path>shopymind/configuration/birthrequired</config_path>
-                            <sort_order>5</sort_order>
+                            <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
+                            <validate>required-entry</validate>
+                            <can_be_empty>0</can_be_empty>
                         </birth_required>
                     </fields>
                 </shopymind_configuration>
