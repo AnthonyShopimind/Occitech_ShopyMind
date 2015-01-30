@@ -4,6 +4,7 @@ scope:
       code: base
       name: First Website
       default_group_id: 1
+      is_default: true
     - website_id: 2
       code: second_website
       name: Second Website
