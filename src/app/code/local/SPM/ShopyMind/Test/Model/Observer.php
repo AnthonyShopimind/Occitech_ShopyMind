@@ -32,6 +32,12 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $this->assertFalse($this->SUT->isDateOfBirthRequiredForModule($event));
     }
 
+    public function testIsDateOfBirthRequiredForModuleOnStoreScope()
+    {
+        $event = $this->generateShopymindConfigurationChangedEvent('second_website_store');
+        $this->assertTrue($this->SUT->isDateOfBirthRequiredForModule($event));
+    }
+
     public function testSaveShouldUpdateCustomerConfigWithDateOfBirthRequirementOnStoreScope()
     {
         $this->expectsConfigIsSavedWith('customer/address/dob_show', SPM_ShopyMind_Model_Observer::REQUIRED_CUSTOMER_DOB, 'stores', 2);
