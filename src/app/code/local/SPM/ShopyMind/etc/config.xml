@@ -47,17 +47,6 @@
     </admin_system_config_changed_section_shopymind_configuration>
 </events>
     </global>
-    <admin>
-        <routers>
-            <shopymind>
-                <use>admin</use>
-                <args>
-                    <module>SPM_ShopyMind</module>
-                    <frontName>shopymind</frontName>
-                </args>
-            </shopymind>
-        </routers>
-    </admin>
 
     <adminhtml>
         <translate>
