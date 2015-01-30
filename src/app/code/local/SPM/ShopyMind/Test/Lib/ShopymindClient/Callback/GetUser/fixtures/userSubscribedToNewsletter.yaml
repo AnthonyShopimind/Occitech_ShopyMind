@@ -1,0 +1,8 @@
+tables:
+ newsletter_subscriber:
+   - subscriber_id: 2
+     store_id: 1
+     customer_id: 1
+     subscriber_email: april.oliver90@example.com
+     subscriber_status: 1
+     subscriber_confirm_code: 8dapoz4rtem22fj1wqu1j60z2ro1fvy4
