@@ -10,7 +10,10 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
     protected function setUp()
     {
         parent::setUp();
-        $this->SUT = Mage::getModel('shopymind/observer');
+
+        $this->SUT = $this->getModelMock('shopymind/observer', array('getShopyMindClientConfiguration'));
+        $this->replaceByMock('model', 'shopymind/observer', $this->SUT);
+        $this->mockGetUrlContacts();
         $this->setConfigStores();
     }
 
@@ -85,6 +88,24 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $this->assertFalse($this->SUT->isMultiStore());
     }
 
+    public function testGetStoreInformationsForShopyMind()
+    {
+        $this->markTestIncomplete();
+        $expectedInformations = array(
+            'foo-bar',
+            'bar',
+            'en',
+            'GBP',
+            'http://magento.local/contacts/contacts/index',
+            '+33102030405',
+            'Europe/London',
+            true,
+            1
+        );
+
+        $informations = $this->SUT->getInformationsForShopyMindForStore();
+        $this->assertEquals($expectedInformations, $informations);
+    }
     private function generateShopymindConfigurationChangedEvent($storeCode = null)
     {
         return $this->generateObserver(array('store' => $storeCode), 'admin_system_config_changed_section_shopymind_configuration');
@@ -119,14 +140,14 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $this->replaceByMock('model', 'eav/entity_setup', $Entity);
     }
 
-    public function testIsMultiStore()
+    private function mockGetUrlContacts()
     {
-        $this->assertTrue($this->SUT->isMultiStore());
-    }
+        $MockedUrl =  $this->mockModel('core/url', array('getUrl'));
+        $MockedUrl->expects($this->any())
+            ->method('getUrl')
+            ->with($this->equalTo('contacts'))
+            ->will($this->returnValue('http://magento.local/contacts/contacts/index'));
 
-    public function testIsMultiStoreShouldDoNotTakeIntoAccountInactiveStores()
-    {
-        Mage::app()->getStore(2)->setIsActive(0)->save();
-        $this->assertFalse($this->SUT->isMultiStore());
+        $this->replaceByMock('model', 'core/url', $MockedUrl);
     }
 }

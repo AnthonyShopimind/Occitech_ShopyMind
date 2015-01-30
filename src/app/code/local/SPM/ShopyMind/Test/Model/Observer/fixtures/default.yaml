@@ -32,3 +32,13 @@ scope:
       code: second_website_store
       name: Second Store
       is_active: 1
+
+config:
+  default/customer/address/dob_show: opt
+  default/shopymind/configuration/apiidentification: foo-bar
+  default/shopymind/configuration/apipassword: bar
+  default/shopymind/configuration/birthrequired: no
+  default/general/locale/code: en_GB
+  default/general/locale/timezone: Europe/London
+  default/currency/options/default: GBP
+  default/general/store_information/phone: +33102030405

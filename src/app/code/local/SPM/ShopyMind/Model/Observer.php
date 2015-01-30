@@ -43,6 +43,31 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     public function adminSystemConfigChangedSectionShopymindConfiguration(Varien_Event_Observer $observer)
     {
         $this->updateDateOfBirthCustomerAttributeFrom($observer);
+        if ($this->hasShopyMindClientConfiguration()) {
+            list(
+                $apiIdentifiant,
+                $apiPassword,
+                $defaultLanguage,
+                $defaultCurrency,
+                $contactPageUrl,
+                $phoneNumber,
+                $timezone,
+                $isMultiStore,
+                $storeId
+            ) = $this->getInformationsForShopyMindForStore($observer->getStore());
+
+            $this->dispatchToShopyMind(
+                $apiIdentifiant,
+                $apiPassword,
+                $defaultLanguage,
+                $defaultCurrency,
+                $contactPageUrl,
+                $phoneNumber,
+                $timezone,
+                $isMultiStore,
+                $storeId
+            );
+        }
     }
 
     private function updateDateOfBirthCustomerAttributeFrom(Varien_Event_Observer $observer)
@@ -85,7 +110,8 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             $store = Mage::getModel('core/store')->load($observer->getStore(), 'code');
         }
 
-        return Mage::getStoreConfig('shopymind/configuration/birthrequired', $store) == self::REQUIRED;
+        $isDateOfBirthRequired = Mage::getStoreConfig('shopymind/configuration/birthrequired', $store);
+        return ($isDateOfBirthRequired == self::REQUIRED) || ($isDateOfBirthRequired == self::LEGACY_REQUIRED);
     }
 
     public function isMultiStore()
@@ -95,5 +121,74 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         });
 
         return count($activeStores) > 1;
+    }
+
+    public function getInformationsForShopyMindForStore($storeCode = null)
+    {
+        if (!is_null($storeCode)) {
+            $currentStore =  Mage::getModel('core/store')->load($storeCode, 'code');
+        } else {
+            $currentStore =  Mage::app()->getDefaultStoreView();
+        }
+
+        $storeInformations = array(
+            Mage::getStoreConfig('shopymind/configuration/apiidentification', $currentStore),
+            Mage::getStoreConfig('shopymind/configuration/apipassword', $currentStore),
+            Mage::getStoreConfig('general/locale/code', $currentStore),
+            substr(Mage::app()->getLocale()->getDefaultLocale(),0,2),
+            Mage::getStoreConfig('currency/options/default', $currentStore),
+            Mage::getUrl('contacts'),
+            Mage::getStoreConfig('general/store_information/phone', $currentStore),
+            Mage::getStoreConfig('general/locale/timezone', $currentStore),
+            $this->isMultiStore(),
+            $currentStore->getId()
+        );
+
+        return $storeInformations;
+    }
+
+    public function dispatchToShopyMind($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId)
+    {
+        if ($this->hasShopyMindClientConfiguration()) {
+            $configurationClient = $this->getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
+
+            if (!$configurationClient->testConnection())
+                Mage::throwException($this->__('Error when test connection'));
+            else {
+                // Connexion au serveur et sauvegarde des informations
+                $connect = $configurationClient->connectServer();
+                if ($connect !== true) {
+                    Mage::throwException($this->__('Error when connect to server'));
+                } else {
+                    $message = $this->__('Your form has been submitted successfully.');
+                    Mage::getSingleton('adminhtml/session')->addSuccess($message);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasShopyMindClientConfiguration()
+    {
+        return file_exists(Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Configuration.php');
+    }
+
+    /**
+     * @param $apiIdentifiant
+     * @param $apiPassword
+     * @param $defaultLanguage
+     * @param $defaultCurrency
+     * @param $contactPageUrl
+     * @param $phoneNumber
+     * @param $timezone
+     * @param $isMultiStore
+     * @param $storeId
+     * @return ShopymindClient_Bin_Configuration
+     */
+    private function getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId)
+    {
+        return ShopymindClient_Bin_Configuration::factory($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
     }
 }
