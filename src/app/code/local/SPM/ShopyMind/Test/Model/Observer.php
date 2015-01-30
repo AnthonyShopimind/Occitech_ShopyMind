@@ -101,4 +101,15 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
 
         $this->replaceByMock('model', 'eav/entity_setup', $Entity);
     }
+
+    public function testIsMultiStore()
+    {
+        $this->assertTrue($this->SUT->isMultiStore());
+    }
+
+    public function testIsMultiStoreShouldDoNotTakeIntoAccountInactiveStores()
+    {
+        Mage::app()->getStore(2)->setIsActive(0)->save();
+        $this->assertFalse($this->SUT->isMultiStore());
+    }
 }

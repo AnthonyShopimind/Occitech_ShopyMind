@@ -84,4 +84,13 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
 
         return Mage::getStoreConfig('shopymind/configuration/birthrequired', $store) == self::REQUIRED;
     }
+
+    public function isMultiStore()
+    {
+        $activeStores = array_filter(Mage::app()->getStores(), function($store) {
+            return $store->getIsActive();
+        });
+
+        return count($activeStores) > 1;
+    }
 }
