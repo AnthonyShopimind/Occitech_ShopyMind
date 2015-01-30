@@ -34,43 +34,48 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
 
     public function testSaveShouldUpdateCustomerConfigWithDateOfBirthRequirementOnStoreScope()
     {
-    private function generateShopymindConfigurationChangedEvent($storeCode = null)
-    {
-        return $this->generateObserver(array('store' => $storeCode), 'admin_system_config_changed_section_shopymind_configuration');
-    }
-        $Config = $this->getModelMock('core/config', array('saveConfig'));
-        $Config->expects($this->once())
-            ->method('saveConfig')
-            ->with(
-                $this->equalTo('customer/address/dob_show'),
-                $this->equalTo(SPM_ShopyMind_Model_Observer::REQUIRED_CUSTOMER_DOB),
-                $this->equalTo('stores'),
-                $this->equalTo('2')
-            );
-
-        $this->replaceByMock('model', 'core/config', $Config);
-        $event = $this->generateObserver(array('store' => 'second_website_store'), 'admin_system_config_changed_section_shopymind_configuration');
+        $this->expectsConfigIsSavedWith('customer/address/dob_show', SPM_ShopyMind_Model_Observer::REQUIRED_CUSTOMER_DOB, 'stores', 2);
+        $event = $this->generateShopymindConfigurationChangedEvent('second_website_store');
         $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
     }
 
     public function testSaveShouldUpdateCustomerDobAttributeRequirementOnStoreScope()
     {
+        $this->expectsAttributeIsUpdatedWith(1, 'dob', array('is_required' => 1, 'is_visible' => true));
+
+        $event = $this->generateShopymindConfigurationChangedEvent('second_website_store');
+        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
+    }
+    private function generateShopymindConfigurationChangedEvent($storeCode = null)
+    {
+        return $this->generateObserver(array('store' => $storeCode), 'admin_system_config_changed_section_shopymind_configuration');
+    }
+    private function expectsConfigIsSavedWith($configPath, $configValue, $scope, $scopeId)
+    {
+        $Config = $this->getModelMock('core/config', array('saveConfig'));
+        $Config->expects($this->once())
+            ->method('saveConfig')
+            ->with(
+                $this->equalTo($configPath),
+                $this->equalTo($configValue),
+                $this->equalTo($scope),
+                $this->equalTo($scopeId)
+            );
+
+        $this->replaceByMock('model', 'core/config', $Config);
+    }
+
+    private function expectsAttributeIsUpdatedWith($entityTypeId, $attributeCode, $attributeValue)
+    {
         $Entity = $this->getModelMock('eav/entity_setup', array('updateAttribute'), false, array('core_setup'));
         $Entity->expects($this->once())
             ->method('updateAttribute')
             ->with(
-                $this->equalTo(1),
-                $this->equalTo('dob'),
-                $this->equalTo(
-                    array(
-                        'is_required' => 1,
-                        'is_visible' => true,
-                    )
-                )
+                $this->equalTo($entityTypeId),
+                $this->equalTo($attributeCode),
+                $this->equalTo($attributeValue)
             );
 
         $this->replaceByMock('model', 'eav/entity_setup', $Entity);
-        $event = $this->generateObserver(array('store' => 'second_website_store'), 'admin_system_config_changed_section_shopymind_configuration');
-        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
     }
 }
