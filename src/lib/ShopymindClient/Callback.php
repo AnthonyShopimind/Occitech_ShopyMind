@@ -482,17 +482,34 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Permet de récupérer la liste des clients n'ayants pas effectués de commandes
-     * depuis un certaint temps
+     * Get customers who never ordered
      *
-     * @param unknown $dateReference
-     * @param unknown $timezones
-     * @param number $nbDays
-     * @param string $relaunchOlder
-     * @param string $justCount
-     * @return boolean Ambigous , multitype:multitype:Ambigous <multitype:, multitype:string , multitype:multitype:string unknown Ambigous <string, unknown> Ambigous <number, unknown> NULL multitype:unknown > >
+     * Example of expected result:
+     * array(
+     *     array(
+     *         'customer' => array(
+     *             'id_customer' => '',
+     *             'last_name' => '',
+     *             'first_name' => '',
+     *             'email_address' => '',
+     *             'gender' => '', // 1 = man, 2 = woman, 0 = undefined ; might not be present
+     *             'locale' => '', // might not be present
+     *             'voucher_number' => '', // might not be present
+     *             // many other magento customer
+     *         )
+     *     )
+     * )
+     *
+     * @param int $storeId Magento store id
+     * @param string $dateReference Date from which we search customers that have not ordered
+     * @param array $timezones Timezones to use
+     * @param int $nbDays Duration in days from $dateReference
+     * @param bool $relaunchOlder Not used in Magento client
+     * @param bool $justCount Return the count instead of a list
+     *
+     * @return array|int
      */
-    public static function getMissingClients($dateReference, $timezones, $nbDays = 0, $relaunchOlder = false, $justCount = false) {
+    public static function getMissingClients($storeId, $dateReference, $timezones, $nbDays = 0, $relaunchOlder = false, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -519,6 +536,7 @@ class ShopymindClient_Callback {
         AND DATE_FORMAT(`customer_primary_table`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) ($nbDays) . ' DAY),"%Y-%m-%d")
         AND ' . $timezonesWhere . '
          AND `customer_primary_table`.`is_active` = 1
+        AND `customer_primary_table`.`store_id` = ' . $storeId . '
         GROUP BY `customer_order`.`customer_id`';
         $results = $readConnection->fetchAll($query);
 
