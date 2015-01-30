@@ -5,13 +5,16 @@
  */
 class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
 {
+    /**
+     * @var SPM_ShopyMind_Model_Observer
+     */
     private $SUT;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->SUT = $this->getModelMock('shopymind/observer', array('getShopyMindClientConfiguration'));
+        $this->SUT = $this->getModelMock('shopymind/observer', array('dispatchToShopyMind'));
         $this->replaceByMock('model', 'shopymind/observer', $this->SUT);
         $this->mockGetUrlContacts();
         $this->setConfigStores();
@@ -22,7 +25,7 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
      */
     private function setConfigStores()
     {
-        Mage::app()->getStore(0)
+        Mage::app()->getStore(1)
             ->setConfig('customer/address/dob_show', 'opt')
             ->setConfig('shopymind/configuration/birthrequired', 0);
         Mage::app()->getStore(2)
