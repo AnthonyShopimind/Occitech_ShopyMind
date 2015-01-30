@@ -46,10 +46,27 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $event = $this->generateShopymindConfigurationChangedEvent('second_website_store');
         $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
     }
+
+    public function testSaveShouldUpdateCustomerConfigWithDateOfBirthRequirementOnGlobalScope()
+    {
+        $this->expectsConfigIsSavedWith('customer/address/dob_show', SPM_ShopyMind_Model_Observer::OPTIONAL_CUSTOMER_DOB, 'default', 0);
+        $event = $this->generateShopymindConfigurationChangedEvent();
+        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
+    }
+
+    public function testSaveShouldUpdateCustomerDobAttributeRequirementOnGlobalScope()
+    {
+        $this->expectsAttributeIsUpdatedWith(1, 'dob', array('is_required' => 0, 'is_visible' => true));
+
+        $event = $this->generateShopymindConfigurationChangedEvent();
+        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
+    }
+
     private function generateShopymindConfigurationChangedEvent($storeCode = null)
     {
         return $this->generateObserver(array('store' => $storeCode), 'admin_system_config_changed_section_shopymind_configuration');
     }
+
     private function expectsConfigIsSavedWith($configPath, $configValue, $scope, $scopeId)
     {
         $Config = $this->getModelMock('core/config', array('saveConfig'));
