@@ -50,6 +50,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
 
         $Config = Mage::getModel('core/config');
         $Config->saveConfig(self::CUSTOMER_SHOW_DOB_CONFIG_PATH, $showDateOfBirth, $scope, $scopeId);
+        $Config->reinit();
 
         $EavEntity = Mage::getModel('eav/entity_setup', 'core_setup');
         $customerEntityTypeId = Mage::getModel('customer/customer')->getEntityTypeId();
@@ -59,7 +60,6 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         );
 
         $EavEntity->updateAttribute($customerEntityTypeId, 'dob', $dobSettings);
-        $Config->reinit();
         Mage::app()->reinitStores();
     }
 
