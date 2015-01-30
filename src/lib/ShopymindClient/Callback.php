@@ -556,16 +556,33 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Permet de récupérer les commandes ayant un certain statut, depuis $nbDays jours
+     * Get orders having a given status since $dateReference
      *
-     * @param unknown $dateReference
-     * @param unknown $timezones
-     * @param unknown $nbDays
-     * @param unknown $idStatus
-     * @param string $justCount
-     * @return boolean Ambigous , multitype:multitype:unknown multitype:multitype:unknown string Ambigous <multitype:, multitype:string , multitype:multitype:string unknown Ambigous <string, unknown> Ambigous <number, unknown> NULL multitype:unknown > >
+     * Example of expected result:
+     * array(
+     *     array(
+     *         'articles' => array(
+     *             // array of order products data
+     *         ),
+     *         'customer' => array(
+     *             // customer data
+     *         ),
+     *         'currency' => '', //currency code
+     *         'total_amount' => '',
+     *         'id_order' => '',
+     *     )
+     * )
+     *
+     * @param int $storeId Magento store id
+     * @param string $dateReference Date the orders was set to the given status
+     * @param array $timezones Timezones to use
+     * @param int $nbDays
+     * @param mixed $idStatus Magento status code
+     * @param bool $justCount Return the count instead of a list
+     *
+     * @return array|int
      */
-    public static function getOrdersByStatus($dateReference, $timezones, $nbDays, $idStatus, $justCount = false) {
+    public static function getOrdersByStatus($storeId, $dateReference, $timezones, $nbDays, $idStatus, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -589,6 +606,7 @@ class ShopymindClient_Callback {
             AND DATE_FORMAT(`order_status`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays) . ' DAY),"%Y-%m-%d")
             AND ' . $timezonesWhere . '
             AND `order_last`.`entity_id` IS NULL
+            AND `order_primary`.`store_id` = ' . $storeId . '
             GROUP BY `order_primary`.`customer_email`';
         $results = $readConnection->fetchAll($query);
 
