@@ -20,54 +20,128 @@ class ShopymindClient_Callback {
     protected static $initialEnvironmentInfo = false;
 
     /**
-     * Permet de récupérer les informations utilisateur(s)
-     * en fonction de son identifiant
+     * Allow to fetch user information from either an id or email address(es)
      *
-     * @param mixed|array $id
+     * @param mixed|array $idOrEmails If single and numeric, then it's an id otherwise a list of email addresses
      * @return array
      */
-    public static function getUser($id, $fromQuotes = false) {
+    public static function getUser($idOrEmails, $fromQuotes = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
-        $return = array ();
+
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
-        if (is_numeric($id)) {
-            $query = 'SELECT `customer_default_phone`.`value` as `phone`,`customer_default_billing_country`.`value` as `country_code`,`customer_primary_table`.`entity_id`, `customer_primary_table`.`store_id`, `customer_firstname_table`.`value` as `firstname`, `customer_lastname_table`.`value` as `lastname`, `customer_primary_table`.`email`, `customer_primary_table`.`created_at`, `customer_primary_table`.`group_id`, `customer_gender`.`value` AS `gender_id`, `customer_birth_table`.`value` AS `birthday`
-	         FROM `' . $tablePrefix . 'customer_entity` AS `customer_primary_table`
-	         LEFT JOIN `' . $tablePrefix . 'customer_entity_datetime` AS `customer_birth_table` ON(`customer_birth_table`.`entity_id` = `customer_primary_table`.`entity_id` AND `customer_birth_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'dob') . ')
-	         LEFT JOIN `' . $tablePrefix . 'customer_entity_varchar` AS `customer_firstname_table` ON(`customer_firstname_table`.`entity_id` = `customer_primary_table`.`entity_id`) AND (`customer_firstname_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'firstname') . ')
-	         LEFT JOIN `' . $tablePrefix . 'customer_entity_varchar` AS `customer_lastname_table` ON(`customer_lastname_table`.`entity_id` = `customer_primary_table`.`entity_id`) AND (`customer_lastname_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'lastname') . ')
-	         LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_default_billing_jt` ON (`customer_default_billing_jt`.`entity_id` = `customer_primary_table`.`entity_id`) AND (`customer_default_billing_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'default_shipping') . ')
-	         LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_country` ON (`customer_default_billing_jt`.`value` = `customer_default_billing_country`.`entity_id`) AND (`customer_default_billing_country`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
-	         LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_phone` ON (`customer_default_billing_jt`.`value` = `customer_default_phone`.`entity_id`) AND (`customer_default_phone`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'telephone') . ')
-	         LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt` ON (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`) AND (`customer_default_billing_state_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR `customer_default_billing_state_jt`.`attribute_id` IS NULL)
-	         LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `customer_default_billing_state_jt`.`value`)
-	         LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_gender` ON(`customer_gender`.`entity_id` = `customer_primary_table`.`entity_id`) AND (`customer_gender`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'gender') . ')
-	        WHERE  `customer_primary_table`.`entity_id` IN(' . (implode(', ', (array) $id)) . ')
-	        GROUP BY `customer_primary_table`.`entity_id`';
-        } else {
 
+        $return = array();
+        if (is_numeric($idOrEmails)) {
+            $query = '
+                SELECT
+                    `customer_default_phone`.`value` as `phone`,
+                    `customer_default_billing_country`.`value` as `country_code`,
+                    `customer_primary_table`.`entity_id`,
+                    `customer_primary_table`.`store_id`,
+                    `customer_firstname_table`.`value` as `firstname`,
+                    `customer_lastname_table`.`value` as `lastname`,
+                    `customer_primary_table`.`email`,
+                    `customer_primary_table`.`created_at`,
+                    `customer_primary_table`.`group_id`,
+                    `customer_gender`.`value` AS `gender_id`,
+                    `customer_birth_table`.`value` AS `birthday`
+                FROM `' . $tablePrefix . 'customer_entity` AS `customer_primary_table`
+                LEFT JOIN `' . $tablePrefix . 'customer_entity_datetime` AS `customer_birth_table`
+                ON (
+                    `customer_birth_table`.`entity_id` = `customer_primary_table`.`entity_id`
+                    AND `customer_birth_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'dob') . '
+                )
+                LEFT JOIN `' . $tablePrefix . 'customer_entity_varchar` AS `customer_firstname_table`
+                ON
+                    (`customer_firstname_table`.`entity_id` = `customer_primary_table`.`entity_id`)
+                    AND (`customer_firstname_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'firstname') . ')
+                LEFT JOIN `' . $tablePrefix . 'customer_entity_varchar` AS `customer_lastname_table`
+                ON
+                    (`customer_lastname_table`.`entity_id` = `customer_primary_table`.`entity_id`)
+                    AND (`customer_lastname_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'lastname') . ')
+                LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_default_billing_jt`
+                ON
+                    (`customer_default_billing_jt`.`entity_id` = `customer_primary_table`.`entity_id`)
+                    AND (`customer_default_billing_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'default_shipping') . ')
+                LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_country`
+                ON
+                    (`customer_default_billing_jt`.`value` = `customer_default_billing_country`.`entity_id`)
+                    AND (`customer_default_billing_country`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
+                LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_phone`
+                ON
+                    (`customer_default_billing_jt`.`value` = `customer_default_phone`.`entity_id`)
+                    AND (`customer_default_phone`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'telephone') . ')
+                LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt`
+                ON
+                    (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`)
+                    AND (
+                        `customer_default_billing_state_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . '
+                        OR `customer_default_billing_state_jt`.`attribute_id` IS NULL
+                    )
+                LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state`
+                ON (`customer_default_billing_state`.`region_id` = `customer_default_billing_state_jt`.`value`)
+                LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_gender`
+                ON
+                    (`customer_gender`.`entity_id` = `customer_primary_table`.`entity_id`)
+                    AND (`customer_gender`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'gender') . ')
+
+                WHERE  `customer_primary_table`.`entity_id` IN(' . (implode(', ', (array) $idOrEmails)) . ')
+                GROUP BY `customer_primary_table`.`entity_id`';
+        } else {
             if ($fromQuotes) {
-                $query = 'SELECT `quote_address`.`telephone` as `phone`,`quote_address`.`country_id` as `country_code`,`quote_address`.`email` AS `entity_id`, `quote`.`store_id`, `quote_address`.`firstname`, `quote_address`.`lastname`, `quote_address`.`email`, `quote`.`created_at`, `quote`.`customer_group_id` AS `group_id`, `quote`.`customer_gender` AS `gender_id`, `quote`.`customer_dob` AS `birthday`
-		         FROM `' . $tablePrefix . 'sales_flat_quote_address` AS `quote_address`
-		         INNER JOIN `' . $tablePrefix . 'sales_flat_quote` AS `quote` ON(`quote`.`entity_id` = `quote_address`.`quote_id`)
-		        WHERE  `quote_address`.`email` IN("' . (implode('", "', (array) $id)) . '") AND `quote_address`.`address_type` = "billing"
-		        GROUP BY `quote_address`.`email`
-		        ORDER BY `quote`.`entity_id` ASC';
+                $query = '
+                  SELECT
+                    `quote_address`.`telephone` as `phone`,
+                    `quote_address`.`country_id` as `country_code`,
+                    `quote_address`.`email` AS `entity_id`, `quote`.`store_id`,
+                    `quote_address`.`firstname`,
+                    `quote_address`.`lastname`,
+                    `quote_address`.`email`,
+                    `quote`.`created_at`,
+                    `quote`.`customer_group_id` AS `group_id`,
+                    `quote`.`customer_gender` AS `gender_id`,
+                    `quote`.`customer_dob` AS `birthday`
+                  FROM `' . $tablePrefix . 'sales_flat_quote_address` AS `quote_address`
+                  INNER JOIN `' . $tablePrefix . 'sales_flat_quote` AS `quote` ON (
+                    `quote`.`entity_id` = `quote_address`.`quote_id`
+                  )
+                  WHERE
+                    `quote_address`.`email` IN("' . (implode('", "', (array) $idOrEmails)) . '")
+                    AND `quote_address`.`address_type` = "billing"
+                  GROUP BY `quote_address`.`email`
+                  ORDER BY `quote`.`entity_id` ASC';
             } else {
-                $query = 'SELECT `order_address`.`telephone` as `phone`,`order_address`.`country_id` as `country_code`,`order_address`.`email` AS `entity_id`, `order`.`store_id`, `order_address`.`firstname`, `order_address`.`lastname`, `order_address`.`email`, `order`.`created_at`, `order`.`customer_group_id` AS `group_id`, `order`.`customer_gender` AS `gender_id`, `order`.`customer_dob` AS `birthday`
-		         FROM `' . $tablePrefix . 'sales_flat_order_address` AS `order_address`
-		         INNER JOIN `' . $tablePrefix . 'sales_flat_order` AS `order` ON(`order`.`entity_id` = `order_address`.`parent_id`)
-		        WHERE  `order_address`.`email` IN("' . (implode('", "', (array) $id)) . '") AND `order_address`.`address_type` = "billing"
-		        GROUP BY `order_address`.`email`
-		        ORDER BY `order`.`entity_id` ASC';
+                $query = '
+                  SELECT
+                    `order_address`.`telephone` as `phone`,
+                    `order_address`.`country_id` as `country_code`,
+                    `order_address`.`email` AS `entity_id`,
+                    `order`.`store_id`,
+                    `order_address`.`firstname`,
+                    `order_address`.`lastname`,
+                    `order_address`.`email`,
+                    `order`.`created_at`,
+                    `order`.`customer_group_id` AS `group_id`,
+                    `order`.`customer_gender` AS `gender_id`,
+                    `order`.`customer_dob` AS `birthday`
+                  FROM `' . $tablePrefix . 'sales_flat_order_address` AS `order_address`
+                  INNER JOIN `' . $tablePrefix . 'sales_flat_order` AS `order` ON (
+                    `order`.`entity_id` = `order_address`.`parent_id`
+                  )
+                  WHERE
+                    `order_address`.`email` IN("' . (implode('", "', (array) $idOrEmails)) . '")
+                    AND `order_address`.`address_type` = "billing"
+                  GROUP BY `order_address`.`email`
+                  ORDER BY `order`.`entity_id` ASC';
             }
         }
+
         $results = $readConnection->fetchAll($query);
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
