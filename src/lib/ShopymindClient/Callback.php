@@ -341,19 +341,36 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Permet de récupérer la liste des bons clients
-     * par montant de commande sur une période donnée
+     * Get the most spender customers for a defined period in time
      *
-     * @param unknown $dateReference
-     * @param unknown $timezones
-     * @param unknown $amount
-     * @param unknown $amountMax
-     * @param unknown $duration
-     * @param unknown $nbDaysLastOrder
-     * @param string $justCount
-     * @return boolean Ambigous , multitype:multitype:Ambigous <multitype:, multitype:string , multitype:multitype:string unknown Ambigous <string, unknown> Ambigous <number, unknown> NULL multitype:unknown > >
+     * Example of expected result:
+     * array(
+     *     array(
+     *         'customer' => array(
+     *             'id_customer' => '',
+     *             'last_name' => '',
+     *             'first_name' => '',
+     *             'email_address' => '',
+     *             'gender' => '', // 1 = man, 2 = woman, 0 = undefined ; might not be present
+     *             'locale' => '', // might not be present
+     *             'voucher_number' => '', // might not be present
+     *             // many other magento customer
+     *         )
+     *     )
+     * )
+     *
+     * @param int $storeId Magento store id
+     * @param string $dateReference From which date ; format Y-m-d H:i:s
+     * @param array $timezones Timezones to use
+     * @param float $amount Minimum amount for fetched carts
+     * @param float $amountMax Maximum amount for fetched carts
+     * @param int $duration Duration in days from $dateReference
+     * @param int $nbDaysLastOrder Duration in days since $dateReference that the customer ordered for the last time
+     * @param bool $justCount Return the count instead of a list
+     *
+     * @return array|int
      */
-    public static function getGoodClientsByAmount($dateReference, $timezones, $amount, $amountMax, $duration, $nbDaysLastOrder, $justCount = false) {
+    public static function getGoodClientsByAmount($storeId, $dateReference, $timezones, $amount, $amountMax, $duration, $nbDaysLastOrder, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -376,6 +393,7 @@ class ShopymindClient_Callback {
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
             AND `order_last`.`entity_id` IS NULL
+            AND `order_primary`.`store_id` = ' . $storeId . '
             GROUP BY `order_primary`.`customer_email`
     		HAVING `Total` >= ' . (float) $amount . '
     		' . ($amountMax ? ' AND `Total` <= ' . (float) $amountMax : '');
