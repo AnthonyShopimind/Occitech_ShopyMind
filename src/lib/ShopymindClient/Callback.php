@@ -148,6 +148,7 @@ class ShopymindClient_Callback {
                 $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($row ['email']);
                 $return [] = array (
                         'id_customer' => $row ['entity_id'],
+                        'store_id' => $row ['store_id'],
                         'optin' => $subscriber->isSubscribed(),
                         'customer_since' => $row ['created_at'],
                         'last_name' => $row ['lastname'],
