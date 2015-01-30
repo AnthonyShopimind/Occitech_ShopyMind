@@ -39,13 +39,13 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
             ->method('saveConfig')
             ->with(
                 $this->equalTo('customer/address/dob_show'),
-                $this->equalTo(SPM_ShopyMind_Model_Observer::OPTIONAL_CUSTOMER_DOB),
+                $this->equalTo(SPM_ShopyMind_Model_Observer::REQUIRED_CUSTOMER_DOB),
                 $this->equalTo('stores'),
-                $this->equalTo('1')
+                $this->equalTo('2')
             );
 
         $this->replaceByMock('model', 'core/config', $Config);
-        $event = $this->generateObserver(array('store' => 'default'), 'admin_system_config_changed_section_shopymind_configuration');
+        $event = $this->generateObserver(array('store' => 'second_website_store'), 'admin_system_config_changed_section_shopymind_configuration');
         $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
     }
 
@@ -59,14 +59,14 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
                 $this->equalTo('dob'),
                 $this->equalTo(
                     array(
-                        'is_required' => 0,
+                        'is_required' => 1,
                         'is_visible' => true,
                     )
                 )
             );
 
         $this->replaceByMock('model', 'eav/entity_setup', $Entity);
-        $event = $this->generateObserver(array('store' => 'default'), 'admin_system_config_changed_section_shopymind_configuration');
+        $event = $this->generateObserver(array('store' => 'second_website_store'), 'admin_system_config_changed_section_shopymind_configuration');
         $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
     }
 }
