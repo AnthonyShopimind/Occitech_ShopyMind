@@ -28,12 +28,16 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
 
     public function testIsDateOfBirthRequiredForModuleOnGlobalScope()
     {
-        $event = $this->generateObserver(array(), 'admin_system_config_changed_section_shopymind_configuration');
+        $event = $this->generateShopymindConfigurationChangedEvent();
         $this->assertFalse($this->SUT->isDateOfBirthRequiredForModule($event));
     }
 
     public function testSaveShouldUpdateCustomerConfigWithDateOfBirthRequirementOnStoreScope()
     {
+    private function generateShopymindConfigurationChangedEvent($storeCode = null)
+    {
+        return $this->generateObserver(array('store' => $storeCode), 'admin_system_config_changed_section_shopymind_configuration');
+    }
         $Config = $this->getModelMock('core/config', array('saveConfig'));
         $Config->expects($this->once())
             ->method('saveConfig')
