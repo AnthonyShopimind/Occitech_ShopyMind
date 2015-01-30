@@ -88,7 +88,11 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
     public function testIsMultiStoreShouldDoNotTakeIntoAccountInactiveStores()
     {
         Mage::app()->getStore(2)->setIsActive(0)->save();
-        $this->assertFalse($this->SUT->isMultiStore());
+        $isMultiStore = $this->SUT->isMultiStore();
+        Mage::app()->getStore(2)->setIsActive(1)->save();
+
+        $this->assertFalse($isMultiStore);
+    }
 
     public function testSendCorrectStoreInformationsToShopyMind()
     {
