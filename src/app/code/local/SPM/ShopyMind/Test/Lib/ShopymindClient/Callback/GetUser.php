@@ -22,6 +22,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         'date_last_order' => 0,
         'nb_order'        => 0,
         'sum_order'       => 0,
+        'nb_order_year'   => 0,
+        'sum_order_year'  => 0,
         'groups'          => array(1)
     );
 
@@ -48,7 +50,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         $result = ShopymindClient_Callback::getUser(1);
         $expectedOrderStats = array(
             'nb_order' => 2,
-            'sum_order' => (146.35 + 14.00)
+            'sum_order' => (146.35 + 14.00),
+            'nb_order_year' => 1,
+            'sum_order_year' => 14.00,
         );
         $this->assertEquals($expectedOrderStats, array_intersect_key($result, $expectedOrderStats));
     }
@@ -89,7 +93,13 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             'april.oliver90@example.com'
         ));
 
-        $noOrderStats = array('nb_order' => 0, 'sum_order' => 0);
+        $noOrderStats = array(
+            'nb_order' => 0,
+            'sum_order' => 0,
+            'nb_order_year' => 0,
+            'sum_order_year' => 0,
+        );
+
         $results = array_map(function($result) use ($noOrderStats) {
             return array_intersect_key($result, $noOrderStats);
         }, $results);
