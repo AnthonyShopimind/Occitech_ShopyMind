@@ -20,6 +20,11 @@ class ShopymindClient_Callback {
     protected static $initialEnvironmentInfo = false;
 
     /**
+     * @var null|int Current timestamp (to allow simulating time changes from tests)
+     */
+    public static $now = null;
+
+    /**
      * Allow to fetch user information from either an id or email address(es)
      *
      * @param mixed|array $idOrEmails If single and numeric, then it's an id otherwise a list of email addresses
@@ -324,21 +329,31 @@ class ShopymindClient_Callback {
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
-        $return = array ();
-        $date = date('Y-m-d H:i:s');
+
+        $return = array();
+        $now = date('Y-m-d H:i:s', strtotime('now', static::$now)); // useful to allow simulating time for testing purposes
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
         $mageVersion = Mage::getVersion();
-        $query = 'SELECT `quote_table`.* FROM `' . $tablePrefix . 'sales_flat_quote` AS `quote_table`
-        LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_table` ON (`order_table`.`customer_email` = `quote_table`.`customer_email` AND `order_table`.`customer_id` = `quote_table`.`customer_id` AND `order_table`.`created_at` >= DATE_SUB("' . $date . '",  INTERVAL 7 DAY) )
-        WHERE (((`quote_table`.`reserved_order_id` = "" OR `quote_table`.`reserved_order_id` IS NULL)))
-        AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") >= DATE_SUB("' . $date . '", INTERVAL ' . ($nbSeconds * 2) . ' SECOND))
-        AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") <= DATE_SUB("' . $date . '", INTERVAL ' . ($nbSeconds) . ' SECOND))
-        AND (`quote_table`.`items_count` > 0)
-        AND (`quote_table`.`customer_id` IS NOT NULL OR `quote_table`.`customer_email` IS NOT NULL)
-        AND (`order_table`.`entity_id` IS NULL)
-         GROUP BY `quote_table`.`customer_email`';
+
+        $query = '
+          SELECT `quote_table`.*
+          FROM `' . $tablePrefix . 'sales_flat_quote` AS `quote_table`
+          LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_table` ON (
+            `order_table`.`customer_email` = `quote_table`.`customer_email`
+            AND `order_table`.`customer_id` = `quote_table`.`customer_id`
+            AND `order_table`.`created_at` >= DATE_SUB("' . $now . '",  INTERVAL 7 DAY)
+          )
+          WHERE
+            (`quote_table`.`reserved_order_id` = "" OR `quote_table`.`reserved_order_id` IS NULL)
+            AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") >= DATE_SUB("' . $now . '", INTERVAL ' . ($nbSeconds * 2) . ' SECOND))
+            AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") <= DATE_SUB("' . $now . '", INTERVAL ' . ($nbSeconds) . ' SECOND))
+            AND (`quote_table`.`items_count` > 0)
+            AND (`quote_table`.`customer_id` IS NOT NULL OR `quote_table`.`customer_email` IS NOT NULL)
+            AND (`order_table`.`entity_id` IS NULL)
+          GROUP BY `quote_table`.`customer_email`
+        ';
 
         $results = $readConnection->fetchAll($query);
         if ($results && is_array($results) && sizeof($results)) {
