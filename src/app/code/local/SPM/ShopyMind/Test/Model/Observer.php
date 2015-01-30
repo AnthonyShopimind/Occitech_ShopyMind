@@ -32,6 +32,12 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $this->assertFalse($this->SUT->isDateOfBirthRequiredForModule($event));
     }
 
+    public function testIsDateOfBirthRequiredForModuleWithLegacyConfig()
+    {
+        Mage::app()->getStore(0)->setConfig('shopymind/configuration/birthrequired', 'no');
+        $event = $this->generateShopymindConfigurationChangedEvent();
+        $this->assertFalse($this->SUT->isDateOfBirthRequiredForModule($event));
+    }
     public function testIsDateOfBirthRequiredForModuleOnStoreScope()
     {
         $event = $this->generateShopymindConfigurationChangedEvent('second_website_store');

@@ -13,6 +13,9 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     const REQUIRED = 1;
     const OPTIONAL = 0;
 
+    const LEGACY_REQUIRED = 'yes';
+    const LEGACY_OPTIONAL = 'no';
+
     const CUSTOMER_SHOW_DOB_CONFIG_PATH = 'customer/address/dob_show';
     const OPTIONAL_CUSTOMER_DOB = 'opt';
     const REQUIRED_CUSTOMER_DOB = 'req';
