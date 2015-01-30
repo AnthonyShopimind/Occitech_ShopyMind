@@ -26,13 +26,13 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
             ->setConfig('shopymind/configuration/birthrequired', 1);
     }
 
-    public function testIsDateOfBirthRequiredForModule()
+    public function testIsDateOfBirthRequiredForModuleOnGlobalScope()
     {
         $event = $this->generateObserver(array(), 'admin_system_config_changed_section_shopymind_configuration');
         $this->assertFalse($this->SUT->isDateOfBirthRequiredForModule($event));
     }
 
-    public function testSaveShouldUpdateCustomerConfigWhenDateOfBirthIsRequired()
+    public function testSaveShouldUpdateCustomerConfigWithDateOfBirthRequirementOnStoreScope()
     {
         $Config = $this->getModelMock('core/config', array('saveConfig'));
         $Config->expects($this->once())
@@ -49,7 +49,7 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
     }
 
-    public function testSaveShouldUpdateCustomerDobAttributeRequirement()
+    public function testSaveShouldUpdateCustomerDobAttributeRequirementOnStoreScope()
     {
         $Entity = $this->getModelMock('eav/entity_setup', array('updateAttribute'), false, array('core_setup'));
         $Entity->expects($this->once())
