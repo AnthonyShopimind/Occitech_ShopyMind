@@ -68,6 +68,17 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
     }
 
+    public function testIsMultiStore()
+    {
+        $this->assertTrue($this->SUT->isMultiStore());
+    }
+
+    public function testIsMultiStoreShouldDoNotTakeIntoAccountInactiveStores()
+    {
+        Mage::app()->getStore(2)->setIsActive(0)->save();
+        $this->assertFalse($this->SUT->isMultiStore());
+    }
+
     private function generateShopymindConfigurationChangedEvent($storeCode = null)
     {
         return $this->generateObserver(array('store' => $storeCode), 'admin_system_config_changed_section_shopymind_configuration');
