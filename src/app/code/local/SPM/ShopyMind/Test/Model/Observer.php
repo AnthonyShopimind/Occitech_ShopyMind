@@ -86,26 +86,45 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
     {
         Mage::app()->getStore(2)->setIsActive(0)->save();
         $this->assertFalse($this->SUT->isMultiStore());
-    }
 
-    public function testGetStoreInformationsForShopyMind()
+    public function testSendCorrectStoreInformationsToShopyMind()
     {
-        $this->markTestIncomplete();
-        $expectedInformations = array(
-            'foo-bar',
-            'bar',
-            'en',
-            'GBP',
-            'http://magento.local/contacts/contacts/index',
-            '+33102030405',
-            'Europe/London',
-            true,
-            1
-        );
+        $this->SUT->expects($this->once())
+            ->method('dispatchToShopyMind')
+            ->with(
+                'foo-bar',
+                'bar',
+                'en',
+                'GBP',
+                'http://magento.local/contacts/contacts/index',
+                '+33102030405',
+                'Europe/London',
+                true,
+                1
+            );
 
-        $informations = $this->SUT->getInformationsForShopyMindForStore();
-        $this->assertEquals($expectedInformations, $informations);
+        $this->SUT->sendInformationsForShopyMindForStore('default');
     }
+
+    public function testSendDefaultStoreInformationsToShopyMindWhenNoStoreCodePassed()
+    {
+        $this->SUT->expects($this->once())
+            ->method('dispatchToShopyMind')
+            ->with(
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+                $this->anything(),
+                1
+            );
+
+        $this->SUT->sendInformationsForShopyMindForStore();
+    }
+
     private function generateShopymindConfigurationChangedEvent($storeCode = null)
     {
         return $this->generateObserver(array('store' => $storeCode), 'admin_system_config_changed_section_shopymind_configuration');

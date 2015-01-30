@@ -44,29 +44,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     {
         $this->updateDateOfBirthCustomerAttributeFrom($observer);
         if ($this->hasShopyMindClientConfiguration()) {
-            list(
-                $apiIdentifiant,
-                $apiPassword,
-                $defaultLanguage,
-                $defaultCurrency,
-                $contactPageUrl,
-                $phoneNumber,
-                $timezone,
-                $isMultiStore,
-                $storeId
-            ) = $this->getInformationsForShopyMindForStore($observer->getStore());
-
-            $this->dispatchToShopyMind(
-                $apiIdentifiant,
-                $apiPassword,
-                $defaultLanguage,
-                $defaultCurrency,
-                $contactPageUrl,
-                $phoneNumber,
-                $timezone,
-                $isMultiStore,
-                $storeId
-            );
+             $this->sendInformationsForShopyMindForStore($observer->getStore());
         }
     }
 
@@ -123,7 +101,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         return count($activeStores) > 1;
     }
 
-    public function getInformationsForShopyMindForStore($storeCode = null)
+    public function sendInformationsForShopyMindForStore($storeCode = null)
     {
         if (!is_null($storeCode)) {
             $currentStore =  Mage::getModel('core/store')->load($storeCode, 'code');
@@ -131,10 +109,9 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             $currentStore =  Mage::app()->getDefaultStoreView();
         }
 
-        $storeInformations = array(
+        $this->dispatchToShopyMind(
             Mage::getStoreConfig('shopymind/configuration/apiidentification', $currentStore),
             Mage::getStoreConfig('shopymind/configuration/apipassword', $currentStore),
-            Mage::getStoreConfig('general/locale/code', $currentStore),
             substr(Mage::app()->getLocale()->getDefaultLocale(),0,2),
             Mage::getStoreConfig('currency/options/default', $currentStore),
             Mage::getUrl('contacts'),
@@ -143,8 +120,6 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             $this->isMultiStore(),
             $currentStore->getId()
         );
-
-        return $storeInformations;
     }
 
     public function dispatchToShopyMind($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId)
