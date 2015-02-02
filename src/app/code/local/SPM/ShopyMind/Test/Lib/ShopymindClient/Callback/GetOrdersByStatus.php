@@ -16,4 +16,19 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetOrdersByStatus extends 
         $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(), 0, 0, false);
         $this->assertEmpty($result);
     }
+
+    public function testItReturnsOrdersCountIfJustCountParameterIsTrue()
+    {
+        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(), 0, 0, true);
+        $expectedCount = 0;
+        $this->assertEquals($expectedCount, $result);
+    }
+
+    public function testItReturnsOrderWithWantedStatus()
+    {
+        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(), 0, 0, true);
+        $expected = array(
+
+        );
+    }
 }
