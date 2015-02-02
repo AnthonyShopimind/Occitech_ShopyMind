@@ -1372,6 +1372,9 @@ class ShopymindClient_Callback {
 
         $params = array (
             'idRemindersSend' => $spm_key,
+            'shopIdShop' => $orderData['store_id'],
+            'orderIsConfirm' => ($orderData['state'] == Mage_Sales_Model_Order::STATE_PROCESSING || $orderData['state'] == Mage_Sales_Model_Order::STATE_COMPLETE) ? true : false,
+            'idStatus' => $orderData['state'],
             'idCart' => $orderData['quote_id'],
             'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
             'idOrder' => $orderData['increment_id'],
@@ -1382,6 +1385,7 @@ class ShopymindClient_Callback {
             'voucherUsed' => $voucherUsed,
             'products' => array(),
             'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email'])),
+            'shipping_number' => array(),
         );
 
         return $params;
