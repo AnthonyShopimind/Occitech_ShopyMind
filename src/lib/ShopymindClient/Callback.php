@@ -1367,4 +1367,46 @@ class ShopymindClient_Callback {
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
     }
+
+    /**
+     * Permet de récupérer la liste des contacts présents dans la base
+     * Cette méthode est utilisée pour la fonctionnalité de campagne SMS et Email
+     *
+     * @param int $id_shop
+     * @param string $start
+     * @param int $limit
+     * @param string $lastUpdate
+     * @param boolean $justCount
+     *
+     * @return array $customers
+     */
+    public static function getContacts($id_shop, $start, $limit, $lastUpdate, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+
+        $customers = array();
+        $customerCollection = Mage::getModel('customer/customer')
+            ->getCollection()
+            ->addFieldToFilter('store_id', $id_shop)
+            ->addAttributeToSelect('entity_id')
+            ->addAttributeToSelect('is_active');
+
+        $customerCollection->getSelect()->where('is_active = 1');
+
+        if ($limit) {
+            $customerCollection->getSelect()->limit($limit, $start);
+        }
+
+        foreach($customerCollection as $customer) {
+            $customers [] = array (
+                'customer' => self::getUser($customer['entity_id'])
+            );
+        }
+
+        return $customers;
+    }
 }
