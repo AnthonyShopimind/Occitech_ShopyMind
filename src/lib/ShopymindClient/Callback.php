@@ -602,18 +602,46 @@ class ShopymindClient_Callback {
         $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
         if (! $timezonesWhere)
             return false;
-        $query = 'SELECT `order_primary`.`store_id`, `order_primary`.`entity_id`, `order_primary`.`order_currency_code`, `order_primary`.`base_grand_total`, `order_primary`.`customer_id`, `order_primary`.`customer_email`
+        $query = '
+            SELECT
+                `order_primary`.`store_id`,
+                `order_primary`.`entity_id`,
+                `order_primary`.`order_currency_code`,
+                `order_primary`.`base_grand_total`,
+                `order_primary`.`customer_id`,
+                `order_primary`.`customer_email`
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0) AND `order_last`.`customer_email` = `order_primary`.`customer_email`)) AND `order_last`.`created_at` > `order_primary`.`created_at`)
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_status_history` AS `order_status` ON (`order_status`.`status` = `order_primary`.`status` AND `order_status`.`parent_id` = `order_primary`.`entity_id`)
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
-            LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
-            WHERE `order_primary`.status = "' . $idStatus . '" AND DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays + 14) . ' DAY),"%Y-%m-%d")
-            AND DATE_FORMAT(`order_status`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays) . ' DAY),"%Y-%m-%d")
-            AND ' . $timezonesWhere . '
-            AND `order_last`.`entity_id` IS NULL
-            AND `order_primary`.`store_id` = "'. $storeId .'"
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (
+                (
+                    (
+                        `order_last`.`customer_id` IS NOT NULL
+                        AND `order_last`.`customer_id` = `order_primary`.`customer_id`
+                    )
+                    OR (
+                        (`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0)
+                        AND `order_last`.`customer_email` = `order_primary`.`customer_email`
+                    )
+                )
+                AND `order_last`.`created_at` > `order_primary`.`created_at`
+            )
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_status_history` AS `order_status` ON (
+                `order_status`.`status` = `order_primary`.`status`
+                AND `order_status`.`parent_id` = `order_primary`.`entity_id`
+            )
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON (
+                `order_address`.`parent_id` = `order_primary`.`entity_id`
+            ) AND (`order_address`.`address_type` = "billing")
+            LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON (
+                `customer_default_billing_state`.`region_id` = `order_address`.`region_id`
+            )
+            WHERE `order_primary`.status = "' . $idStatus . '"
+                AND DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays + 14) . ' DAY),"%Y-%m-%d")
+                AND DATE_FORMAT(`order_status`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays) . ' DAY),"%Y-%m-%d")
+                AND ' . $timezonesWhere . '
+                AND `order_last`.`entity_id` IS NULL
+                AND `order_primary`.`store_id` = "'. $storeId .'"
             GROUP BY `order_primary`.`customer_email`';
+
         $results = $readConnection->fetchAll($query);
 
         if ($results && is_array($results) && sizeof($results)) {
