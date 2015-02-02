@@ -17,7 +17,6 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
                         'description' => null,
                         'qty' => '0.0000',
                         'price' => null,
-                        'image_url' => '/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
                         'product_url' => 'catalog/product/view/id/1/',
                     ),
                 ),
@@ -52,6 +51,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
             0,
             'processing'
         );
+        unset($actual[0]['articles'][0]['image_url']);
 
         $this->assertEquals($expected, $actual);
     }
