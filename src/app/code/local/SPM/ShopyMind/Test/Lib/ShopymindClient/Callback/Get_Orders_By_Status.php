@@ -42,7 +42,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
                     'nb_order_year' => 1,
                     'sum_order_year' => 0
                 ),
-                'shipping_number' => '',
+                'shipping_number' => array(),
                 'date_order' => '2015-01-01 10:00:00'
             ),
         );
@@ -88,6 +88,22 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
         $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(), 0, 0, true);
         $expectedCount = 0;
         $this->assertEquals($expectedCount, $result);
+    }
+
+    /**
+     * @loadFixture orderWithTrackingNumber
+     */
+    public function testItShouldReturnsOrderWithShippingNumber()
+    {
+        $result = ShopymindClient_Callback::getOrdersByStatus(
+            1,
+            '2015-01-11',
+            array(array('country' => 'US')),
+            0,
+            'processing'
+        );
+
+        $this->assertEquals(array('EXAMPLE0042', 'EXAMPLE0043'), $result[0]['shipping_number']);
     }
 
 }

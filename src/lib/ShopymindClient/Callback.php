@@ -671,6 +671,15 @@ class ShopymindClient_Callback {
                         );
                     }
                 }
+                $tracks = Mage::getModel('sales/order')->load($row['entity_id'])->getTracksCollection()->toArray();
+                $shippingNumbers = array();
+
+                if ($tracks['totalRecords'] > 0) {
+                    foreach($tracks['items'] as $trackItem) {
+                        $shippingNumbers[] = $trackItem['track_number'];
+                    }
+                }
+
                 if (sizeof($returnProducts))
                     $return [] = array (
                             'currency' => $row ['order_currency_code'],
@@ -679,7 +688,7 @@ class ShopymindClient_Callback {
                             'date_order' => $row['created_at'],
                             'id_order' => $row ['entity_id'],
                             'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
-                            'shipping_number' => '',
+                            'shipping_number' => $shippingNumbers,
                     );
 
                 self::stopLangEmulation();
@@ -689,6 +698,7 @@ class ShopymindClient_Callback {
                 'count' => sizeof($return)
         ) : $return);
     }
+
 
     /**
      * Obtention d'un shortId

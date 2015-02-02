@@ -1,0 +1,60 @@
+eav:
+  customer:
+    - entity_id: 2
+      entity_type_id: 1
+      attribute_set_id: 0
+      website_id: 1
+      store_id: 1
+      group_id: 1
+      is_active: 1
+      gender: 2
+      firstname: Foo
+      lastname: Oliver
+      email: foo.oliver90@example.com
+      dob: 1990-01-31 00:00:00
+
+tables:
+  sales/order:
+    - entity_id: 3
+      base_total_invoiced: 100.0000
+      customer_id: 2
+      customer_email: foo.oliver90@example.com
+      created_at: 2015-01-11 10:00:00
+      store_id: 1
+      status: processing
+      order_currency_code: EUR
+      base_grand_total: 150.0000
+
+  sales/order_address:
+    - entity_id: 3
+      parent_id: 3
+      country_id: US
+      address_type: billing
+
+  sales/shipment:
+    - entity_id: 2
+      store_id: 1
+      order_id: 3
+      customer_id: 2
+      shipping_address_id: 3
+
+  sales/shipment_track:
+    - entity_id: 2
+      parent_id: 2
+      order_id: 3
+      track_number: EXAMPLE0042
+    - entity_id: 3
+      parent_id: 2
+      order_id: 3
+      track_number: EXAMPLE0043
+
+  sales/order_item:
+    - item_id: 2
+      order_id: 3
+      product_id: 1
+
+  sales_flat_order_status_history:
+    - entity_id: 5
+      parent_id: 3
+      status: processing
+      created_at: 2015-01-11
