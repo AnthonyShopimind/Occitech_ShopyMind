@@ -1347,24 +1347,43 @@ class ShopymindClient_Callback {
             ), func_get_args());
 
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
-        $quote = Mage::getSingleton('sales/quote')->load((int) $orderData ['quote_id']);
-        $params = array (
-                'idRemindersSend' => $spm_key,
-                'idCart' => $orderData ['quote_id'],
-                'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
-                'idOrder' => $orderData ['increment_id'],
-                'amount' => $orderData ['base_total_paid'],
-                'taxRate' => $orderData ['base_to_order_rate'],
-                'currency' => $orderData ['order_currency_code'],
-                'dateOrder' => $orderData ['created_at'],
-                'voucherUsed' => $voucherUsed,
-                'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email']))
-        );
+        $params = self::formatOrderData($order, $orderData, $spm_key, $voucherUsed);
+
         $spm_key = ShopymindClient_Bin_Notify::newOrder($params);
         if ($spm_key && isset($spm_key ['idRemindersSend']) && $spm_key ['idRemindersSend']) {
             $tablePrefix = Mage::getConfig()->getTablePrefix();
             $write = Mage::getSingleton('core/resource')->getConnection('core_write');
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
+    }
+
+    /**
+     * Formate les données d'une commande dans le format attendu par le serveur de ShopyMind
+     *
+     * @param Mage_Sales_Model_Order $order
+     * @param array $orderData
+     * @param string $spm_key
+     * @param array $voucherUsed
+     *
+     * @return array $params
+     */
+    private static function formatOrderData(Mage_Sales_Model_Order $order, $orderData, $spm_key, $voucherUsed) {
+        $quote = Mage::getSingleton('sales/quote')->load((int) $orderData ['quote_id']);
+
+        $params = array (
+            'idRemindersSend' => $spm_key,
+            'idCart' => $orderData['quote_id'],
+            'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
+            'idOrder' => $orderData['increment_id'],
+            'amount' => $orderData['base_total_paid'],
+            'taxRate' => $orderData['base_to_order_rate'],
+            'currency' => $orderData['order_currency_code'],
+            'dateOrder' => $orderData['created_at'],
+            'voucherUsed' => $voucherUsed,
+            'products' => array(),
+            'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email'])),
+        );
+
+        return $params;
     }
 }
