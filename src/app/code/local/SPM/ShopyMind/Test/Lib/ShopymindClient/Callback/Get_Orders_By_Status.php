@@ -8,15 +8,21 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
 
     public function testCanGetProcessingOrders()
     {
+        $this->markTestIncomplete('Awaiting for #5 merge in develop');
+
         $expected = array(
             array(
                 'currency' => 'EUR',
                 'total_amount' => '100.0000',
                 'articles' => array(
                     array(
+                        'id' => 'produit-1',
                         'description' => null,
                         'qty' => '0.0000',
-                        'price' => null,
+                        'price' => 10.00,
+                        'id_combination' => null,
+                        'product_categories' => array(2),
+                        'product_manufacturer' => 'foo_corp',
                         'image_url' => '/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
                         'product_url' => 'catalog/product/view/id/1/',
                     ),
@@ -105,5 +111,4 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
 
         $this->assertEquals(array('EXAMPLE0042', 'EXAMPLE0043'), $result[0]['shipping_number']);
     }
-
 }
