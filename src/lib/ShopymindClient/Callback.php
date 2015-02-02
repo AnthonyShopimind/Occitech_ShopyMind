@@ -218,11 +218,11 @@ class ShopymindClient_Callback {
      *     )
      * )
      *
-     * @param int $storeId Magento store id
+     * @param int $id_shop Magento store id
      * @param string|false $lastUpdate Only get timezones for customers create since $lastUpdate
      * @return array
      */
-    public static function getTimezones($storeId, $lastUpdate) {
+    public static function getTimezones($id_shop, $lastUpdate) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -241,7 +241,7 @@ class ShopymindClient_Callback {
         LEFT JOIN `' . $tablePrefix . 'directory_country_region` c ON(c.`region_id` = b.`value`)
         WHERE (b.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR b.`attribute_id` IS NULL) AND ( a.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
         ' . ($lastUpdate ? ' AND d.`updated_at` >= "' . $lastUpdate . '"' : '') . '
-        AND d.store_id = ' . $storeId . '
+        AND d.store_id = ' . $id_shop . '
         GROUP BY country_code,region_code';
         $results = $readConnection->fetchAll($query);
         if ($results && is_array($results) && sizeof($results)) {
@@ -272,7 +272,7 @@ class ShopymindClient_Callback {
      *     )
      * )
      *
-     * @param int $storeId Magento store id
+     * @param int $id_shop Magento store id
      * @param string $dateReference Birthday date ; format: Y-m-d H:i:s
      * @param array $timezones Timezones to use
      * @param int $nbDays Minus delta for date reference
@@ -280,7 +280,7 @@ class ShopymindClient_Callback {
      *
      * @return array|int
      */
-    public static function getBirthdayClients($storeId, $dateReference, $timezones, $nbDays = 0, $justCount = false) {
+    public static function getBirthdayClients($id_shop, $dateReference, $timezones, $nbDays = 0, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -303,7 +303,7 @@ class ShopymindClient_Callback {
          LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt` ON (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`) AND (`customer_default_billing_state_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR `customer_default_billing_state_jt`.`attribute_id` IS NULL)
          LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `customer_default_billing_state_jt`.`value`)
         WHERE  DATE_FORMAT(`customer_birth_table`.`value`,"%m-%d") = "' . $birthDate . '" AND ' . $timezonesWhere . ' AND `customer_primary_table`.`is_active` = 1
-        AND `customer_primary_table`.`store_id` = ' . $storeId . '
+        AND `customer_primary_table`.`store_id` = ' . $id_shop . '
         GROUP BY `customer_primary_table`.`entity_id`';
         $results = $readConnection->fetchAll($query);
 
@@ -436,7 +436,7 @@ class ShopymindClient_Callback {
      *     )
      * )
      *
-     * @param int $storeId Magento store id
+     * @param int $id_shop Magento store id
      * @param string $dateReference From which date ; format Y-m-d H:i:s
      * @param array $timezones Timezones to use
      * @param float $amount Minimum amount for fetched carts
@@ -447,7 +447,7 @@ class ShopymindClient_Callback {
      *
      * @return array|int
      */
-    public static function getGoodClientsByAmount($storeId, $dateReference, $timezones, $amount, $amountMax, $duration, $nbDaysLastOrder, $justCount = false) {
+    public static function getGoodClientsByAmount($id_shop, $dateReference, $timezones, $amount, $amountMax, $duration, $nbDaysLastOrder, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -470,7 +470,7 @@ class ShopymindClient_Callback {
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
             AND `order_last`.`entity_id` IS NULL
-            AND `order_primary`.`store_id` = ' . $storeId . '
+            AND `order_primary`.`store_id` = ' . $id_shop . '
             GROUP BY `order_primary`.`customer_email`
     		HAVING `Total` >= ' . (float) $amount . '
     		' . ($amountMax ? ' AND `Total` <= ' . (float) $amountMax : '');
@@ -506,7 +506,7 @@ class ShopymindClient_Callback {
      *     )
      * )
      *
-     * @param int $storeId Magento store id
+     * @param int $id_shop Magento store id
      * @param string $dateReference From which date ; format Y-m-d H:i:s
      * @param array $timezones Timezones to use
      * @param float $nbOrder Minimum orders amount
@@ -517,7 +517,7 @@ class ShopymindClient_Callback {
      *
      * @return array|int
      */
-    public static function getGoodClientsByNumberOrders($storeId, $dateReference, $timezones, $nbOrder, $nbOrderMax, $duration, $nbDaysLastOrder, $justCount = false) {
+    public static function getGoodClientsByNumberOrders($id_shop, $dateReference, $timezones, $nbOrder, $nbOrderMax, $duration, $nbDaysLastOrder, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -540,7 +540,7 @@ class ShopymindClient_Callback {
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
             AND `order_last`.`entity_id` IS NULL
-            AND `order_primary`.`store_id` = ' . $storeId . '
+            AND `order_primary`.`store_id` = ' . $id_shop . '
             GROUP BY `order_primary`.`customer_email`
     		HAVING `Total` >= ' . (int) $nbOrder . '
     		' . ($nbOrderMax ? ' AND `Total` <= ' . (int) $nbOrderMax : '');
@@ -577,7 +577,7 @@ class ShopymindClient_Callback {
      *     )
      * )
      *
-     * @param int $storeId Magento store id
+     * @param int $id_shop Magento store id
      * @param string $dateReference Date from which we search customers that have not ordered
      * @param array $timezones Timezones to use
      * @param int $nbDays Duration in days from $dateReference
@@ -586,7 +586,7 @@ class ShopymindClient_Callback {
      *
      * @return array|int
      */
-    public static function getMissingClients($storeId, $dateReference, $timezones, $nbDays = 0, $relaunchOlder = false, $justCount = false) {
+    public static function getMissingClients($id_shop, $dateReference, $timezones, $nbDays = 0, $relaunchOlder = false, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -613,7 +613,7 @@ class ShopymindClient_Callback {
         AND DATE_FORMAT(`customer_primary_table`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) ($nbDays) . ' DAY),"%Y-%m-%d")
         AND ' . $timezonesWhere . '
          AND `customer_primary_table`.`is_active` = 1
-        AND `customer_primary_table`.`store_id` = ' . $storeId . '
+        AND `customer_primary_table`.`store_id` = ' . $id_shop . '
         GROUP BY `customer_order`.`customer_id`';
         $results = $readConnection->fetchAll($query);
 
@@ -650,7 +650,7 @@ class ShopymindClient_Callback {
      *     )
      * )
      *
-     * @param int $storeId Magento store id
+     * @param int $id_shop Magento store id
      * @param string $dateReference Date the orders was set to the given status
      * @param array $timezones Timezones to use
      * @param int $nbDays
@@ -659,7 +659,7 @@ class ShopymindClient_Callback {
      *
      * @return array|int
      */
-    public static function getOrdersByStatus($storeId, $dateReference, $timezones, $nbDays, $idStatus, $justCount = false) {
+    public static function getOrdersByStatus($id_shop, $dateReference, $timezones, $nbDays, $idStatus, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -683,7 +683,7 @@ class ShopymindClient_Callback {
             AND DATE_FORMAT(`order_status`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays) . ' DAY),"%Y-%m-%d")
             AND ' . $timezonesWhere . '
             AND `order_last`.`entity_id` IS NULL
-            AND `order_primary`.`store_id` = ' . $storeId . '
+            AND `order_primary`.`store_id` = ' . $id_shop . '
             GROUP BY `order_primary`.`customer_email`';
         $results = $readConnection->fetchAll($query);
 
@@ -868,14 +868,14 @@ class ShopymindClient_Callback {
     /**
      * Get customer groups
      *
-     * The store id parameter is not used in Magento as Magento
+     * The shop id parameter is not used in Magento as Magento
      * does not manage customer groups by store
      *
-     * @param int $storeId Magento store id
+     * @param int $id_shop Magento store id
      *
      * @return array
      */
-    public static function getCustomerGroups($storeId) {
+    public static function getCustomerGroups($id_shop) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -985,12 +985,12 @@ class ShopymindClient_Callback {
     /**
      * Get test data
      *
-     * @param int $storeId Magento storeId
+     * @param int $id_shop Magento storeId
      * @param string|bool $lang Locale to use
      *
      * @return array
      */
-    public static function getTestData($storeId, $lang = false) {
+    public static function getTestData($id_shop, $lang = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -1004,7 +1004,7 @@ class ShopymindClient_Callback {
                 '_nosid' => true
         )));
         // Article au hasard
-        $return ['articles'] = self::getProducts($storeId, $lang, false, true);
+        $return ['articles'] = self::getProducts($id_shop, $lang, false, true);
         if ($lang)
             self::stopLangEmulation();
         return $return;
@@ -1040,7 +1040,7 @@ class ShopymindClient_Callback {
      * Get products list
      * Both $products and $random cannot be false at the same time
      *
-     * @param int $storeId Magento store id
+     * @param int $id_shop Magento store id
      * @param string $lang Locale to use
      * @param array|bool $products If array, list of product ids to fetch. If set to false, use the $random parameter
      * @param bool $random Fetch random products
@@ -1048,7 +1048,7 @@ class ShopymindClient_Callback {
      *
      * @return array
      */
-    public static function getProducts($storeId, $lang, $products = false, $random = false, $maxProducts = 3) {
+    public static function getProducts($id_shop, $lang, $products = false, $random = false, $maxProducts = 3) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -1076,7 +1076,7 @@ class ShopymindClient_Callback {
         }
 
         $store = Mage::getModel('core/store')
-            ->load($storeId);
+            ->load($id_shop);
         $collection->addStoreFilter($store);
 
         if ($collection && sizeof($collection)) {
