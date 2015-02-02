@@ -671,14 +671,7 @@ class ShopymindClient_Callback {
                         );
                     }
                 }
-                $tracks = Mage::getModel('sales/order')->load($row['entity_id'])->getTracksCollection()->toArray();
-                $shippingNumbers = array();
-
-                if ($tracks['totalRecords'] > 0) {
-                    foreach($tracks['items'] as $trackItem) {
-                        $shippingNumbers[] = $trackItem['track_number'];
-                    }
-                }
+                $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
                 if (sizeof($returnProducts))
                     $return [] = array (
@@ -699,6 +692,22 @@ class ShopymindClient_Callback {
         ) : $return);
     }
 
+    /**
+     * @param $orderId
+     * @return array
+     */
+    private static function getShippingNumbersForOrderId($orderId)
+    {
+        $tracks = Mage::getModel('sales/order')->load($orderId)->getTracksCollection()->toArray();
+        $shippingNumbers = array();
+
+        if ($tracks['totalRecords'] > 0) {
+            foreach ($tracks['items'] as $trackItem) {
+                $shippingNumbers[] = $trackItem['track_number'];
+            }
+        }
+        return $shippingNumbers;
+    }
 
     /**
      * Obtention d'un shortId
@@ -1444,4 +1453,5 @@ class ShopymindClient_Callback {
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
     }
+
 }
