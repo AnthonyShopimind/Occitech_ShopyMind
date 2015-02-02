@@ -34,11 +34,6 @@ scope:
       is_active: 1
 
 eav:
- catalog_category:
-   - entity_id: 1
-     name: "A category"
-   - entity_id: 2
-     name: "Another category"
  catalog_product:
    - entity_id: 1
      sku: 14156575-XS-9394
