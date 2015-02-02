@@ -958,15 +958,18 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Récupération de produits
+     * Get products list
+     * Both $products and $random cannot be false at the same time
      *
-     * @param string $lang
-     * @param string $products
-     * @param string $random
-     * @param number $maxProducts
+     * @param int $storeId Magento store id
+     * @param string $lang Locale to use
+     * @param array|bool $products If array, list of product ids to fetch. If set to false, use the $random parameter
+     * @param bool $random Fetch random products
+     * @param int $maxProducts Maximum number of products to fetch if random
+     *
      * @return array
      */
-    public static function getProducts($lang, $products = false, $random = false, $maxProducts = 3) {
+    public static function getProducts($storeId, $lang, $products = false, $random = false, $maxProducts = 3) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -992,6 +995,11 @@ class ShopymindClient_Callback {
             $collection->addStoreFilter();
             $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         }
+
+        $store = Mage::getModel('core/store')
+            ->load($storeId);
+        $collection->addStoreFilter($store);
+
         if ($collection && sizeof($collection)) {
             foreach ( $collection as $product ) {
                 $image_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
