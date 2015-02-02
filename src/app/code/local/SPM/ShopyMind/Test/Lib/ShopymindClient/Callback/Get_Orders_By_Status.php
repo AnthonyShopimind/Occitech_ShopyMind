@@ -38,6 +38,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
                     'nb_order' => '1',
                     'sum_order' => 0,
                     'groups' => array('1'),
+                    'store_id' => '1',
+                    'nb_order_year' => '1',
+                    'sum_order_year' => 0,
                 ),
             ),
         );

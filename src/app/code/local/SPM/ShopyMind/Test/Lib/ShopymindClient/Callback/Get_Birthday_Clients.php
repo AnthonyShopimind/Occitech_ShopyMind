@@ -39,6 +39,9 @@ QUERY
                     'nb_order' => '0',
                     'sum_order' => 0,
                     'groups' => array('1'),
+                    'store_id' => '1',
+                    'nb_order_year' => '0',
+                    'sum_order_year' => 0,
                 ),
             ),
             array(
@@ -58,6 +61,9 @@ QUERY
                     'nb_order' => '0',
                     'sum_order' => 0,
                     'groups' => array('1'),
+                    'store_id' => '1',
+                    'nb_order_year' => '0',
+                    'sum_order_year' => 0,
                 ),
             ),
         );

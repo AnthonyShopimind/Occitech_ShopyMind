@@ -12,6 +12,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Products extends EcomD
         $products = ShopymindClient_Callback::getProducts(1, false, false, true, 1);
 
         $this->assertRegExp('#catalog/product/view/id/[1-2]/#', $products[0]['product_url']);
+
+        Mage::app()->setCurrentStore(0);
     }
 
     public function testIfAStoreHasNoProductsNothingIsReturned()

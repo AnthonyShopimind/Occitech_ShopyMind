@@ -26,6 +26,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Amount
                     'nb_order' => '3',
                     'sum_order' => 0,
                     'groups' => array('1'),
+                    'store_id' => '1',
+                    'nb_order_year' => '3',
+                    'sum_order_year' => 0,
                 ),
             ),
             array(
@@ -45,6 +48,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Amount
                     'nb_order' => '1',
                     'sum_order' => 0,
                     'groups' => array('1'),
+                    'store_id' => '1',
+                    'nb_order_year' => '1',
+                    'sum_order_year' => 0,
                 ),
             ),
         );
