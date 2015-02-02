@@ -34,10 +34,31 @@ scope:
       is_active: 1
 
 eav:
+ catalog_category:
+   - entity_id: 1
+     name: "A category"
+   - entity_id: 2
+     name: "Another category"
  catalog_product:
    - entity_id: 1
-     sku: some_sku
+     sku: 14156575-XS-9394
      attribute_set_id: 4
+     type_id: "simple"
+     name: LEGGING
+     weight: 0.4000
+     price: 13.0000
+     category_ids:
+      - 2
+      - 1
+     small_image: "/l/e/legging-awesome.jpg"
+     small_image_label: "Legging"
+     tax_class_id: 1
+     thumbnail: "/l/e/legging-awesome.jpg"
+     thumbnail_label: "Legging"
+     url_key: "legging"
+     url_path: "legging.html"
+     manufacturer: 42 # Must be simulated by mock because I have not found a way to load attributes correctly - TODO Make it DRY
+
  customer:
    - entity_id: 1234
      entity_type_id: 1

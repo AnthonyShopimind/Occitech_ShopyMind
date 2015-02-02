@@ -36,7 +36,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
     /**
      * @loadFixture aDroppedCart
      */
-    public function testGetDroppedOutCartReturnsCorrectData()
+    public function testGetDroppedOutCartReturnsCorrectDataForCartWithSimpleProduct()
     {
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
         $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 10 * 60);
@@ -50,11 +50,15 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
                 'link_cart' => 'checkout/cart/',
                 'articles' => array (
                     array (
+                        'id' => 1,
                         'description' => 'LEGGING',
-                        'qty' => '2.0000',
                         'price' => '13.0000',
                         'image_url' => '/frontend/base/default/images/catalog/product/placeholder/small_image.jpg',
-                        'product_url' => 'catalog/product/view/id/1/',
+                        'product_url' => 'catalog/product/view/id/1/s/legging/',
+                        'id_combination' => false,
+                        'qty' => '2.0000',
+                        'product_categories' => array(1, 2),
+                        'product_manufacturer' => null, // See test below
                     ),
                 ),
                 'customer' => array(
@@ -80,6 +84,49 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
             ),
         );
         $this->assertEquals($expectedResult, $results);
+    }
+
+    /**
+     * @loadFixture aDroppedCart
+     */
+    public function testGetDroppedOutCartReturnsCorrectManufacturer()
+    {
+        $this->markTestIncomplete(
+            'TODO: make the test work, because for some reasons the mock model is not loaded when using' .
+            'Mage::getModel("sales/quote")->load($cartId)->getAllVisibleItems() to load products'
+        );
+        $product = $this->getModelMock('catalog/product', array('getManufacturer'));
+        $product->expects($this->any())
+            ->method('getManufacturer')
+            ->will($this->returnValue(42));
+        $this->replaceByMock('model', 'catalog/product', $product);
+
+        $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
+        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 10 * 60);
+
+        $this->assertEquals(42, $results[0]['articles'][0]['product_manufacturer']);
+    }
+
+    /**
+     * @loadFixture aDroppedCartWithConfigurableProduct
+     */
+    public function testGetDroppedOutCartReturnsCorrectDataForCartWithConfigurableProduct()
+    {
+        $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
+        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 10 * 60);
+
+        $expectedResult = array(array(
+            'id' => 2,
+            'description' => 'LEGGING configurable',
+            'price' => '13.0000',
+            'image_url' => '/frontend/base/default/images/catalog/product/placeholder/small_image.jpg',
+            'product_url' => 'catalog/product/view/id/2/',
+            'id_combination' => 1,
+            'qty' => '2.0000',
+            'product_categories' => array(),
+            'product_manufacturer' => null,
+        ));
+        $this->assertEquals($expectedResult, $results[0]['articles']);
     }
 
     /**

@@ -383,18 +383,21 @@ class ShopymindClient_Callback {
 
     private static function productsOfCart($cartId)
     {
-        $resultProducts = Mage::getModel('sales/quote_item')->getCollection()
-            ->addFieldToFilter('quote_id', $cartId)
-            ->addFieldToFilter('parent_item_id', array('null' => true))
-            ->getData();
+        if (!self::isStoreEmulated()) {
+            throw new RuntimeException('Please emulate a store!');
+        }
 
+        $resultProducts = Mage::getModel('sales/quote')->load($cartId)->getAllVisibleItems();
         if (empty($resultProducts) || !is_array($resultProducts)) {
             return array();
         }
 
         $result = array();
         foreach ($resultProducts as $quoteItem) {
-            $product = Mage::getModel('catalog/product')->load($quoteItem['product_id']);
+            /** @var Mage_Sales_Model_Quote_Item $quoteItem */
+            $product = $quoteItem->getProduct();
+            $children = $quoteItem->getChildren();
+            $combinationId = count($children) ? $children[0]->getProductId() : false;
 
             try {
                 $image_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
@@ -404,11 +407,15 @@ class ShopymindClient_Callback {
             $product_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
 
             $result[] = array (
-                'description' => $quoteItem['name'],
-                'qty' => $quoteItem['qty'],
-                'price' => $quoteItem['price_incl_tax'],
+                'id' => $product->getId(),
+                'description' => $quoteItem->getName(),
+                'qty' => $quoteItem->getQty(),
+                'price' => $quoteItem->getPriceInclTax(),
                 'image_url' => $image_url,
-                'product_url' => $product_url
+                'product_url' => $product_url,
+                'id_combination' => $combinationId,
+                'product_categories' => $product->getCategoryIds(),
+                'product_manufacturer' => $product->getManufacturer(),
             );
         }
         return $result;
@@ -864,6 +871,11 @@ class ShopymindClient_Callback {
                 self::startLangEmulationByStoreId($store_id);
             }
         }
+    }
+
+    public static function isStoreEmulated()
+    {
+        return (self::$appEmulation !== false);
     }
 
     /**
