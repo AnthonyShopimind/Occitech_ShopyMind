@@ -906,12 +906,14 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Récupération de données d'exemple
+     * Get test data
      *
-     * @param string $lang
+     * @param int $storeId Magento storeId
+     * @param string|bool $lang Locale to use
+     *
      * @return array
      */
-    public static function getTestData($lang = false) {
+    public static function getTestData($storeId, $lang = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -925,7 +927,7 @@ class ShopymindClient_Callback {
                 '_nosid' => true
         )));
         // Article au hasard
-        $return ['articles'] = self::getProducts($lang, false, true);
+        $return ['articles'] = self::getProducts($storeId, $lang, false, true);
         if ($lang)
             self::stopLangEmulation();
         return $return;
