@@ -1388,12 +1388,11 @@ class ShopymindClient_Callback {
                 __FUNCTION__
             ), func_get_args());
 
-        $customers = array();
         $customerCollection = Mage::getModel('customer/customer')
             ->getCollection()
+            ->addFieldToFilter('updated_at', array('gt' => $lastUpdate))
             ->addFieldToFilter('store_id', $id_shop)
-            ->addAttributeToSelect('entity_id')
-            ->addAttributeToSelect('is_active');
+            ->addAttributeToSelect('entity_id');
 
         $customerCollection->getSelect()->where('is_active = 1');
 
@@ -1401,6 +1400,13 @@ class ShopymindClient_Callback {
             $customerCollection->getSelect()->limit($limit, $start);
         }
 
+        if ($justCount) {
+            return array(
+                'count' => count($customerCollection)
+            );
+        }
+
+        $customers = array();
         foreach($customerCollection as $customer) {
             $customers [] = array (
                 'customer' => self::getUser($customer['entity_id'])
