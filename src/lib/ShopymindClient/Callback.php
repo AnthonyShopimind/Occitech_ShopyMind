@@ -359,30 +359,8 @@ class ShopymindClient_Callback {
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
                 self::startLangEmulationByStoreId($row ['store_id']);
-                // if(!$row['customer_id']) continue;
-                $resultProducts = Mage::getModel("sales/quote_item")->getCollection()->addFieldToFilter("quote_id", $row ['entity_id'])->addFieldToFilter("parent_item_id", array (
-                        'null' => true
-                ))->getData();
-                if ($resultProducts && is_array($resultProducts) && sizeof($resultProducts)) {
-                    $returnProducts = array ();
-                    foreach ( $resultProducts as $row2 ) {
-                        $product = Mage::getModel('catalog/product')->load($row2 ['product_id']);
-                        try {
-                            $image_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
-                        } catch ( Exception $e ) {
-                            $image_url = '';
-                        }
-                        $product_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
-                        $returnProducts [] = array (
-                                'description' => $row2 ['name'],
-                                'qty' => $row2 ['qty'],
-                                'price' => $row2 ['price_incl_tax'],
-                                'image_url' => $image_url,
-                                'product_url' => $product_url
-                        );
-                    }
-                }
-                if (sizeof($returnProducts))
+                $cartProducts = self::productsOfCart($row['entity_id']);
+                if (!empty($cartProducts)) {
                     $return [] = array (
                             'sum_cart' => ($row ['base_grand_total'] / $row ['store_to_base_rate']),
                             'currency' => $row ['base_currency_code'],
@@ -391,15 +369,49 @@ class ShopymindClient_Callback {
                             'link_cart' => str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', Mage::getUrl('checkout/cart', array (
                                     '_nosid' => true
                             ))),
-                            'articles' => $returnProducts,
+                            'articles' => $cartProducts,
                             'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']), true)
                     );
+                }
                 self::stopLangEmulation();
             }
         }
         return ($justCount ? array (
                 'count' => sizeof($return)
         ) : $return);
+    }
+
+    private static function productsOfCart($cartId)
+    {
+        $resultProducts = Mage::getModel('sales/quote_item')->getCollection()
+            ->addFieldToFilter('quote_id', $cartId)
+            ->addFieldToFilter('parent_item_id', array('null' => true))
+            ->getData();
+
+        if (empty($resultProducts) || !is_array($resultProducts)) {
+            return array();
+        }
+
+        $result = array();
+        foreach ($resultProducts as $quoteItem) {
+            $product = Mage::getModel('catalog/product')->load($quoteItem['product_id']);
+
+            try {
+                $image_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
+            } catch ( Exception $e ) {
+                $image_url = '';
+            }
+            $product_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
+
+            $result[] = array (
+                'description' => $quoteItem['name'],
+                'qty' => $quoteItem['qty'],
+                'price' => $quoteItem['price_incl_tax'],
+                'image_url' => $image_url,
+                'product_url' => $product_url
+            );
+        }
+        return $result;
     }
 
     /**
