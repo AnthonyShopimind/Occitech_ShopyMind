@@ -609,6 +609,7 @@ class ShopymindClient_Callback {
                 `order_primary`.`order_currency_code`,
                 `order_primary`.`base_grand_total`,
                 `order_primary`.`customer_id`,
+                `order_primary`.`created_at`,
                 `order_primary`.`customer_email`
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (
@@ -675,8 +676,10 @@ class ShopymindClient_Callback {
                             'currency' => $row ['order_currency_code'],
                             'total_amount' => $row ['base_grand_total'],
                             'articles' => $returnProducts,
+                            'date_order' => $row['created_at'],
                             'id_order' => $row ['entity_id'],
-                            'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']))
+                            'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
+                            'shipping_number' => '',
                     );
 
                 self::stopLangEmulation();
