@@ -6,6 +6,19 @@
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Missing_Clients extends EcomDev_PHPUnit_Test_Case
 {
 
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+
+        $write = Mage::getSingleton('core/resource')->getConnection('write');
+        $write->query(<<<'QUERY'
+        TRUNCATE customer_address_entity_int;
+        TRUNCATE customer_address_entity_varchar;
+        TRUNCATE sales_flat_order_address;
+QUERY
+        );
+    }
+
     /**
      * @group bugged
      */
