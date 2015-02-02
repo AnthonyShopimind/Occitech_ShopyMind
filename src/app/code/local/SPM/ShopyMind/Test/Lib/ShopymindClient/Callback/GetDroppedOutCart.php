@@ -2,6 +2,7 @@
 
 /**
  * @loadSharedFixture
+ * @doNotIndexAll
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends EcomDev_PHPUnit_Test_Case
 {
