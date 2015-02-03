@@ -317,25 +317,25 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Permet de récupérer les paniers abandonnés depuis un nombre de secondes
+     * Allow to get carts abandoned since a given period in seconds
      *
      * @param int $nbSeconds
      * @param bool $justCount
-     * @return array
+     * @return array Either the cart details, or an array with the counter: array('count' => xx)
      */
     public static function getDroppedOutCart($nbSeconds, $justCount = false) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
             ), func_get_args());
+        }
 
         $return = array();
         $now = date('Y-m-d H:i:s', strtotime('now', static::$now)); // useful to allow simulating time for testing purposes
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
-        $mageVersion = Mage::getVersion();
 
         $query = '
           SELECT `quote_table`.*
@@ -356,29 +356,29 @@ class ShopymindClient_Callback {
         ';
 
         $results = $readConnection->fetchAll($query);
-        if ($results && is_array($results) && sizeof($results)) {
-            foreach ( $results as $row ) {
-                self::startLangEmulationByStoreId($row ['store_id']);
+        if (!empty($results) && is_array($results)) {
+            foreach($results as $row) {
+                self::startLangEmulationByStoreId($row['store_id']);
                 $cartProducts = self::productsOfCart($row['entity_id']);
                 if (!empty($cartProducts)) {
-                    $return [] = array (
-                            'sum_cart' => ($row ['base_grand_total'] / $row ['store_to_base_rate']),
-                            'currency' => $row ['base_currency_code'],
-                            'tax_rate' => $row ['store_to_base_rate'],
-                            'id_cart' => $row ['entity_id'],
-                            'link_cart' => str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', Mage::getUrl('checkout/cart', array (
-                                    '_nosid' => true
-                            ))),
-                            'articles' => $cartProducts,
-                            'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']), true)
+                    $return[] = array(
+                        'sum_cart' => ($row['base_grand_total'] / $row['store_to_base_rate']),
+                        'currency' => $row['base_currency_code'],
+                        'tax_rate' => $row['store_to_base_rate'],
+                        'id_cart' => $row['entity_id'],
+                        'link_cart' => str_replace(
+                            basename($_SERVER ['SCRIPT_NAME']) . '/',
+                            '',
+                            Mage::getUrl('checkout/cart', array('_nosid' => true)
+                        )),
+                        'articles' => $cartProducts,
+                        'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']), true)
                     );
                 }
                 self::stopLangEmulation();
             }
         }
-        return ($justCount ? array (
-                'count' => sizeof($return)
-        ) : $return);
+        return ($justCount ? array('count' => count($return)) : $return);
     }
 
     private static function productsOfCart($cartId)
