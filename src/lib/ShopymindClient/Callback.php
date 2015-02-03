@@ -1393,7 +1393,7 @@ class ShopymindClient_Callback {
             ->addFieldToFilter('updated_at', array('gt' => $lastUpdate))
             ->addAttributeToSelect('entity_id');
 
-        if($storeId) {
+        if ($storeId) {
             $customerCollection->addFieldToFilter('store_id', $storeId);
         }
 
