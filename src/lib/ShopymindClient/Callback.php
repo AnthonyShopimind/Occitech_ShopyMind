@@ -1382,12 +1382,12 @@ class ShopymindClient_Callback {
      */
     public static function getContacts($storeId, $start, $limit, $lastUpdate, $justCount = false)
     {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array(
                 'ShopymindClient_CallbackOverride',
                 __FUNCTION__
             ), func_get_args());
-
+        }
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
 
         $customerCollection = Mage::getModel('customer/customer')
@@ -1403,18 +1403,22 @@ class ShopymindClient_Callback {
         }
 
         if ($justCount) {
-            return array(
-                'count' => count($customerCollection)
-            );
+            return self::counterResponse($customerCollection);
         }
 
         $customers = array();
         foreach($customerCollection as $customer) {
-            $customers [] = array (
+            $customers[] = array (
                 'customer' => self::getUser($customer['entity_id'])
             );
         }
-
         return $customers;
+    }
+
+    private static function counterResponse(Varien_Data_Collection $collection)
+    {
+        return array(
+            'count' => $collection->count()
+        );
     }
 }
