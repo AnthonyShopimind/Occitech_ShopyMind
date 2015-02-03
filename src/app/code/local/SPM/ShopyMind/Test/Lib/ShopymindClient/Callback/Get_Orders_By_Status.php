@@ -114,9 +114,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
 
     public function testItReturnsOrdersCountIfJustCountParameterIsTrue()
     {
-        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(), 0, 0, true);
-        $expectedCount = 0;
-        $this->assertEquals($expectedCount, $result);
+        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(array('country' => 'US')), 0, 0, true);
+        $expected = array('count' => 0);
+        $this->assertEquals($expected, $result);
     }
 
     /**
