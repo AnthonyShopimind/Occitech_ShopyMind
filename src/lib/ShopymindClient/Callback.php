@@ -610,7 +610,8 @@ class ShopymindClient_Callback {
                 `order_primary`.`base_grand_total`,
                 `order_primary`.`customer_id`,
                 `order_primary`.`created_at`,
-                `order_primary`.`customer_email`
+                `order_primary`.`customer_email`,
+                `order_primary`.`quote_id`
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (
                 (
