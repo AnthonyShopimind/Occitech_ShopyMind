@@ -127,9 +127,9 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         if ($this->hasShopyMindClientConfiguration()) {
             $configurationClient = $this->getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
 
-            if (!$configurationClient->testConnection())
+            if (!$configurationClient->testConnection()) {
                 Mage::throwException($this->__('Error when test connection'));
-            else {
+            } else {
                 // Connexion au serveur et sauvegarde des informations
                 $connect = $configurationClient->connectServer();
                 if ($connect !== true) {
