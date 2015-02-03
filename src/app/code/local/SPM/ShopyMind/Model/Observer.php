@@ -142,9 +142,6 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         }
     }
 
-    /**
-     * @return bool
-     */
     private function hasShopyMindClientConfiguration()
     {
         return file_exists(Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Configuration.php');
