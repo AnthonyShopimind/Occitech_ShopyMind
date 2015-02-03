@@ -38,6 +38,7 @@ eav:
    - entity_id: 1
      name: Produit 1
      sku: some_sku
+     type_id: simple
      attribute_set_id: 4
      category_ids:
          - 2
@@ -67,7 +68,7 @@ tables:
       store_id: 1
       quote_id: 1
       status: processing
-      order_currency_code: EUR
+      order_currency_code: USD
       base_grand_total: 100.0000
 
   sales/order_address:
@@ -131,7 +132,7 @@ tables:
       subtotal_with_discount: 144.9100
       base_subtotal_with_discount: 144.9100
       is_changed: 1
-      trigger_recollect: 1
+      trigger_recollect: 0
       is_persistent: 0
 
   sales/quote_item:
@@ -163,7 +164,7 @@ tables:
       base_row_total: 20.0000
       row_total_with_discount: 0.0000
       row_weight: 0.0000
-      product_type: configurable
+      product_type: simple
       base_tax_before_discount: null
       tax_before_discount: null
       original_custom_price: 10.0000

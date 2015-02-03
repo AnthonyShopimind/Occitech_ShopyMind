@@ -17,12 +17,12 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
                     array(
                         'id' => '1',
                         'description' => 'Produit 1',
-                        'qty' => '2.0000',
-                        'price' => 13.00,
+                        'qty' => 2.0,
+                        'price' => '13.0000',
                         'id_combination' => false,
                         'product_categories' => array(2),
                         'product_manufacturer' => null,
-                        'image_url' => '/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
+                        'image_url' => '/catalog/product/cache/1/small_image/200x/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
                         'product_url' => 'catalog/product/view/id/1/',
                     ),
                 ),
@@ -69,12 +69,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
         $expectedProduct = array(
             'id' => '1',
             'description' => 'Produit 1',
-            'qty' => '2.0000',
-            'price' => 13.00,
+            'qty' => 2.0,
+            'price' => '13.0000',
             'id_combination' => false,
             'product_categories' => array(2),
             'product_manufacturer' => null,
-            'image_url' => '/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
             'product_url' => 'catalog/product/view/id/1/',
         );
         $result =  ShopymindClient_Callback::getOrdersByStatus(
@@ -85,6 +84,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
             'processing'
         );
 
+        unset($result[0]['articles'][0]['image_url']);
         $this->assertEquals($expectedProduct, $result[0]['articles'][0]);
     }
 
@@ -109,7 +109,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
 
     public function testItReturnsEmptyArrayWhenNoOrdersMatched()
     {
-        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(), 0, 0, false);
+        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(array('country' => 'US')), 0, 0, false);
         $this->assertEmpty($result);
     }
 
@@ -123,7 +123,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
     /**
      * @loadFixture orderWithTrackingNumber
      */
-    public function testItShouldReturnsOrderWithShippingNumber()
+    public function testItShouldReturnsOrderWithShippingNumbers()
     {
         $result = ShopymindClient_Callback::getOrdersByStatus(
             1,
