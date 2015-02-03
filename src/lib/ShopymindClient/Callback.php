@@ -20,6 +20,11 @@ class ShopymindClient_Callback {
     protected static $initialEnvironmentInfo = false;
 
     /**
+     * @var null|int Current timestamp (to allow simulating time changes from tests)
+     */
+    public static $now = null;
+
+    /**
      * Allow to fetch user information from either an id or email address(es)
      *
      * @param mixed|array $idOrEmails If single and numeric, then it's an id otherwise a list of email addresses
@@ -312,79 +317,104 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Permet de récupérer les paniers abandonnés depuis un nombre de secondes
+     * Allow to get carts abandoned since a given period in seconds
      *
      * @param int $nbSeconds
      * @param bool $justCount
-     * @return array
+     * @return array Either the cart details, or an array with the counter: array('count' => xx)
      */
     public static function getDroppedOutCart($nbSeconds, $justCount = false) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
             ), func_get_args());
-        $return = array ();
-        $date = date('Y-m-d H:i:s');
+        }
+
+        $return = array();
+        $now = date('Y-m-d H:i:s', strtotime('now', static::$now)); // useful to allow simulating time for testing purposes
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
-        $mageVersion = Mage::getVersion();
-        $query = 'SELECT `quote_table`.* FROM `' . $tablePrefix . 'sales_flat_quote` AS `quote_table`
-        LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_table` ON (`order_table`.`customer_email` = `quote_table`.`customer_email` AND `order_table`.`customer_id` = `quote_table`.`customer_id` AND `order_table`.`created_at` >= DATE_SUB("' . $date . '",  INTERVAL 7 DAY) )
-        WHERE (((`quote_table`.`reserved_order_id` = "" OR `quote_table`.`reserved_order_id` IS NULL)))
-        AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") >= DATE_SUB("' . $date . '", INTERVAL ' . ($nbSeconds * 2) . ' SECOND))
-        AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") <= DATE_SUB("' . $date . '", INTERVAL ' . ($nbSeconds) . ' SECOND))
-        AND (`quote_table`.`items_count` > 0)
-        AND (`quote_table`.`customer_id` IS NOT NULL OR `quote_table`.`customer_email` IS NOT NULL)
-        AND (`order_table`.`entity_id` IS NULL)
-         GROUP BY `quote_table`.`customer_email`';
+
+        $query = '
+          SELECT `quote_table`.*
+          FROM `' . $tablePrefix . 'sales_flat_quote` AS `quote_table`
+          LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_table` ON (
+            `order_table`.`customer_email` = `quote_table`.`customer_email`
+            AND `order_table`.`customer_id` = `quote_table`.`customer_id`
+            AND `order_table`.`created_at` >= DATE_SUB("' . $now . '",  INTERVAL 7 DAY)
+          )
+          WHERE
+            (`quote_table`.`reserved_order_id` = "" OR `quote_table`.`reserved_order_id` IS NULL)
+            AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") >= DATE_SUB("' . $now . '", INTERVAL ' . ($nbSeconds * 2) . ' SECOND))
+            AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") <= DATE_SUB("' . $now . '", INTERVAL ' . ($nbSeconds) . ' SECOND))
+            AND (`quote_table`.`items_count` > 0)
+            AND (`quote_table`.`customer_id` IS NOT NULL OR `quote_table`.`customer_email` IS NOT NULL)
+            AND (`order_table`.`entity_id` IS NULL)
+          GROUP BY `quote_table`.`customer_email`
+        ';
 
         $results = $readConnection->fetchAll($query);
-        if ($results && is_array($results) && sizeof($results)) {
-            foreach ( $results as $row ) {
-                self::startLangEmulationByStoreId($row ['store_id']);
-                // if(!$row['customer_id']) continue;
-                $resultProducts = Mage::getModel("sales/quote_item")->getCollection()->addFieldToFilter("quote_id", $row ['entity_id'])->addFieldToFilter("parent_item_id", array (
-                        'null' => true
-                ))->getData();
-                if ($resultProducts && is_array($resultProducts) && sizeof($resultProducts)) {
-                    $returnProducts = array ();
-                    foreach ( $resultProducts as $row2 ) {
-                        $product = Mage::getModel('catalog/product')->load($row2 ['product_id']);
-                        try {
-                            $image_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
-                        } catch ( Exception $e ) {
-                            $image_url = '';
-                        }
-                        $product_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
-                        $returnProducts [] = array (
-                                'description' => $row2 ['name'],
-                                'qty' => $row2 ['qty'],
-                                'price' => $row2 ['price_incl_tax'],
-                                'image_url' => $image_url,
-                                'product_url' => $product_url
-                        );
-                    }
-                }
-                if (sizeof($returnProducts))
-                    $return [] = array (
-                            'sum_cart' => ($row ['base_grand_total'] / $row ['store_to_base_rate']),
-                            'currency' => $row ['base_currency_code'],
-                            'tax_rate' => $row ['store_to_base_rate'],
-                            'id_cart' => $row ['entity_id'],
-                            'link_cart' => str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', Mage::getUrl('checkout/cart', array (
-                                    '_nosid' => true
-                            ))),
-                            'articles' => $returnProducts,
-                            'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']), true)
+        if (!empty($results) && is_array($results)) {
+            foreach($results as $row) {
+                self::startLangEmulationByStoreId($row['store_id']);
+                $cartProducts = self::productsOfCart($row['entity_id']);
+                if (!empty($cartProducts)) {
+                    $return[] = array(
+                        'sum_cart' => ($row['base_grand_total'] / $row['store_to_base_rate']),
+                        'currency' => $row['base_currency_code'],
+                        'tax_rate' => $row['store_to_base_rate'],
+                        'id_cart' => $row['entity_id'],
+                        'link_cart' => str_replace(
+                            basename($_SERVER ['SCRIPT_NAME']) . '/',
+                            '',
+                            Mage::getUrl('checkout/cart', array('_nosid' => true)
+                        )),
+                        'articles' => $cartProducts,
+                        'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']), true)
                     );
+                }
                 self::stopLangEmulation();
             }
         }
-        return ($justCount ? array (
-                'count' => sizeof($return)
-        ) : $return);
+        return ($justCount ? array('count' => count($return)) : $return);
+    }
+
+    private static function productsOfCart($cartId)
+    {
+        if (!self::isStoreEmulated()) {
+            throw new RuntimeException('Please emulate a store!');
+        }
+
+        $resultProducts = Mage::getModel('sales/quote')->load($cartId)->getAllVisibleItems();
+        if (empty($resultProducts) || !is_array($resultProducts)) {
+            return array();
+        }
+
+        $result = array();
+        foreach ($resultProducts as $quoteItem) {
+            /** @var Mage_Sales_Model_Quote_Item $quoteItem */
+            $product = $quoteItem->getProduct();
+            $children = $quoteItem->getChildren();
+            $combinationId = count($children) ? $children[0]->getProductId() : false;
+
+            $image_url = Mage::helper('catalog/image')->init($product, 'small_image')->resize(200);
+            $product_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
+
+            $result[] = array (
+                'id' => $product->getId(),
+                'description' => $quoteItem->getName(),
+                'qty' => $quoteItem->getQty(),
+                'price' => $quoteItem->getPriceInclTax(),
+                'image_url' => (string) $image_url,
+                'product_url' => $product_url,
+                'id_combination' => $combinationId,
+                'product_categories' => $product->getCategoryIds(),
+                'product_manufacturer' => $product->getManufacturer(),
+            );
+        }
+        return $result;
     }
 
     /**
@@ -837,6 +867,11 @@ class ShopymindClient_Callback {
                 self::startLangEmulationByStoreId($store_id);
             }
         }
+    }
+
+    public static function isStoreEmulated()
+    {
+        return (self::$appEmulation !== false);
     }
 
     /**
