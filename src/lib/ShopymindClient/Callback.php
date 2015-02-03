@@ -317,6 +317,70 @@ class ShopymindClient_Callback {
     }
 
     /**
+     * Retrieve customer which have their signup anniversary corresponding to $dateReference
+     *
+     * @param int $storeId
+     * @param string $dateReference
+     * @param array $timezones
+     * @param bool $justCount
+     *
+     * @return array $customers
+     */
+    public static function getBirthdayClientsSignUp($storeId, $dateReference, $timezones, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $customerCollection = Mage::getModel('customer/customer')
+            ->getCollection()
+            ->addFieldToFilter('created_at', array('date' => true, 'from' => date('Y-m-d', strtotime($dateReference)), 'to' =>  date('Y-m-d', strtotime($dateReference . ' + 1 day'))))
+            ->addAttributeToSelect('entity_id');
+
+        if (!empty($timezones)) {
+            $customerCollection->joinAttribute('billing_country_id', 'customer_address/country_id', 'default_billing');
+
+            $countryIds = array_map(
+                function($zone) { return $zone['country']; },
+                array_filter($timezones,
+                    function($zone) { return !empty($zone['country']); }
+                )
+            );
+
+            $regionIds = array_map(
+                function($zone) { return $zone['region']; },
+                array_filter($timezones,
+                    function($zone) { return !empty($zone['region']); }
+                )
+            );
+
+            if (!empty($countryIds)) {
+                $customerCollection->addAttributeToFilter('billing_country_id', array('in' => $countryIds));
+            }
+
+            if (!empty($regionIds)) {
+                $customerCollection->joinAttribute('billing_region_id', 'customer_address/region_id', 'default_billing')
+                    ->joinTable('directory/country_region', 'region_id = billing_region_id', array('code'), array('code' => array('in' => $regionIds)), 'inner');
+            }
+
+        }
+
+        if ($justCount) {
+            return array(
+                'count' => count($customerCollection)
+            );
+        }
+
+        $customers = array_map(function($customer) {
+            return array('customer' => self::getUser($customer['entity_id']));
+        }, $customerCollection->getData());
+
+        return $customers;
+    }
+    /**
      * Allow to get carts abandoned since a given period in seconds
      *
      * @param int $nbSeconds
