@@ -399,11 +399,7 @@ class ShopymindClient_Callback {
             $children = $quoteItem->getChildren();
             $combinationId = count($children) ? $children[0]->getProductId() : false;
 
-            try {
-                $image_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
-            } catch ( Exception $e ) {
-                $image_url = '';
-            }
+            $image_url = Mage::helper('catalog/image')->init($product, 'small_image')->resize(200);
             $product_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
 
             $result[] = array (
@@ -411,7 +407,7 @@ class ShopymindClient_Callback {
                 'description' => $quoteItem->getName(),
                 'qty' => $quoteItem->getQty(),
                 'price' => $quoteItem->getPriceInclTax(),
-                'image_url' => $image_url,
+                'image_url' => (string) $image_url,
                 'product_url' => $product_url,
                 'id_combination' => $combinationId,
                 'product_categories' => $product->getCategoryIds(),

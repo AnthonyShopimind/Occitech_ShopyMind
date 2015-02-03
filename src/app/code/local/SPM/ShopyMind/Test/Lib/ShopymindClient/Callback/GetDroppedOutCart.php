@@ -54,7 +54,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
                         'id' => 1,
                         'description' => 'LEGGING',
                         'price' => '13.0000',
-                        'image_url' => '/frontend/base/default/images/catalog/product/placeholder/small_image.jpg',
+                        'image_url' => $this->placeholderImageUrl(),
                         'product_url' => 'catalog/product/view/id/1/s/legging/',
                         'id_combination' => false,
                         'qty' => '2.0000',
@@ -120,7 +120,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
             'id' => 2,
             'description' => 'LEGGING configurable',
             'price' => '13.0000',
-            'image_url' => '/frontend/base/default/images/catalog/product/placeholder/small_image.jpg',
+            'image_url' => $this->placeholderImageUrl(),
             'product_url' => 'catalog/product/view/id/2/',
             'id_combination' => 1,
             'qty' => '2.0000',
@@ -166,6 +166,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
         );
         ShopymindClient_Callback::$now = null;
         return $results;
+    }
+
+    private function placeholderImageUrl()
+    {
+        return '/catalog/product/cache/1/small_image/200x/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg';
     }
 
 }
