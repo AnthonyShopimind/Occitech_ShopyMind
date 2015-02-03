@@ -94,10 +94,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
 
     public function isMultiStore()
     {
-        $activeStores = array_filter(Mage::app()->getStores(), function($store) {
-            return $store->getIsActive();
-        });
-
+        $activeStores = $this->getActiveStores();
         return count($activeStores) > 1;
     }
 
@@ -162,5 +159,13 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     private function getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId)
     {
         return ShopymindClient_Bin_Configuration::factory($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
+    }
+
+    public function getActiveStores()
+    {
+        $activeStores = array_filter(Mage::app()->getStores(), function ($store) {
+            return $store->getIsActive();
+        });
+        return $activeStores;
     }
 }
