@@ -1391,8 +1391,11 @@ class ShopymindClient_Callback {
         $customerCollection = Mage::getModel('customer/customer')
             ->getCollection()
             ->addFieldToFilter('updated_at', array('gt' => $lastUpdate))
-            ->addFieldToFilter('store_id', $storeId)
             ->addAttributeToSelect('entity_id');
+
+        if($storeId) {
+            $customerCollection->addFieldToFilter('store_id', $storeId);
+        }
 
         $customerCollection->getSelect()->where('is_active = 1');
 
