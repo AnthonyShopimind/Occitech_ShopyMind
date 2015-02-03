@@ -9,7 +9,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
     public function testCanGetProcessingOrders()
     {
         $this->markTestIncomplete('Awaiting for #5 merge in develop');
-
+        
         $expected = array(
             array(
                 'currency' => 'EUR',
