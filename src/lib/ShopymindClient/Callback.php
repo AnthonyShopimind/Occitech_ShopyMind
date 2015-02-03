@@ -1372,7 +1372,7 @@ class ShopymindClient_Callback {
      * Allow to retrieve the Magento customers list
      * This method is used for mailing or SMS campaign
      *
-     * @param int $storeId
+     * @param string $storeId Shopymind store id
      * @param string $start
      * @param int $limit
      * @param string $lastUpdate
@@ -1388,14 +1388,13 @@ class ShopymindClient_Callback {
                 __FUNCTION__
             ), func_get_args());
 
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
+
         $customerCollection = Mage::getModel('customer/customer')
             ->getCollection()
             ->addFieldToFilter('updated_at', array('gt' => $lastUpdate))
             ->addAttributeToSelect('entity_id');
-
-        if ($storeId) {
-            $customerCollection->addFieldToFilter('store_id', $storeId);
-        }
+        $scope->restrictCollection($customerCollection);
 
         $customerCollection->getSelect()->where('is_active = 1');
 
