@@ -649,36 +649,14 @@ class ShopymindClient_Callback {
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
                 self::startLangEmulationByStoreId($row ['store_id']);
-                $resultProducts = Mage::getModel("sales/order_item")->getCollection()->addFieldToFilter("order_id", $row ['entity_id'])->addFieldToFilter("parent_item_id", array (
-                        'null' => true
-                ))->getData();
-                if ($resultProducts && is_array($resultProducts) && sizeof($resultProducts)) {
-                    $returnProducts = array ();
-                    foreach ( $resultProducts as $row2 ) {
-                        $product = Mage::getModel('catalog/product')->load($row2 ['product_id']);
-                        try {
-                            $image_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
-                        } catch ( Exception $e ) {
-                            $image_url = '';
-                        }
-                        $product_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
-
-                        $returnProducts [] = array (
-                                'description' => $row2 ['name'],
-                                'qty' => $row2 ['qty_invoiced'],
-                                'price' => $row2 ['price_incl_tax'],
-                                'image_url' => $image_url,
-                                'product_url' => $product_url
-                        );
-                    }
-                }
+                $orderedProducts = self::productsOfCart($row['quote_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
-                if (sizeof($returnProducts))
+                if (sizeof($orderedProducts))
                     $return [] = array (
                             'currency' => $row ['order_currency_code'],
                             'total_amount' => $row ['base_grand_total'],
-                            'articles' => $returnProducts,
+                            'articles' => $orderedProducts,
                             'date_order' => $row['created_at'],
                             'id_order' => $row ['entity_id'],
                             'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
@@ -688,9 +666,7 @@ class ShopymindClient_Callback {
                 self::stopLangEmulation();
             }
         }
-        return ($justCount ? array (
-                'count' => sizeof($return)
-        ) : $return);
+        return ($justCount ? array('count' => sizeof($return)) : $return);
     }
 
     /**
