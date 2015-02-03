@@ -8,21 +8,19 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
 
     public function testCanGetProcessingOrders()
     {
-        $this->markTestIncomplete('Awaiting for #5 merge in develop');
-        
         $expected = array(
             array(
                 'currency' => 'EUR',
                 'total_amount' => '100.0000',
                 'articles' => array(
                     array(
-                        'id' => 'produit-1',
-                        'description' => null,
-                        'qty' => '0.0000',
-                        'price' => 10.00,
-                        'id_combination' => null,
+                        'id' => '1',
+                        'description' => 'Produit 1',
+                        'qty' => '2.0000',
+                        'price' => 13.00,
+                        'id_combination' => false,
                         'product_categories' => array(2),
-                        'product_manufacturer' => 'foo_corp',
+                        'product_manufacturer' => null,
                         'image_url' => '/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
                         'product_url' => 'catalog/product/view/id/1/',
                     ),
@@ -61,7 +59,32 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
             'processing'
         );
 
+        unset($actual[0]['articles'], $expected[0]['articles']);
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testItShouldReturnsProductWithCorrectFormat()
+    {
+        $expectedProduct = array(
+            'id' => '1',
+            'description' => 'Produit 1',
+            'qty' => '2.0000',
+            'price' => 13.00,
+            'id_combination' => false,
+            'product_categories' => array(2),
+            'product_manufacturer' => null,
+            'image_url' => '/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
+            'product_url' => 'catalog/product/view/id/1/',
+        );
+        $result =  ShopymindClient_Callback::getOrdersByStatus(
+            1,
+            '2015-01-01',
+            array(array('country' => 'US')),
+            0,
+            'processing'
+        );
+
+        $this->assertEquals($expectedProduct, $result[0]['articles'][0]);
     }
 
     public function testIfTheStoreHasNoOrderAnEmptyArrayIsReturned()
