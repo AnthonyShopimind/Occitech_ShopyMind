@@ -49,8 +49,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetContacts extends EcomDe
         $result = ShopymindClient_Callback::getContacts(3, 0, false, '1970-01-01');
         $resultCustomerIds = array_map(function($customer) { return $customer['customer']['id_customer']; }, $result);
 
-        $expected = array();
-        $this->assertEquals($expected, $resultCustomerIds);
+        $this->assertEmpty($resultCustomerIds);
     }
     public function testGetContactsShouldReturnCustomerUpdatedAfterLastUpdate() {
         $result = ShopymindClient_Callback::getContacts(1, 0, false, "2015-01-20");

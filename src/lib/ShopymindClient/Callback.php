@@ -1369,10 +1369,10 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Permet de récupérer la liste des contacts présents dans la base
-     * Cette méthode est utilisée pour la fonctionnalité de campagne SMS et Email
+     * Allow to retrieve the Magento customers list
+     * This method is used for mailing or SMS campaign
      *
-     * @param int $id_shop
+     * @param int $storeId
      * @param string $start
      * @param int $limit
      * @param string $lastUpdate
@@ -1380,7 +1380,7 @@ class ShopymindClient_Callback {
      *
      * @return array $customers
      */
-    public static function getContacts($id_shop, $start, $limit, $lastUpdate, $justCount = false)
+    public static function getContacts($storeId, $start, $limit, $lastUpdate, $justCount = false)
     {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array(
@@ -1391,7 +1391,7 @@ class ShopymindClient_Callback {
         $customerCollection = Mage::getModel('customer/customer')
             ->getCollection()
             ->addFieldToFilter('updated_at', array('gt' => $lastUpdate))
-            ->addFieldToFilter('store_id', $id_shop)
+            ->addFieldToFilter('store_id', $storeId)
             ->addAttributeToSelect('entity_id');
 
         $customerCollection->getSelect()->where('is_active = 1');
