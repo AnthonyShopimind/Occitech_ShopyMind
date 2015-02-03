@@ -1402,4 +1402,25 @@ class ShopymindClient_Callback {
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
     }
+
+    public static function getShops() {
+        $SPM_Observer = Mage::getModel('shopymind/observer');
+        if ($SPM_Observer->isMultiStore()) {
+            $activeStores = $SPM_Observer->getActiveStores();
+            return self::formatStores($activeStores);
+        } else {
+            return array();
+        }
+    }
+
+    private static function formatStores($stores = array())
+    {
+        $storesList = array();
+        foreach ($stores as $store) {
+            $storesList[$store->getId()] = $store->getName();
+        }
+
+        return $storesList;
+    }
+
 }

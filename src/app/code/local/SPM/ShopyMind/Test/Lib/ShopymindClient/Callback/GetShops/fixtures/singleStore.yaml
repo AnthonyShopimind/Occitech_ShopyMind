@@ -1,0 +1,19 @@
+scope:
+  website: # Initialize websites
+    - website_id: 1
+      code: b2c
+      name: B2C
+      default_group_id: 1
+  group: # Initializes store groups
+    - group_id: 1
+      website_id: 1
+      name: B2C
+      default_store_id: 1
+      root_category_id: 2 # Default Category
+  store: # Initializes store views
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: b2c
+      name: France B2C
+      is_active: 1
