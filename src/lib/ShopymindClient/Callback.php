@@ -1481,13 +1481,13 @@ class ShopymindClient_Callback {
         }
 
         $customers = array();
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+
         $customersCollection = Mage::getModel('customer/customer')->getCollection()
             ->addAttributeToSelect('email')
             ->addAttributeToSelect('entity_id');
 
-        if (!is_null($id_shop)) {
-            $customersCollection->addFieldToFilter('store_id', array('eq' => $id_shop));
-        }
+        $scope->restrictCollection($customersCollection);
 
         if (!is_null($lastUpdate)) {
             $customersCollection->addFieldToFilter('updated_at', array('gteq' => $lastUpdate));

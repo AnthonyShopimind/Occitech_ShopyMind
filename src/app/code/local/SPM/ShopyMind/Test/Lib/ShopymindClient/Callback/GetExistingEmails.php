@@ -52,7 +52,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetExistingEmails extends 
 
     public function testItReturnsExistingEmailOnlyFromStoreIdEqualToIdShopParameter()
     {
-        $result = ShopymindClient_Callback::getExistingEmails(2, 0, null, null);
+        $result = ShopymindClient_Callback::getExistingEmails('store-2', 0, null, null);
         $expected = array(
             '2' => 'august.oliver90@example.com',
             '3' => 'january.oliver90@example.com',
@@ -63,7 +63,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetExistingEmails extends 
 
     public function testItShouldReturnsExistingEmailMatchingAllTheConditions()
     {
-        $result = ShopymindClient_Callback::getExistingEmails(2, 1, 1, '2015-01-15 15:00:00');
+        $result = ShopymindClient_Callback::getExistingEmails('website-2', 1, 1, '2015-01-15 15:00:00');
         $expected = array(
             '3' => 'january.oliver90@example.com',
         );
@@ -73,7 +73,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetExistingEmails extends 
 
     public function testItReturnsEmptyArrayIfNothingMatch()
     {
-        $result = ShopymindClient_Callback::getExistingEmails(1, 1, 1, '2015-01-15 15:00:00');
+        $result = ShopymindClient_Callback::getExistingEmails('store-1', 1, 1, '2015-01-15 15:00:00');
         $this->assertEmpty($result);
     }
 }
