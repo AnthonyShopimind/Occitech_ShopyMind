@@ -1,5 +1,5 @@
-.idea
-test/
-vendor/
-composer.lock
-magento_*
+/.idea
+/test/
+/vendor/
+/composer.lock
+/magento_*
