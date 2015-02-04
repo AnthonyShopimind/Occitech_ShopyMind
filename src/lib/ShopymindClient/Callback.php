@@ -341,7 +341,7 @@ class ShopymindClient_Callback {
             ->addAttributeToSelect('entity_id');
 
         if (!empty($timezones)) {
-            $customerCollection->joinAttribute('billing_country_id', 'customer_address/country_id', 'default_billing');
+            $customerCollection->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing');
 
             $countryIds = array_map(
                 function($zone) { return $zone['country']; },
@@ -358,12 +358,12 @@ class ShopymindClient_Callback {
             );
 
             if (!empty($countryIds)) {
-                $customerCollection->addAttributeToFilter('billing_country_id', array('in' => $countryIds));
+                $customerCollection->addAttributeToFilter('customer_country_id', array('in' => $countryIds));
             }
 
             if (!empty($regionIds)) {
-                $customerCollection->joinAttribute('billing_region_id', 'customer_address/region_id', 'default_billing')
-                    ->joinTable('directory/country_region', 'region_id = billing_region_id', array('code'), array('code' => array('in' => $regionIds)), 'inner');
+                $customerCollection->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing')
+                    ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), array('code' => array('in' => $regionIds)), 'inner');
             }
 
         }
