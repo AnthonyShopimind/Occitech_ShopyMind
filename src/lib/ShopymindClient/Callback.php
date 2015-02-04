@@ -654,16 +654,17 @@ class ShopymindClient_Callback {
                 $orderedProducts = self::productsOfCart($row['quote_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
-                if (sizeof($orderedProducts))
-                    $return [] = array (
-                            'currency' => $row ['order_currency_code'],
-                            'total_amount' => $row ['base_grand_total'],
-                            'articles' => $orderedProducts,
-                            'date_order' => $row['created_at'],
-                            'id_order' => $row ['entity_id'],
-                            'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
-                            'shipping_number' => $shippingNumbers,
+                if (sizeof($orderedProducts)) {
+                    $return [] = array(
+                        'currency' => $row ['order_currency_code'],
+                        'total_amount' => $row ['base_grand_total'],
+                        'articles' => $orderedProducts,
+                        'date_order' => $row['created_at'],
+                        'id_order' => $row ['entity_id'],
+                        'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
+                        'shipping_number' => $shippingNumbers,
                     );
+                }
 
                 self::stopLangEmulation();
             }
