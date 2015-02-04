@@ -368,18 +368,9 @@ class ShopymindClient_Callback {
 
         }
 
-        if ($justCount) {
-            return array(
-                'count' => count($customerCollection)
-            );
-        }
-
-        $customers = array_map(function($customer) {
-            return array('customer' => self::getUser($customer['entity_id']));
-        }, $customerCollection->getData());
-
-        return $customers;
+        return self::returnCollectionDataOrCount($customerCollection, $justCount);
     }
+
     /**
      * Allow to get carts abandoned since a given period in seconds
      *
@@ -1466,4 +1457,19 @@ class ShopymindClient_Callback {
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
     }
+
+    private static function returnCollectionDataOrCount(Varien_Data_Collection $collection, $justCount)
+    {
+        if ($justCount) {
+            return array(
+                'count' => count($collection)
+            );
+        } else {
+            return array_map(function ($customer) {
+                return array('customer' => self::getUser($customer['entity_id']));
+            }, $collection->getData());
+        }
+
+    }
+
 }
