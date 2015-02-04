@@ -170,6 +170,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
 
     private function placeholderImageUrl()
     {
+        if (!function_exists('createimagefromjpeg')) {
+            $this->markTestSkipped('Impossible to work with jpeg images on your system');
+        }
         return '/catalog/product/cache/1/small_image/200x/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg';
     }
 
