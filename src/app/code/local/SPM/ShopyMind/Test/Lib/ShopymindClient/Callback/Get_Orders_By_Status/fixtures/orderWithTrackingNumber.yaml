@@ -1,70 +1,10 @@
-scope:
-  website:
-    - website_id: 1
-      code: website_1
-      name: Website 1
-      default_group_id: 1
-    - website_id: 2
-      code: website_2
-      name: website_2
-      default_group_id: 2
-  group:
-    - group_id: 1
-      website_id: 1
-      name: Group 1
-      default_store_id: 1
-      root_category_id: 2
-    - group_id: 2
-      website_id: 2
-      name: Group 2
-      default_store_id: 2
-      root_category_id: 2
-  store:
-    - store_id: 1
-      website_id: 1
-      group_id: 1
-      code: store_1
-      name: Store 1
-      is_active: 1
-    - store_id: 2
-      website_id: 2
-      group_id: 2
-      code: store_2
-      name: Store 2
-      is_active: 1
-
-eav:
-  catalog_product:
-   - entity_id: 1
-     name: Produit 1
-     sku: some_sku
-     type_id: simple
-     attribute_set_id: 4
-     category_ids:
-         - 2
-     price: 13.00
-
-  customer:
-    - entity_id: 1
-      entity_type_id: 1
-      attribute_set_id: 0
-      website_id: 1
-      store_id: 1
-      group_id: 1
-      is_active: 1
-      gender: 2
-      firstname: April
-      lastname: Oliver
-      email: april.oliver90@example.com
-      dob: 1990-01-01 00:00:00
-
 tables:
   sales/order:
-    - entity_id: 2
+    - entity_id: 3
       base_total_invoiced: 50.0000
       customer_id: 1
       customer_email: april.oliver90@example.com
-      created_at: 2015-01-01 10:00:00
+      created_at: 2015-01-11 10:00:00
       store_id: 1
       quote_id: 1
       status: processing
@@ -72,27 +12,27 @@ tables:
       base_grand_total: 100.0000
 
   sales/order_address:
-    - entity_id: 2
-      parent_id: 2
+    - entity_id: 3
+      parent_id: 3
       country_id: US
       address_type: billing
 
   sales_flat_order_status_history:
-    - entity_id: 2
-      parent_id: 2
+    - entity_id: 10
+      parent_id: 3
       status: pending
       created_at: 2014-12-25
-    - entity_id: 3
-      parent_id: 2
+    - entity_id: 11
+      parent_id: 3
       status: pending_payment
       created_at: 2014-12-25
-    - entity_id: 4
-      parent_id: 2
+    - entity_id: 12
+      parent_id: 3
       status: processing
-      created_at: 2015-01-01
+      created_at: 2015-01-11
 
   sales/quote:
-    - entity_id: 1
+    - entity_id: 2
       store_id: 1
       created_at: "2014-01-29 12:45:46 "
       updated_at: "2014-01-30 13:45:46"
@@ -131,8 +71,8 @@ tables:
       is_persistent: 0
 
   sales/quote_item:
-    - item_id: 1
-      quote_id: 1
+    - item_id: 2
+      quote_id: 2
       product_id: 1
       parent_item_id: null
       is_virtual: 0
@@ -181,3 +121,27 @@ tables:
       weee_tax_applied_row_amount: 0.0000
       base_weee_tax_applied_amount: 0.0000
       base_weee_tax_applied_row_amnt: null
+
+  sales/shipment:
+    - entity_id: 2
+      store_id: 1
+      order_id: 3
+      customer_id: 2
+      shipping_address_id: 3
+
+  sales/shipment_track:
+    - entity_id: 2
+      parent_id: 2
+      order_id: 3
+      track_number: EXAMPLE0042
+      number: EXAMPLE0042 # So fixtures work on Magento 1.5
+    - entity_id: 3
+      parent_id: 2
+      order_id: 3
+      track_number: EXAMPLE0043
+      number: EXAMPLE0043 # So fixtures work on Magento 1.5
+
+  sales/order_item:
+    - item_id: 2
+      order_id: 3
+      product_id: 1

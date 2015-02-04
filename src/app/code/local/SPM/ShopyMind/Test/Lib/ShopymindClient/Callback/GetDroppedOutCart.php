@@ -6,15 +6,16 @@
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends EcomDev_PHPUnit_Test_Case
 {
-
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-
         $write = Mage::getSingleton('core/resource')->getConnection('write');
         $write->query(<<<'QUERY'
         TRUNCATE catalog_product_entity_varchar;
         TRUNCATE catalog_product_entity_int;
+        TRUNCATE catalog_product_entity_decimal;
+        TRUNCATE catalog_product_entity_text;
+        TRUNCATE catalog_category_product;
         TRUNCATE catalog_product_entity;
 QUERY
         );

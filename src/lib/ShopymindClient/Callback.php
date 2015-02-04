@@ -714,54 +714,67 @@ class ShopymindClient_Callback {
         $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
         if (! $timezonesWhere)
             return false;
-        $query = 'SELECT `order_primary`.`store_id`, `order_primary`.`entity_id`, `order_primary`.`order_currency_code`, `order_primary`.`base_grand_total`, `order_primary`.`customer_id`, `order_primary`.`customer_email`
+        $query = '
+            SELECT
+                `order_primary`.`store_id`,
+                `order_primary`.`entity_id`,
+                `order_primary`.`order_currency_code`,
+                `order_primary`.`base_grand_total`,
+                `order_primary`.`customer_id`,
+                `order_primary`.`created_at`,
+                `order_primary`.`customer_email`,
+                `order_primary`.`quote_id`
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0) AND `order_last`.`customer_email` = `order_primary`.`customer_email`)) AND `order_last`.`created_at` > `order_primary`.`created_at`)
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_status_history` AS `order_status` ON (`order_status`.`status` = `order_primary`.`status` AND `order_status`.`parent_id` = `order_primary`.`entity_id`)
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
-            LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
-            WHERE `order_primary`.status = "' . $idStatus . '" AND DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays + 14) . ' DAY),"%Y-%m-%d")
-            AND DATE_FORMAT(`order_status`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays) . ' DAY),"%Y-%m-%d")
-            AND ' . $timezonesWhere . '
-            AND `order_last`.`entity_id` IS NULL
-            AND `order_primary`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (
+                (
+                    (
+                        `order_last`.`customer_id` IS NOT NULL
+                        AND `order_last`.`customer_id` = `order_primary`.`customer_id`
+                    )
+                    OR (
+                        (`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0)
+                        AND `order_last`.`customer_email` = `order_primary`.`customer_email`
+                    )
+                )
+                AND `order_last`.`created_at` > `order_primary`.`created_at`
+            )
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_status_history` AS `order_status` ON (
+                `order_status`.`status` = `order_primary`.`status`
+                AND `order_status`.`parent_id` = `order_primary`.`entity_id`
+            )
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON (
+                `order_address`.`parent_id` = `order_primary`.`entity_id`
+            ) AND (`order_address`.`address_type` = "billing")
+            LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON (
+                `customer_default_billing_state`.`region_id` = `order_address`.`region_id`
+            )
+            WHERE `order_primary`.status = "' . $idStatus . '"
+                AND DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays + 14) . ' DAY),"%Y-%m-%d")
+                AND DATE_FORMAT(`order_status`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays) . ' DAY),"%Y-%m-%d")
+                AND ' . $timezonesWhere . '
+                AND `order_last`.`entity_id` IS NULL
+                AND `order_primary`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
             GROUP BY `order_primary`.`customer_email`';
+
         $results = $readConnection->fetchAll($query);
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
                 self::startLangEmulationByStoreId($row ['store_id']);
-                $resultProducts = Mage::getModel("sales/order_item")->getCollection()->addFieldToFilter("order_id", $row ['entity_id'])->addFieldToFilter("parent_item_id", array (
-                        'null' => true
-                ))->getData();
-                if ($resultProducts && is_array($resultProducts) && sizeof($resultProducts)) {
-                    $returnProducts = array ();
-                    foreach ( $resultProducts as $row2 ) {
-                        $product = Mage::getModel('catalog/product')->load($row2 ['product_id']);
-                        try {
-                            $image_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
-                        } catch ( Exception $e ) {
-                            $image_url = '';
-                        }
-                        $product_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
+                $orderedProducts = self::productsOfCart($row['quote_id']);
+                $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
-                        $returnProducts [] = array (
-                                'description' => $row2 ['name'],
-                                'qty' => $row2 ['qty_invoiced'],
-                                'price' => $row2 ['price_incl_tax'],
-                                'image_url' => $image_url,
-                                'product_url' => $product_url
-                        );
-                    }
-                }
-                if (sizeof($returnProducts))
-                    $return [] = array (
-                            'currency' => $row ['order_currency_code'],
-                            'total_amount' => $row ['base_grand_total'],
-                            'articles' => $returnProducts,
-                            'id_order' => $row ['entity_id'],
-                            'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']))
+                if (sizeof($orderedProducts)) {
+                    $return [] = array(
+                        'currency' => $row ['order_currency_code'],
+                        'total_amount' => $row ['base_grand_total'],
+                        'articles' => $orderedProducts,
+                        'date_order' => $row['created_at'],
+                        'id_order' => $row ['entity_id'],
+                        'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
+                        'shipping_number' => $shippingNumbers,
                     );
+                }
 
                 self::stopLangEmulation();
             }
@@ -769,6 +782,22 @@ class ShopymindClient_Callback {
         return ($justCount ? array (
                 'count' => sizeof($return)
         ) : $return);
+    }
+
+    /**
+     * @param $orderId
+     * @return array
+     */
+    private static function getShippingNumbersForOrderId($orderId)
+    {
+        $tracks = Mage::getModel('sales/order')->load($orderId)->getTracksCollection();
+        $shippingNumbers = array();
+        if ($tracks->count()) {
+            foreach ($tracks as $track) {
+                $shippingNumbers[] = $track->getNumber();
+            }
+        }
+        return $shippingNumbers;
     }
 
     /**
