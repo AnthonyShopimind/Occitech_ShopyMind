@@ -1456,4 +1456,18 @@ class ShopymindClient_Callback {
             'count' => $collection->count()
         );
     }
+
+    /**
+     * Method allowing to do a textual lookup for manufacturers matching a given search query
+     *
+     * @param $id_shop Id of the shop to restrict results to
+     * @param bool $lang ??? Why ???
+     * @param $search Text to match against manufacturer names. The search must be at least 3 chars long
+     * @return array List of manufacturers (array('id' => 'xx', 'name' => 'yy')) ordered alphabetically
+     */
+    public static function findManufacturers($id_shop, $lang = false, $search)
+    {
+        return array();
+    }
+
 }
