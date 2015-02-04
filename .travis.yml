@@ -18,6 +18,7 @@ matrix:
   fast_finish: true
 
 before_script:
+  - phpenv config-add travis_tests_config.ini
   - MAGE_CI_SETUP_ONLY=1 composer test ${MAGENTO_VERSION}
 
 script:
