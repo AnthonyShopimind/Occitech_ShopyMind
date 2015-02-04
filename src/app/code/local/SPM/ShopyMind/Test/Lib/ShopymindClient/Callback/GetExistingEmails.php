@@ -5,10 +5,6 @@
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetExistingEmails extends EcomDev_PHPUnit_Test_Case
 {
-    public function testCallbackClassHasMethodGetExistingEmails()
-    {
-        $this->assertTrue(method_exists(ShopymindClient_Callback::class, 'getExistingEmails'));
-    }
 
     public function testItReturnsExistingEmailsFromDefaultStoreWithoutParameters()
     {
