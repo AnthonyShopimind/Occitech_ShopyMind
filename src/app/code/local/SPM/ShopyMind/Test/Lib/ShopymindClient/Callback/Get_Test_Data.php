@@ -8,7 +8,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Test_Data extends Ecom
 
     public function testCanGetDataWithRandomProducts()
     {
-        $testData = ShopymindClient_Callback::getTestData(1, false);
+        $testData = ShopymindClient_Callback::getTestData('store-1', false);
 
         $this->assertContains('/checkout/cart', $testData['link_cart']);
         foreach ($testData['articles'] as $product) {
@@ -18,7 +18,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Test_Data extends Ecom
 
     public function testGetDataOnStoreWithNoProductsReturnEmptyArticles()
     {
-        $testData = ShopymindClient_Callback::getTestData(2, false);
+        $testData = ShopymindClient_Callback::getTestData('store-2', false);
 
         $this->assertEmpty($testData['articles']);
     }

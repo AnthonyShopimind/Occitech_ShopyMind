@@ -238,6 +238,8 @@ class ShopymindClient_Callback {
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
 
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+
         $readConnection = $resource->getConnection('core_read');
         $query = 'SELECT a.`value` as `country_code`, c.`code` as `region_code`
          FROM `' . $tablePrefix . 'customer_entity` AS d
@@ -246,7 +248,7 @@ class ShopymindClient_Callback {
         LEFT JOIN `' . $tablePrefix . 'directory_country_region` c ON(c.`region_id` = b.`value`)
         WHERE (b.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR b.`attribute_id` IS NULL) AND ( a.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
         ' . ($lastUpdate ? ' AND d.`updated_at` >= "' . $lastUpdate . '"' : '') . '
-        AND d.store_id = ' . $id_shop . '
+        AND d.store_id IN ("' . implode('","', $scope->storeIds()) . '")
         GROUP BY country_code,region_code';
         $results = $readConnection->fetchAll($query);
         if ($results && is_array($results) && sizeof($results)) {
@@ -299,6 +301,8 @@ class ShopymindClient_Callback {
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
 
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+
         $readConnection = $resource->getConnection('core_read');
         $query = 'SELECT `customer_primary_table`.`entity_id`
          FROM `' . $tablePrefix . 'customer_entity` AS `customer_primary_table`
@@ -308,7 +312,7 @@ class ShopymindClient_Callback {
          LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt` ON (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`) AND (`customer_default_billing_state_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR `customer_default_billing_state_jt`.`attribute_id` IS NULL)
          LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `customer_default_billing_state_jt`.`value`)
         WHERE  DATE_FORMAT(`customer_birth_table`.`value`,"%m-%d") = "' . $birthDate . '" AND ' . $timezonesWhere . ' AND `customer_primary_table`.`is_active` = 1
-        AND `customer_primary_table`.`store_id` = ' . $id_shop . '
+        AND `customer_primary_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
         GROUP BY `customer_primary_table`.`entity_id`';
         $results = $readConnection->fetchAll($query);
 
@@ -488,6 +492,7 @@ class ShopymindClient_Callback {
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
         $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
         if (! $timezonesWhere)
             return false;
         $query = 'SELECT `order_last`.`entity_id`, `order_primary`.`customer_id`, `order_primary`.`customer_email`,
@@ -500,7 +505,7 @@ class ShopymindClient_Callback {
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
             AND `order_last`.`entity_id` IS NULL
-            AND `order_primary`.`store_id` = ' . $id_shop . '
+            AND `order_primary`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
             GROUP BY `order_primary`.`customer_email`
     		HAVING `Total` >= ' . (float) $amount . '
     		' . ($amountMax ? ' AND `Total` <= ' . (float) $amountMax : '');
@@ -558,6 +563,7 @@ class ShopymindClient_Callback {
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
         $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
         if (! $timezonesWhere)
             return false;
         $query = 'SELECT `order_last`.`entity_id`, `order_primary`.`customer_id`, `order_primary`.`customer_email`,
@@ -570,7 +576,7 @@ class ShopymindClient_Callback {
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
             AND `order_last`.`entity_id` IS NULL
-            AND `order_primary`.`store_id` = ' . $id_shop . '
+            AND `order_primary`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
             GROUP BY `order_primary`.`customer_email`
     		HAVING `Total` >= ' . (int) $nbOrder . '
     		' . ($nbOrderMax ? ' AND `Total` <= ' . (int) $nbOrderMax : '');
@@ -625,6 +631,7 @@ class ShopymindClient_Callback {
         $return = array ();
 
         $timezonesWhere = self::generateTimezonesWhere($timezones);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
         if (! $timezonesWhere)
             return false;
 
@@ -643,7 +650,7 @@ class ShopymindClient_Callback {
         AND DATE_FORMAT(`customer_primary_table`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) ($nbDays) . ' DAY),"%Y-%m-%d")
         AND ' . $timezonesWhere . '
          AND `customer_primary_table`.`is_active` = 1
-        AND `customer_primary_table`.`store_id` = ' . $id_shop . '
+        AND `customer_primary_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
         GROUP BY `customer_order`.`customer_id`';
         $results = $readConnection->fetchAll($query);
 
@@ -699,6 +706,7 @@ class ShopymindClient_Callback {
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
 
         $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
         if (! $timezonesWhere)
@@ -713,7 +721,7 @@ class ShopymindClient_Callback {
             AND DATE_FORMAT(`order_status`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ($nbDays) . ' DAY),"%Y-%m-%d")
             AND ' . $timezonesWhere . '
             AND `order_last`.`entity_id` IS NULL
-            AND `order_primary`.`store_id` = ' . $id_shop . '
+            AND `order_primary`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
             GROUP BY `order_primary`.`customer_email`';
         $results = $readConnection->fetchAll($query);
 
@@ -1110,8 +1118,9 @@ class ShopymindClient_Callback {
             $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         }
 
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
         $store = Mage::getModel('core/store')
-            ->load($id_shop);
+            ->load(array_pop($scope->storeIds()));
         $collection->addStoreFilter($store);
 
         if ($collection && sizeof($collection)) {

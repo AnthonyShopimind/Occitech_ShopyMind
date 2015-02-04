@@ -19,7 +19,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Timezones extends Ecom
             ),
         );
 
-        $actual = ShopymindClient_Callback::getTimezones(1, false);
+        $actual = ShopymindClient_Callback::getTimezones('store-1', false);
 
         $this->assertEquals($expected, $actual);
     }

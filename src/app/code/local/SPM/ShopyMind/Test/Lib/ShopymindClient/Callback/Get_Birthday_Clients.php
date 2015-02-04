@@ -69,7 +69,7 @@ QUERY
         );
 
         $actual = ShopymindClient_Callback::getBirthdayClients(
-            1,
+            'store-1',
             date('1990-01-01 00:00:00'),
             array(array('country' => 'US'))
         );

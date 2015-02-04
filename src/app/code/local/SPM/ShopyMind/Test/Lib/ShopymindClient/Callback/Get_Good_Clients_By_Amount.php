@@ -56,7 +56,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Amount
         );
 
         $actual = ShopymindClient_Callback::getGoodClientsByAmount(
-            1,
+            'store-1',
             date('2015-01-01 00:00:00'),
             array(array('country' => 'US')),
             0,

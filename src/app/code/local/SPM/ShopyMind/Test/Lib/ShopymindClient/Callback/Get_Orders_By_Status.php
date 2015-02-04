@@ -45,7 +45,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
         );
 
         $actual = ShopymindClient_Callback::getOrdersByStatus(
-            1,
+            'store-1',
             '2015-01-01',
             array(array('country' => 'US')),
             0,
@@ -59,7 +59,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
     public function testIfTheStoreHasNoOrderAnEmptyArrayIsReturned()
     {
         $actual = ShopymindClient_Callback::getOrdersByStatus(
-            2,
+            'store-2',
             '2015-01-01',
             array(array('country' => 'US')),
             0,

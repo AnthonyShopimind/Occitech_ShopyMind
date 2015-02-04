@@ -48,7 +48,7 @@ QUERY
         );
 
         $actual = ShopymindClient_Callback::getMissingClients(
-            1,
+            'store-1',
             date('2014-12-25 10:00:00'),
             array(array('country' => 'US')),
             0
@@ -63,7 +63,7 @@ QUERY
         );
 
         $actual = ShopymindClient_Callback::getMissingClients(
-            2,
+            'store-2',
             date('2014-12-25 10:00:00'),
             array(array('country' => 'US')),
             0
