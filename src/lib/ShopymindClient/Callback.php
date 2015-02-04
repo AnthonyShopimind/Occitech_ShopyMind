@@ -1402,4 +1402,58 @@ class ShopymindClient_Callback {
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
     }
+
+    /**
+     * Allow to retrieve the Magento customers list
+     * This method is used for mailing or SMS campaign
+     *
+     * @param string $storeId Shopymind store id
+     * @param string $start
+     * @param int $limit
+     * @param string $lastUpdate
+     * @param boolean $justCount
+     *
+     * @return array $customers
+     */
+    public static function getContacts($storeId, $start, $limit, $lastUpdate, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
+
+        $customerCollection = Mage::getModel('customer/customer')
+            ->getCollection()
+            ->addFieldToFilter('updated_at', array('gt' => $lastUpdate))
+            ->addAttributeToSelect('entity_id');
+        $scope->restrictCollection($customerCollection);
+
+        $customerCollection->getSelect()->where('is_active = 1');
+
+        if ($limit) {
+            $customerCollection->getSelect()->limit($limit, $start);
+        }
+
+        if ($justCount) {
+            return self::counterResponse($customerCollection);
+        }
+
+        $customers = array();
+        foreach($customerCollection as $customer) {
+            $customers[] = array (
+                'customer' => self::getUser($customer['entity_id'])
+            );
+        }
+        return $customers;
+    }
+
+    private static function counterResponse(Varien_Data_Collection $collection)
+    {
+        return array(
+            'count' => $collection->count()
+        );
+    }
 }
