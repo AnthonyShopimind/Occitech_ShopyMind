@@ -1463,7 +1463,7 @@ class ShopymindClient_Callback {
      * Method allowing to do a textual lookup for manufacturers matching a given search query
      *
      * @param $id_shop Id of the shop to restrict results to
-     * @param bool $lang ??? Why ???
+     * @param bool $lang Allow to filter results for a store with a specific language
      * @param $search Text to match against manufacturer names. The search must be at least 3 chars long
      * @return array List of manufacturers (array('id' => 'xx', 'name' => 'yy')) ordered alphabetically
      */
@@ -1481,7 +1481,7 @@ class ShopymindClient_Callback {
         }
         $attribute = Mage::getModel('eav/config')->getAttribute('catalog_product', self::MANUFACTURER_ATTRIBUTE_CODE);
 
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
         $scope->restrictEavAttribute($attribute);
 
         $toShopyMindFormat = function($optionData) {

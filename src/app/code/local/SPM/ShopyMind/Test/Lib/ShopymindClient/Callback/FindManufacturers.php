@@ -72,6 +72,15 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_FindManufacturers extends 
         $this->assertCount(1, $manufacturersInSpecificStore);
     }
 
+    public function testManufacturersCanBeFoundByLanguageFilter()
+    {
+        $manufacturersInGeneralStore = ShopymindClient_Callback::findManufacturers(false, false, 'Daci');
+        $manufacturersInSpecificStore = ShopymindClient_Callback::findManufacturers(false, 'FR', 'Daci');
+
+        $this->assertCount(0, $manufacturersInGeneralStore);
+        $this->assertCount(1, $manufacturersInSpecificStore);
+    }
+
     public function testNothingIsReturnedWhenTheSearchIs2CharsLong()
     {
         $result = ShopymindClient_Callback::findManufacturers(false, false, 'ca');

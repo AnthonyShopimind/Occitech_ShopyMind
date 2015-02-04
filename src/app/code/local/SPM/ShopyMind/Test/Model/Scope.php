@@ -37,4 +37,14 @@ class SPM_ShopyMind_Test_Model_Scope extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals(array(2, 3), $result);
     }
 
+    public function testLangRestrictionOnlyReturnsOneStore()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId(false, 'FR');
+
+        $result = $scope->storeIds();
+        sort($result);
+
+        $this->assertEquals(array(2), $result);
+    }
+
 }

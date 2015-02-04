@@ -32,3 +32,6 @@ scope:
       code: b2b
       name: France B2B
       is_active: 1
+
+config:
+  stores/b2c/general/locale/code: fr_FR

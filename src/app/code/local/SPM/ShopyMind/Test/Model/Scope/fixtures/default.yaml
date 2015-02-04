@@ -45,6 +45,9 @@ scope:
       name: B2B Spanish
       is_active: 0
 
+config:
+  stores/b2b/general/locale/code: fr_FR
+
 eav:
  customer:
    - entity_id: 1

@@ -8,18 +8,20 @@ class SPM_ShopyMind_Model_Scope
 {
     private $id;
     private $scope;
+    private $isoLangCode;
 
     const SCOPE_DEFAULT = 'default';
     const SCOPE_WEBSITE = 'website';
     const SCOPE_STORE = 'store';
 
-    private function __construct($id, $scope)
+    private function __construct($id, $scope, $isoLangCode)
     {
         $this->id = $id;
         $this->scope = $scope;
+        $this->isoLangCode = $isoLangCode;
     }
 
-    public static function fromShopymindId($shopymindId)
+    public static function fromShopymindId($shopymindId, $isoLangCode = false)
     {
         if (empty($shopymindId)) {
             $id = 0;
@@ -27,7 +29,7 @@ class SPM_ShopyMind_Model_Scope
         } else {
             list($scope, $id) = explode('-', $shopymindId);
         }
-        return new self($id, $scope);
+        return new self($id, $scope, $isoLangCode);
     }
 
     public function stores()
@@ -38,7 +40,7 @@ class SPM_ShopyMind_Model_Scope
 
     public function restrictEavAttribute(Mage_Catalog_Model_Resource_Eav_Attribute $attribute)
     {
-        if ($this->scope == self::SCOPE_DEFAULT) {
+        if ($this->scope == self::SCOPE_DEFAULT && empty($this->isoLangCode)) {
             return;
         }
 
@@ -56,6 +58,12 @@ class SPM_ShopyMind_Model_Scope
         } elseif ($this->scope === self::SCOPE_WEBSITE) {
             $inScope = $inScope && $store->getWebsiteId() == $this->id;
         }
+
+        if (!empty($this->isoLangCode)) {
+            $locale = Mage::getStoreConfig('general/locale/code', $store->getId());
+            $inScope = $inScope && (stripos(substr($locale, 0, -3), $this->isoLangCode) === 0);
+        }
+
         return $inScope;
     }
 
