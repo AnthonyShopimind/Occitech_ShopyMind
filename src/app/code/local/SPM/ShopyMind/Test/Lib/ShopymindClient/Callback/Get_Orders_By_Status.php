@@ -54,14 +54,14 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
     public function testItShouldReturnsProductWithCorrectFormat()
     {
         $expectedProduct = array(
-            'id' => '1',
+            'id' => '5',
             'description' => 'Produit 1',
             'qty' => 2.0,
             'price' => '13.0000',
             'id_combination' => false,
             'product_categories' => array(2),
             'product_manufacturer' => null,
-            'product_url' => 'catalog/product/view/id/1/',
+            'product_url' => 'catalog/product/view/id/5/',
         );
         $result =  ShopymindClient_Callback::getOrdersByStatus(
             1,
