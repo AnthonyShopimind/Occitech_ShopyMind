@@ -18,6 +18,8 @@ if (file_exists(Mage::getBaseDir('base') . '/lib/ShopymindClient/callback_overri
 class ShopymindClient_Callback {
     protected static $appEmulation = false;
     protected static $initialEnvironmentInfo = false;
+    const SEARCH_MIN_LENGTH = 3;
+    const MANUFACTURER_ATTRIBUTE_CODE = 'manufacturer';
 
     /**
      * @var null|int Current timestamp (to allow simulating time changes from tests)
@@ -1456,4 +1458,50 @@ class ShopymindClient_Callback {
             'count' => $collection->count()
         );
     }
+
+    /**
+     * Method allowing to do a textual lookup for manufacturers matching a given search query
+     *
+     * @param $id_shop Id of the shop to restrict results to
+     * @param bool $lang Allow to filter results for a store with a specific language
+     * @param $search Text to match against manufacturer names. The search must be at least 3 chars long
+     * @return array List of manufacturers (array('id' => 'xx', 'name' => 'yy')) ordered alphabetically
+     */
+    public static function findManufacturers($id_shop, $lang = false, $search)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        if (strlen($search) < self::SEARCH_MIN_LENGTH) {
+            return array();
+        }
+        $attribute = Mage::getModel('eav/config')->getAttribute('catalog_product', self::MANUFACTURER_ATTRIBUTE_CODE);
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
+        $scope->restrictEavAttribute($attribute);
+
+        $toShopyMindFormat = function($optionData) {
+            return array(
+                'id' => $optionData['value'],
+                'value' => $optionData['label'],
+            );
+        };
+        $matchesSearch = function($option) use ($search) {
+            return stripos($option['value'], $search) !== false;
+        };
+        $options = array_filter(
+            array_map($toShopyMindFormat, $attribute->getSource()->getAllOptions(false)),
+            $matchesSearch
+        );
+
+        usort($options, function($optA, $optB) {
+            return strcmp($optA['value'], $optB['value']);
+        });
+        return $options;
+    }
+
 }
