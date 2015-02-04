@@ -1511,7 +1511,7 @@ class ShopymindClient_Callback {
             return self::counterResponse($collection);
         } else {
             return array_map(function ($customer) {
-                return array('customer' => self::getUser($customer['entity_id']));
+                return array('customer' => ShopymindClient_Callback::getUser($customer['entity_id']));
             }, $collection->getData());
         }
     }
