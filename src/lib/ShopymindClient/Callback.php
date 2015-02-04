@@ -1484,8 +1484,10 @@ class ShopymindClient_Callback {
 
         $collection = Mage::getResourceModel('sales/order_collection')
             ->addAttributeToSelect('customer_id')
-            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')))
-            ->addAttributeToFilter('main_table.store_id', array('in' => array($id_shop)));
+            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')));
+
+        SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)
+            ->restrictCollection($collection, 'main_table.store_id');
 
         $collection->getSelect()
             ->distinct(true);

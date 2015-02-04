@@ -8,7 +8,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
 
     public function testIfNoTimezonesAreGivenReturnFalse()
     {
-        $this->assertFalse(ShopymindClient_Callback::getInactiveClients(1, '2015-01-31', array(), 3));
+        $this->assertFalse(ShopymindClient_Callback::getInactiveClients('store-1', '2015-01-31', array(), 3));
     }
 
     public function testCanGetCustomersWithoutOrdersSinceThreeMonths()
@@ -38,21 +38,21 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
             ),
         );
 
-        $actual = ShopymindClient_Callback::getInactiveClients(1, '2015-01-31 23:59:59', array(array('country' => 'US', 'region' => 'AL')), 3);
+        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2015-01-31 23:59:59', array(array('country' => 'US', 'region' => 'AL')), 3);
 
         $this->assertEquals($expected, $actual);
     }
 
     public function testIfACountryHasNoOrderTheListIsEmpty()
     {
-        $actual = ShopymindClient_Callback::getInactiveClients(1, '2015-01-31 23:59:59', array(array('country' => 'FR')), 3);
+        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2015-01-31 23:59:59', array(array('country' => 'FR')), 3);
 
         $this->assertEmpty($actual);
     }
 
     public function testIfAStoreHasNoOrderTheListIsEmpty()
     {
-        $actual = ShopymindClient_Callback::getInactiveClients(2, '2015-01-31 23:59:59', array(array('country' => 'US')), 3);
+        $actual = ShopymindClient_Callback::getInactiveClients('store-2', '2015-01-31 23:59:59', array(array('country' => 'US')), 3);
 
         $this->assertEmpty($actual);
     }
