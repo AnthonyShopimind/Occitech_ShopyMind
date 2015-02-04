@@ -31,7 +31,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_SendOrderToSPM extends Eco
 
         $method = $this->getPrivateMethod('ShopymindClient_Callback', 'formatOrderData');
         $ShopymindClient_Callback = new ShopymindClient_Callback();
-        $result = $method->invokeArgs($ShopymindClient_Callback, array($order, $orderData, 1, 1));
+        $result = $method->invokeArgs($ShopymindClient_Callback, array($orderData, 1, 1));
 
         $this->assertEquals($expected, $result);
     }
@@ -44,7 +44,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_SendOrderToSPM extends Eco
 
         $method = $this->getPrivateMethod('ShopymindClient_Callback', 'formatOrderData');
         $ShopymindClient_Callback = new ShopymindClient_Callback();
-        $result = $method->invokeArgs($ShopymindClient_Callback, array($order, $orderData, 1, 1));
+        $result = $method->invokeArgs($ShopymindClient_Callback, array($orderData, 1, 1));
 
         $this->assertTrue($result['orderIsConfirm']);
     }

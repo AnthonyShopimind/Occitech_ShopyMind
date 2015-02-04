@@ -1382,7 +1382,7 @@ class ShopymindClient_Callback {
             ), func_get_args());
 
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
-        $params = self::formatOrderData($order, $orderData, $spm_key, $voucherUsed);
+        $params = self::formatOrderData($orderData, $spm_key, $voucherUsed);
         
         $spm_key = ShopymindClient_Bin_Notify::newOrder($params);
         if ($spm_key && isset($spm_key ['idRemindersSend']) && $spm_key ['idRemindersSend']) {
@@ -1449,15 +1449,15 @@ class ShopymindClient_Callback {
     /**
      * Formate les données d'une commande dans le format attendu par le serveur de ShopyMind
      *
-     * @param Mage_Sales_Model_Order $order
      * @param array $orderData
      * @param string $spm_key
      * @param array $voucherUsed
      *
      * @return array $params
      */
-    private static function formatOrderData(Mage_Sales_Model_Order $order, $orderData, $spm_key, $voucherUsed) {
-        $quote = Mage::getSingleton('sales/quote')->load((int) $orderData ['quote_id']);
+    private static function formatOrderData($orderData, $spm_key, $voucherUsed) {
+        self::startLangEmulationByStoreId($orderData['store_id']);
+        $quote = Mage::getSingleton('sales/quote')->load($orderData ['quote_id']);
 
         $params = array (
             'idRemindersSend' => $spm_key,
@@ -1472,11 +1472,12 @@ class ShopymindClient_Callback {
             'currency' => $orderData['order_currency_code'],
             'dateOrder' => $orderData['created_at'],
             'voucherUsed' => $voucherUsed,
-            'products' => array(),
+            'products' => self::productsOfCart($orderData ['quote_id']),
             'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email'])),
             'shipping_number' => array(),
         );
 
+        self::stopLangEmulation();
         return $params;
     }
 }
