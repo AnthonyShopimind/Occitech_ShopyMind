@@ -9,13 +9,13 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
 
     public function testGetDroppedOutCartReturnsEmptyResultsWhenNoCart()
     {
-        $result = ShopymindClient_Callback::getDroppedOutCart(1000);
+        $result = ShopymindClient_Callback::getDroppedOutCart('store-1', 1000);
         $this->assertEquals(array(), $result);
     }
 
     public function testGetDroppedOutCartReturnsZeroWhenCountingNoCart()
     {
-        $result = ShopymindClient_Callback::getDroppedOutCart(1000, true);
+        $result = ShopymindClient_Callback::getDroppedOutCart('store-1', 1000, true);
         $this->assertEquals(array('count' => 0), $result);
     }
 
@@ -26,8 +26,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
     {
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
         ShopymindClient_Callback::$now = strtotime($_11minutesAfterTheOrder);
-        $resultsWithin10Minutes = ShopymindClient_Callback::getDroppedOutCart(10 * 60, true);
-        $resultsWithin12Minutes = ShopymindClient_Callback::getDroppedOutCart(12 * 60, true);
+        $resultsWithin10Minutes = ShopymindClient_Callback::getDroppedOutCart('store-1', 10 * 60, true);
+        $resultsWithin12Minutes = ShopymindClient_Callback::getDroppedOutCart('store-1', 12 * 60, true);
         ShopymindClient_Callback::$now = null;
 
         $this->assertEquals(1, $resultsWithin10Minutes['count']);
@@ -40,7 +40,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
     public function testGetDroppedOutCartReturnsCorrectDataForCartWithSimpleProduct()
     {
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
-        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 10 * 60);
+        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 'store-1', 10 * 60);
 
         $expectedResult = array(
             array(
@@ -103,7 +103,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
         $this->replaceByMock('model', 'catalog/product', $product);
 
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
-        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 10 * 60);
+        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 'store-1', 10 * 60);
 
         $this->assertEquals(42, $results[0]['articles'][0]['product_manufacturer']);
     }
@@ -114,7 +114,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
     public function testGetDroppedOutCartReturnsCorrectDataForCartWithConfigurableProduct()
     {
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
-        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 10 * 60);
+        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 'store-1', 10 * 60);
 
         $expectedResult = array(array(
             'id' => 2,
@@ -136,7 +136,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
     public function testGetDroppedOutCartFilterEmptyCarts()
     {
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
-        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 10 * 60);
+        $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 'store-1', 10 * 60);
 
         $this->assertEmpty($results);
     }
@@ -149,9 +149,15 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
     {
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
         ShopymindClient_Callback::$now = strtotime($_11minutesAfterTheOrder);
-        $results = ShopymindClient_Callback::getDroppedOutCart(10 * 60);
+        $results = ShopymindClient_Callback::getDroppedOutCart('store-1', 10 * 60);
         ShopymindClient_Callback::$now = null;
 
+        $this->assertEmpty($results);
+    }
+
+    public function testIfAStoreHasNotCartTheListIsEmpty()
+    {
+        $results = ShopymindClient_Callback::getDroppedOutCart('store-2', 10 * 60);
         $this->assertEmpty($results);
     }
 

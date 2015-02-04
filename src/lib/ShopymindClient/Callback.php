@@ -359,7 +359,7 @@ class ShopymindClient_Callback {
      * @param bool $justCount
      * @return array Either the cart details, or an array with the counter: array('count' => xx)
      */
-    public static function getDroppedOutCart($nbSeconds, $justCount = false) {
+    public static function getDroppedOutCart($id_shop, $nbSeconds, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array(
                 'ShopymindClient_CallbackOverride',
@@ -372,6 +372,7 @@ class ShopymindClient_Callback {
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
 
         $query = '
           SELECT `quote_table`.*
@@ -388,6 +389,7 @@ class ShopymindClient_Callback {
             AND (`quote_table`.`items_count` > 0)
             AND (`quote_table`.`customer_id` IS NOT NULL OR `quote_table`.`customer_email` IS NOT NULL)
             AND (`order_table`.`entity_id` IS NULL)
+            AND `quote_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
           GROUP BY `quote_table`.`customer_email`
         ';
 
