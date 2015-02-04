@@ -1367,4 +1367,83 @@ class ShopymindClient_Callback {
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
     }
+
+    /**
+     * Get customers who have not orders since $dateReference
+     *
+     * @param int $id_shop Magento store id
+     * @param string $dateReference Date since when we should look for customers who have not ordered ; format: Y-m-d H:i:s
+     * @param array $timezones Timezones to use
+     * @param int $nbMonthsLastOrder How many months customers have not ordered since $dateReference
+     * @param bool $relaunchOlder Force retrieval of customers that have not ordered since $dateReference - ($nbMonthsLastOrder + $relaunchOlder) months
+     * @param bool $justCount
+     *
+     * @return bool|array|int
+     */
+    public static function getInactiveClients($id_shop, $dateReference, $timezones, $nbMonthsLastOrder, $relaunchOlder = false, $justCount = false)
+    {
+        if (empty($timezones)) {
+            return false;
+        }
+
+        $collection = Mage::getResourceModel('sales/order_collection')
+            ->addAttributeToSelect('customer_id')
+            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')))
+            ->addAttributeToFilter('main_table.store_id', array('in' => array($id_shop)));
+
+        $collection->getSelect()
+            ->distinct(true);
+
+        $orderAddressJoined = false;
+        $CountryRegionJoined = false;
+        foreach ($timezones as $timezone) {
+            if (isset($timezone['country'])) {
+                if (!$orderAddressJoined) {
+                    $collection
+                        ->join(array('order_address' => 'sales/order_address'), 'order_address.parent_id = main_table.entity_id AND order_address.address_type = "billing"', null);
+
+                    $orderAddressJoined = true;
+                }
+
+                $collection->getSelect()
+                    ->where('order_address.country_id = ?', $timezone['country']);
+            }
+
+            if (isset($timezone['region'])) {
+                if (!$CountryRegionJoined) {
+                    $collection
+                        ->join(array('country_region' => 'directory/country_region'), 'country_region.region_id = order_address.region_id', null);
+
+                    $CountryRegionJoined = true;
+                }
+
+                $collection->getSelect()
+                    ->where('country_region.code = ?', $timezone['region']);
+            }
+        }
+
+        $collection->getSelect()
+            ->joinLeft(
+                array('recent_orders' => 'sales_flat_order'),
+                sprintf(
+                    'main_table.customer_id = recent_orders.customer_id AND recent_orders.created_at > "%s" AND recent_orders.status IN ("processing", "complete")',
+                    date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
+                ),
+                null
+            )
+            ->where('recent_orders.entity_id IS NULL');
+
+        $customers = array();
+        foreach ($collection as $order) {
+            $customers[] = array (
+                'customer' => self::getUser($order['customer_id'])
+            );
+        }
+
+        if ($justCount) {
+            return count($customers);
+        } else {
+            return $customers;
+        }
+    }
 }
