@@ -1492,17 +1492,7 @@ class ShopymindClient_Callback {
             $customerCollection->getSelect()->limit($limit, $start);
         }
 
-        if ($justCount) {
-            return self::counterResponse($customerCollection);
-        }
-
-        $customers = array();
-        foreach($customerCollection as $customer) {
-            $customers[] = array (
-                'customer' => self::getUser($customer['entity_id'])
-            );
-        }
-        return $customers;
+        return self::returnCollectionDataOrCount($customerCollection, $justCount);
     }
 
     private static function counterResponse(Varien_Data_Collection $collection)
@@ -1515,9 +1505,7 @@ class ShopymindClient_Callback {
     private static function returnCollectionDataOrCount(Varien_Data_Collection $collection, $justCount)
     {
         if ($justCount) {
-            return array(
-                'count' => count($collection)
-            );
+            return self::counterResponse($collection);
         } else {
             return array_map(function ($customer) {
                 return array('customer' => self::getUser($customer['entity_id']));
