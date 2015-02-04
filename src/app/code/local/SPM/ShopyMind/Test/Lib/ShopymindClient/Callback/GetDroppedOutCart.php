@@ -13,9 +13,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends 
 
         $write = Mage::getSingleton('core/resource')->getConnection('write');
         $write->query(<<<'QUERY'
-        TRUNCATE catalog_product_entity;
         TRUNCATE catalog_product_entity_varchar;
         TRUNCATE catalog_product_entity_int;
+        TRUNCATE catalog_product_entity;
 QUERY
         );
     }
