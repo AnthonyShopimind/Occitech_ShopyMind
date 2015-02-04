@@ -13,19 +13,6 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
             array(
                 'currency' => 'USD',
                 'total_amount' => '100.0000',
-                'articles' => array(
-                    array(
-                        'id' => '1',
-                        'description' => 'Produit 1',
-                        'qty' => 2.0,
-                        'price' => '13.0000',
-                        'id_combination' => false,
-                        'product_categories' => array(2),
-                        'product_manufacturer' => null,
-                        'image_url' => '/catalog/product/cache/1/small_image/200x/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
-                        'product_url' => 'catalog/product/view/id/1/',
-                    ),
-                ),
                 'id_order' => '2',
                 'customer' => array(
                     'id_customer' => '1',
@@ -60,7 +47,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
             'processing'
         );
 
-        unset($actual[0]['articles'], $expected[0]['articles']);
+        unset($actual[0]['articles']);
         $this->assertEquals($expected, $actual);
     }
 
