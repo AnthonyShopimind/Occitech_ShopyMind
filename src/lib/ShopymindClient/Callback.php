@@ -1668,6 +1668,35 @@ class ShopymindClient_Callback {
         $collection->getSelect()
             ->distinct(true);
 
+        self::restrictOrdersCollectionBillingAddressesToTimezones($collection, $timezones);
+
+        $collection->getSelect()
+            ->joinLeft(
+                array('recent_orders' => 'sales_flat_order'),
+                sprintf(
+                    'main_table.customer_id = recent_orders.customer_id AND recent_orders.created_at > "%s" AND recent_orders.status IN ("processing", "complete")',
+                    date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
+                ),
+                null
+            )
+            ->where('recent_orders.entity_id IS NULL');
+
+        if ($justCount) {
+            return self::counterResponse($collection);
+        }
+
+        $customers = array();
+        foreach ($collection as $order) {
+            $customers[] = array (
+                'customer' => self::getUser($order['customer_id'])
+            );
+        }
+
+        return $customers;
+    }
+
+    private static function restrictOrdersCollectionBillingAddressesToTimezones(Varien_Data_Collection_Db $collection, array $timezones)
+    {
         $orderAddressJoined = false;
         $CountryRegionJoined = false;
         foreach ($timezones as $timezone) {
@@ -1695,29 +1724,5 @@ class ShopymindClient_Callback {
                     ->where('`directory/country_region`.code = ?', $timezone['region']);
             }
         }
-
-        $collection->getSelect()
-            ->joinLeft(
-                array('recent_orders' => 'sales_flat_order'),
-                sprintf(
-                    'main_table.customer_id = recent_orders.customer_id AND recent_orders.created_at > "%s" AND recent_orders.status IN ("processing", "complete")',
-                    date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
-                ),
-                null
-            )
-            ->where('recent_orders.entity_id IS NULL');
-
-        if ($justCount) {
-            return self::counterResponse($collection);
-        }
-
-        $customers = array();
-        foreach ($collection as $order) {
-            $customers[] = array (
-                'customer' => self::getUser($order['customer_id'])
-            );
-        }
-
-        return $customers;
     }
 }
