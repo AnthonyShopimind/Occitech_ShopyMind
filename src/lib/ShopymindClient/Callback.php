@@ -1634,6 +1634,52 @@ class ShopymindClient_Callback {
     }
 
     /**
+     * Allows to get customer emails from database.
+     * This method is used to get emails when enabling retargeting. It will allow to know if the emails is real or not to not flag visitor as anonymous.
+     * Once email is fetched, it will be hashed with md5
+     *
+     * @param string $id_shop storeId
+     * @param int $start offset the result from the query
+     * @param int $limit limit the result from the query.
+     * @param string $lastUpdate date|datetime to narrow the query.
+     *
+     * @return array empty | array($customerId => $customerEmail);
+     */
+    public static function getExistingEmails($id_shop = null, $start = 0, $limit = null, $lastUpdate = null)
+    {
+        //Do we still need this ? It's looks like Prestashop Override mechanism
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+
+        $customersCollection = Mage::getModel('customer/customer')->getCollection()
+            ->addAttributeToSelect('email')
+            ->addAttributeToSelect('entity_id');
+
+        $scope->restrictCollection($customersCollection);
+
+        if (!is_null($lastUpdate)) {
+            $customersCollection->addFieldToFilter('updated_at', array('gteq' => $lastUpdate));
+        }
+
+        if (!is_null($limit)) {
+            $customersCollection->getSelect()->limit($limit, $start);
+        }
+
+        $customers = array();
+        foreach ($customersCollection as $customer) {
+            $customers[$customer->getId()] = $customer->getEmail();
+        }
+
+        return $customers;
+    }
+    
+    /**
      * Get customers who have not orders since $dateReference
      *
      * @param int $id_shop Magento store id
