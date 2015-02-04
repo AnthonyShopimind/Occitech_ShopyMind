@@ -1509,11 +1509,11 @@ class ShopymindClient_Callback {
     {
         if ($justCount) {
             return self::counterResponse($collection);
-        } else {
-            return array_map(function ($customer) {
-                return array('customer' => ShopymindClient_Callback::getUser($customer['entity_id']));
-            }, $collection->getData());
         }
+
+        return array_map(function ($customer) {
+            return array('customer' => ShopymindClient_Callback::getUser($customer['entity_id']));
+        }, $collection->getData());
     }
 
 }
