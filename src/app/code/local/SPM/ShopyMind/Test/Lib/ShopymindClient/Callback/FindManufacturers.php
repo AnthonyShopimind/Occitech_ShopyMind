@@ -35,14 +35,12 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_FindManufacturers extends 
     public static function tearDownAfterClass()
     {
         $attribute = Mage::getModel('eav/config')->getAttribute(self::ENTITY_PRODUCT_TYPE, self::MANUFACTURER_ATTRIBUTE_CODE);
-        $options = $attribute->getSource()->getAllOptions();
+        $options = $attribute->getSource()->getAllOptions(false);
 
         $optionsToDelete = array();
-        foreach($options as $option) {
-            if ($option['value'] != '') {
-                $optionsToDelete['delete'][$option['value']] = true;
-                $optionsToDelete['value'][$option['value']] = true;
-            }
+        foreach ($options as $option) {
+            $optionsToDelete['delete'][$option['value']] = true;
+            $optionsToDelete['value'][$option['value']] = true;
         }
 
         $setup = new Mage_Eav_Model_Entity_Setup('core_setup');
@@ -58,17 +56,26 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_FindManufacturers extends 
 
     public function testManufacturersAreOrderedByName()
     {
-        $this->markTestIncomplete();
+        $manufacturers = ShopymindClient_Callback::findManufacturers(false, false, 'cars');
+        $values = array_map(function($manufacturer) { return $manufacturer['value']; }, $manufacturers);
+
+        $expectedValues = array('Peugeot cars', 'Renault cars', 'Volvo cars');
+        $this->assertEquals($expectedValues, $values);
     }
 
-    public function testManufacturersCanBeFilteredByStore()
+    public function testManufacturersCanBeFoundByStore()
     {
-        $this->markTestIncomplete();
+        $manufacturersInGeneralStore = ShopymindClient_Callback::findManufacturers(false, false, 'Daci');
+        $manufacturersInSpecificStore = ShopymindClient_Callback::findManufacturers('website-1', false, 'Daci');
+
+        $this->assertCount(0, $manufacturersInGeneralStore);
+        $this->assertCount(1, $manufacturersInSpecificStore);
     }
 
-    public function testNothingIsReturnedWhenTheSearchIs3CharsLong()
+    public function testNothingIsReturnedWhenTheSearchIs2CharsLong()
     {
-        $this->markTestIncomplete();
+        $result = ShopymindClient_Callback::findManufacturers(false, false, 'ca');
+        $this->assertSame(array(), $result);
     }
 
 }

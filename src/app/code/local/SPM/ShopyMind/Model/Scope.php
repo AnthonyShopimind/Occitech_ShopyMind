@@ -36,6 +36,18 @@ class SPM_ShopyMind_Model_Scope
         return array_values($stores);
     }
 
+    public function restrictEavAttribute(Mage_Catalog_Model_Resource_Eav_Attribute $attribute)
+    {
+        if ($this->scope == self::SCOPE_DEFAULT) {
+            return;
+        }
+
+        $storeIds = $this->storeIds();
+        if (!empty($storeIds)) {
+            $attribute->setStoreId($storeIds[0]);
+        }
+    }
+
     private function isInScope(Mage_Core_Model_Store $store)
     {
         $inScope = $store->getIsActive();
