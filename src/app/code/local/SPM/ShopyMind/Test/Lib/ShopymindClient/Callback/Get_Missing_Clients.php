@@ -59,9 +59,6 @@ QUERY
 
     public function testReturnAnEmptyListIfTheStoreHasNoClients()
     {
-        $expected = array(
-        );
-
         $actual = ShopymindClient_Callback::getMissingClients(
             'store-2',
             date('2014-12-25 10:00:00'),
@@ -69,7 +66,7 @@ QUERY
             0
         );
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEmpty($actual);
     }
 
 }
