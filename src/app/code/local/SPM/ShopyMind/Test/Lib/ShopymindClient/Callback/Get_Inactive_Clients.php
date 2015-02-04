@@ -57,4 +57,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
         $this->assertEmpty($actual);
     }
 
+    public function testItCanCountResults()
+    {
+        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2015-01-31 23:59:59', array(array('country' => 'US', 'region' => 'AL')), 3, false, true);
+
+        $this->assertEquals(array('count' => 1), $actual);
+    }
+
 }

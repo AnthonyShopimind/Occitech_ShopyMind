@@ -1707,6 +1707,10 @@ class ShopymindClient_Callback {
             )
             ->where('recent_orders.entity_id IS NULL');
 
+        if ($justCount) {
+            return self::counterResponse($collection);
+        }
+
         $customers = array();
         foreach ($collection as $order) {
             $customers[] = array (
@@ -1714,10 +1718,6 @@ class ShopymindClient_Callback {
             );
         }
 
-        if ($justCount) {
-            return count($customers);
-        } else {
-            return $customers;
-        }
+        return $customers;
     }
 }
