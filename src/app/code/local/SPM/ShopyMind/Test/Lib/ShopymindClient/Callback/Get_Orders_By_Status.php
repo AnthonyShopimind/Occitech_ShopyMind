@@ -11,7 +11,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
     {
         $expected = array(
             array(
-                'currency' => 'EUR',
+                'currency' => 'USD',
                 'total_amount' => '100.0000',
                 'articles' => array(
                     array(

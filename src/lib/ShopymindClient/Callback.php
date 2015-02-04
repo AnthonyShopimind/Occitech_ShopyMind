@@ -675,12 +675,11 @@ class ShopymindClient_Callback {
      */
     private static function getShippingNumbersForOrderId($orderId)
     {
-        $tracks = Mage::getModel('sales/order')->load($orderId)->getTracksCollection()->toArray();
+        $tracks = Mage::getModel('sales/order')->load($orderId)->getTracksCollection();
         $shippingNumbers = array();
-
-        if ($tracks['totalRecords'] > 0) {
-            foreach ($tracks['items'] as $trackItem) {
-                $shippingNumbers[] = $trackItem['track_number'];
+        if ($tracks->count()) {
+            foreach ($tracks as $track) {
+                $shippingNumbers[] = $track->getNumber();
             }
         }
         return $shippingNumbers;
