@@ -654,6 +654,7 @@ class ShopymindClient_Callback {
         AND DATE_FORMAT(`customer_primary_table`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) ($nbDays) . ' DAY),"%Y-%m-%d")
         AND ' . $timezonesWhere . '
          AND `customer_primary_table`.`is_active` = 1
+        AND `customer_primary_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
         GROUP BY `customer_order`.`customer_id`';
         $results = $readConnection->fetchAll($query);
 
@@ -1705,5 +1706,98 @@ class ShopymindClient_Callback {
         }
 
         return $customers;
+    }
+    
+    /**
+     * Get customers who have not orders since $dateReference
+     *
+     * @param int $id_shop Magento store id
+     * @param string $dateReference Date since when we should look for customers who have not ordered ; format: Y-m-d H:i:s
+     * @param array $timezones Timezones to use
+     * @param int $nbMonthsLastOrder How many months customers have not ordered since $dateReference
+     * @param bool $relaunchOlder Force retrieval of customers that have not ordered since $dateReference - ($nbMonthsLastOrder + $relaunchOlder) months
+     * @param bool $justCount
+     *
+     * @return bool|array|int
+     */
+    public static function getInactiveClients($id_shop, $dateReference, $timezones, $nbMonthsLastOrder, $relaunchOlder = false, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        if (empty($timezones)) {
+            return false;
+        }
+
+        $collection = Mage::getResourceModel('sales/order_collection')
+            ->addAttributeToSelect('customer_id')
+            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')));
+
+        SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)
+            ->restrictCollection($collection, 'main_table.store_id');
+
+        $collection->getSelect()
+            ->distinct(true);
+
+        self::restrictOrdersCollectionBillingAddressesToTimezones($collection, $timezones);
+
+        $collection->getSelect()
+            ->joinLeft(
+                array('recent_orders' => 'sales_flat_order'),
+                sprintf(
+                    'main_table.customer_id = recent_orders.customer_id AND recent_orders.created_at > "%s" AND recent_orders.status IN ("processing", "complete")',
+                    date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
+                ),
+                null
+            )
+            ->where('recent_orders.entity_id IS NULL');
+
+        if ($justCount) {
+            return self::counterResponse($collection);
+        }
+
+        $customers = array();
+        foreach ($collection as $order) {
+            $customers[] = array (
+                'customer' => self::getUser($order['customer_id'])
+            );
+        }
+
+        return $customers;
+    }
+
+    private static function restrictOrdersCollectionBillingAddressesToTimezones(Varien_Data_Collection_Db $collection, array $timezones)
+    {
+        $orderAddressJoined = false;
+        $CountryRegionJoined = false;
+        foreach ($timezones as $timezone) {
+            if (isset($timezone['country'])) {
+                if (!$orderAddressJoined) {
+                    $collection
+                        ->join('sales/order_address', '`sales/order_address`.parent_id = main_table.entity_id AND `sales/order_address`.address_type = "billing"', null);
+
+                    $orderAddressJoined = true;
+                }
+
+                $collection->getSelect()
+                    ->where('`sales/order_address`.country_id = ?', $timezone['country']);
+            }
+
+            if (isset($timezone['region'])) {
+                if (!$CountryRegionJoined) {
+                    $collection
+                        ->join('directory/country_region', '`directory/country_region`.region_id = `sales/order_address`.region_id', null);
+
+                    $CountryRegionJoined = true;
+                }
+
+                $collection->getSelect()
+                    ->where('`directory/country_region`.code = ?', $timezone['region']);
+            }
+        }
     }
 }
