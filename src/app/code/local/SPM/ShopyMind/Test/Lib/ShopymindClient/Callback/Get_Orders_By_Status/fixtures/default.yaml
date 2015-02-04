@@ -35,7 +35,7 @@ scope:
 
 eav:
   catalog_product:
-   - entity_id: 5
+   - entity_id: 1
      name: Produit 1
      sku: some_sku
      type_id: simple
@@ -91,11 +91,6 @@ tables:
       status: processing
       created_at: 2015-01-01
 
-  sales/order_item:
-    - item_id: 2
-      order_id: 2
-      product_id: 1
-
   sales/quote:
     - entity_id: 1
       store_id: 1
@@ -138,7 +133,7 @@ tables:
   sales/quote_item:
     - item_id: 1
       quote_id: 1
-      product_id: 5
+      product_id: 1
       parent_item_id: null
       is_virtual: 0
       sku: some_sku

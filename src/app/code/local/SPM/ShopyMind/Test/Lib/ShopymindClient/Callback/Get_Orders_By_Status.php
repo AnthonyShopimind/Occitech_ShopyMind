@@ -3,9 +3,24 @@
 /**
  * @loadSharedFixture
  * @doNotIndexAll
+ * @group mine
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status extends EcomDev_PHPUnit_Test_Case
 {
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+        $write = Mage::getSingleton('core/resource')->getConnection('write');
+        $write->query(<<<'QUERY'
+        TRUNCATE catalog_product_entity_varchar;
+        TRUNCATE catalog_product_entity_int;
+        TRUNCATE catalog_product_entity_decimal;
+        TRUNCATE catalog_product_entity_text;
+        TRUNCATE catalog_category_product;
+        TRUNCATE catalog_product_entity;
+QUERY
+        );
+    }
 
     public function testCanGetProcessingOrders()
     {
@@ -54,14 +69,14 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status exten
     public function testItShouldReturnsProductWithCorrectFormat()
     {
         $expectedProduct = array(
-            'id' => '5',
+            'id' => '1',
             'description' => 'Produit 1',
             'qty' => 2.0,
             'price' => '13.0000',
             'id_combination' => false,
             'product_categories' => array(2),
             'product_manufacturer' => null,
-            'product_url' => 'catalog/product/view/id/5/',
+            'product_url' => 'catalog/product/view/id/1/',
         );
         $result =  ShopymindClient_Callback::getOrdersByStatus(
             1,
