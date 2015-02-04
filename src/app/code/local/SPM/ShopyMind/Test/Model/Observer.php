@@ -17,19 +17,6 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $this->SUT = $this->getModelMock('shopymind/observer', array('dispatchToShopyMind'));
         $this->replaceByMock('model', 'shopymind/observer', $this->SUT);
         $this->mockGetUrlContacts();
-        $this->setConfigStores();
-    }
-
-    /**
-     * @see http://www.wenda.io/questions/2656587/ecomdev-phpunit-fixture-for-website-specific-configuration.html
-     */
-    private function setConfigStores()
-    {
-        Mage::app()->getStore(1)
-            ->setConfig('customer/address/dob_show', 'opt')
-            ->setConfig('shopymind/configuration/birthrequired', 0);
-        Mage::app()->getStore(2)
-            ->setConfig('shopymind/configuration/birthrequired', 1);
     }
 
     public function testIsDateOfBirthRequiredForModuleOnGlobalScope()
