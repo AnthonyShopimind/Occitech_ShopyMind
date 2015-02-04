@@ -24,7 +24,7 @@ QUERY
      */
     public function testShouldGetCustomersWhoNeverOrdered()
     {
-        $this->markTestIncomplete('Bugger method?');
+        $this->markTestIncomplete('Bugged method?');
         $expected = array(
             array(
                 'customer' => array(
