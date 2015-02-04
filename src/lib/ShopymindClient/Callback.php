@@ -1480,7 +1480,6 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
-        $customers = array();
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
 
         $customersCollection = Mage::getModel('customer/customer')->getCollection()
@@ -1497,6 +1496,7 @@ class ShopymindClient_Callback {
             $customersCollection->getSelect()->limit($limit, $start);
         }
 
+        $customers = array();
         foreach ($customersCollection as $customer) {
             if ($customer->getId()) {
                 $customers[$customer->getId()] = $customer->getEmail();
