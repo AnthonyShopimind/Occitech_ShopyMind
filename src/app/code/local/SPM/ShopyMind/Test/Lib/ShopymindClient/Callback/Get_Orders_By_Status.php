@@ -3,7 +3,6 @@
 /**
  * @loadSharedFixture
  * @doNotIndexAll
- * @group mine
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status extends EcomDev_PHPUnit_Test_Case
 {

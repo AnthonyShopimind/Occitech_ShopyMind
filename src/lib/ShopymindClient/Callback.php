@@ -1684,7 +1684,7 @@ class ShopymindClient_Callback {
             'idStatus' => $orderData['state'],
             'idCart' => $orderData['quote_id'],
             'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
-            'idOrder' => $orderData['increment_id'],
+            'idOrder' => $orderData['entity_id'],
             'amount' => $orderData['base_total_paid'],
             'taxRate' => $orderData['base_to_order_rate'],
             'currency' => $orderData['order_currency_code'],
@@ -1692,7 +1692,7 @@ class ShopymindClient_Callback {
             'voucherUsed' => $voucherUsed,
             'products' => self::productsOfCart($orderData ['quote_id']),
             'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email'])),
-            'shipping_number' => array(),
+            'shipping_number' => self::getShippingNumbersForOrderId(2),
         );
 
         self::stopLangEmulation();

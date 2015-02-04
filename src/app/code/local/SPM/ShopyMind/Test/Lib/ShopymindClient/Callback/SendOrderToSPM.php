@@ -18,7 +18,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_SendOrderToSPM extends Eco
             'idStatus' => 'new',
             'idCart' => '1',
             'dateCart' => '2015-01-01 10:00:00',
-            'idOrder' => '1',
+            'idOrder' => '2',
             'amount' => '100.0000',
             'taxRate' => '1.0000',
             'currency' => 'EUR',
