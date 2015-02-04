@@ -1600,19 +1600,8 @@ class ShopymindClient_Callback {
             ), func_get_args());
 
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
-        $quote = Mage::getSingleton('sales/quote')->load((int) $orderData ['quote_id']);
-        $params = array (
-                'idRemindersSend' => $spm_key,
-                'idCart' => $orderData ['quote_id'],
-                'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
-                'idOrder' => $orderData ['increment_id'],
-                'amount' => $orderData ['base_total_paid'],
-                'taxRate' => $orderData ['base_to_order_rate'],
-                'currency' => $orderData ['order_currency_code'],
-                'dateOrder' => $orderData ['created_at'],
-                'voucherUsed' => $voucherUsed,
-                'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email']))
-        );
+        $params = self::formatOrderData($orderData, $spm_key, $voucherUsed);
+        
         $spm_key = ShopymindClient_Bin_Notify::newOrder($params);
         if ($spm_key && isset($spm_key ['idRemindersSend']) && $spm_key ['idRemindersSend']) {
             $tablePrefix = Mage::getConfig()->getTablePrefix();
@@ -1673,6 +1662,41 @@ class ShopymindClient_Callback {
         return array(
             'count' => $collection->count()
         );
+    }
+
+    /**
+     * Formate les données d'une commande dans le format attendu par le serveur de ShopyMind
+     *
+     * @param array $orderData
+     * @param string $spm_key
+     * @param array $voucherUsed
+     *
+     * @return array $params
+     */
+    private static function formatOrderData($orderData, $spm_key, $voucherUsed) {
+        self::startLangEmulationByStoreId($orderData['store_id']);
+        $quote = Mage::getSingleton('sales/quote')->load($orderData ['quote_id']);
+
+        $params = array (
+            'idRemindersSend' => $spm_key,
+            'shopIdShop' => $orderData['store_id'],
+            'orderIsConfirm' => ($orderData['state'] == Mage_Sales_Model_Order::STATE_PROCESSING || $orderData['state'] == Mage_Sales_Model_Order::STATE_COMPLETE) ? true : false,
+            'idStatus' => $orderData['state'],
+            'idCart' => $orderData['quote_id'],
+            'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
+            'idOrder' => $orderData['entity_id'],
+            'amount' => $orderData['base_total_paid'],
+            'taxRate' => $orderData['base_to_order_rate'],
+            'currency' => $orderData['order_currency_code'],
+            'dateOrder' => $orderData['created_at'],
+            'voucherUsed' => $voucherUsed,
+            'products' => self::productsOfCart($orderData ['quote_id']),
+            'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email'])),
+            'shipping_number' => self::getShippingNumbersForOrderId(2),
+        );
+
+        self::stopLangEmulation();
+        return $params;
     }
 
     /**
