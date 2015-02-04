@@ -335,10 +335,13 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
+
         $customerCollection = Mage::getModel('customer/customer')
             ->getCollection()
             ->addFieldToFilter('created_at', array('date' => true, 'from' => date('Y-m-d', strtotime($dateReference)), 'to' =>  date('Y-m-d', strtotime($dateReference . ' + 1 day'))))
             ->addAttributeToSelect('entity_id');
+        $scope->restrictCollection($customerCollection);
 
         if (!empty($timezones)) {
             $customerCollection->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing');

@@ -53,6 +53,13 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetBirthdayClientsSignup e
         $this->assertEquals($expected, $results['count']);
     }
 
+    public function testGetBirthdayClientsSignupShoulReturnClientAccordingToScope() {
+        $results = ShopymindClient_Callback::getBirthdayClientsSignUp('store-2', '2014-10-27 12:34:56', array());
+
+        $expected = array('5');
+        $this->assertEquals($expected, $this->extractCustomerIds($results));
+    }
+
     private function extractCustomerIds($customers) {
         return array_map(function($customer) { return $customer['customer']['id_customer']; }, $customers);
     }
