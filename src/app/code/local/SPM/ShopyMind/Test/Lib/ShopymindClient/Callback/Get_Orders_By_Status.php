@@ -55,7 +55,7 @@ QUERY
         );
 
         $actual = ShopymindClient_Callback::getOrdersByStatus(
-            1,
+            false,
             '2015-01-01',
             array(array('country' => 'US')),
             0,
@@ -79,7 +79,7 @@ QUERY
             'product_url' => 'catalog/product/view/id/1/',
         );
         $result =  ShopymindClient_Callback::getOrdersByStatus(
-            1,
+            false,
             '2015-01-01',
             array(array('country' => 'US')),
             0,
@@ -93,7 +93,7 @@ QUERY
     public function testIfTheStoreHasNoOrderAnEmptyArrayIsReturned()
     {
         $actual = ShopymindClient_Callback::getOrdersByStatus(
-            2,
+            'store-2',
             '2015-01-01',
             array(array('country' => 'US')),
             0,
@@ -105,19 +105,19 @@ QUERY
 
     public function testItReturnsFalseWhenNoTimezonesPassed()
     {
-        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(), 0, 0, false);
+        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2015-01-30 17:40:00', array(), 0, 0, false);
         $this->assertFalse($result);
     }
 
     public function testItReturnsEmptyArrayWhenNoOrdersMatched()
     {
-        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(array('country' => 'US')), 0, 0, false);
+        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2015-01-30 17:40:00', array(array('country' => 'US')), 0, 0, false);
         $this->assertEmpty($result);
     }
 
     public function testItReturnsOrdersCountIfJustCountParameterIsTrue()
     {
-        $result = ShopymindClient_Callback::getOrdersByStatus(1, '2015-01-30 17:40:00', array(array('country' => 'US')), 0, 0, true);
+        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2015-01-30 17:40:00', array(array('country' => 'US')), 0, 0, true);
         $expected = array('count' => 0);
         $this->assertEquals($expected, $result);
     }
@@ -128,7 +128,7 @@ QUERY
     public function testItShouldReturnsOrderWithShippingNumbers()
     {
         $result = ShopymindClient_Callback::getOrdersByStatus(
-            1,
+            false,
             '2015-01-11',
             array(array('country' => 'US')),
             0,
