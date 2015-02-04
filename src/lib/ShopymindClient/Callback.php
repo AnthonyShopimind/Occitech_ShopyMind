@@ -1123,8 +1123,9 @@ class ShopymindClient_Callback {
         }
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $storeIds = $scope->storeIds();
         $store = Mage::getModel('core/store')
-            ->load(array_pop($scope->storeIds()));
+            ->load(array_pop($storeIds));
         $collection->addStoreFilter($store);
 
         if ($collection && sizeof($collection)) {
