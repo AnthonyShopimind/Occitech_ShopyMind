@@ -1498,25 +1498,25 @@ class ShopymindClient_Callback {
             if (isset($timezone['country'])) {
                 if (!$orderAddressJoined) {
                     $collection
-                        ->join(array('order_address' => 'sales/order_address'), 'order_address.parent_id = main_table.entity_id AND order_address.address_type = "billing"', null);
+                        ->join('sales/order_address', '`sales/order_address`.parent_id = main_table.entity_id AND `sales/order_address`.address_type = "billing"', null);
 
                     $orderAddressJoined = true;
                 }
 
                 $collection->getSelect()
-                    ->where('order_address.country_id = ?', $timezone['country']);
+                    ->where('`sales/order_address`.country_id = ?', $timezone['country']);
             }
 
             if (isset($timezone['region'])) {
                 if (!$CountryRegionJoined) {
                     $collection
-                        ->join(array('country_region' => 'directory/country_region'), 'country_region.region_id = order_address.region_id', null);
+                        ->join('directory/country_region', '`directory/country_region`.region_id = `sales/order_address`.region_id', null);
 
                     $CountryRegionJoined = true;
                 }
 
                 $collection->getSelect()
-                    ->where('country_region.code = ?', $timezone['region']);
+                    ->where('`directory/country_region`.code = ?', $timezone['region']);
             }
         }
 
