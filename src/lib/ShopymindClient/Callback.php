@@ -1498,10 +1498,9 @@ class ShopymindClient_Callback {
 
         $customers = array();
         foreach ($customersCollection as $customer) {
-            if ($customer->getId()) {
-                $customers[$customer->getId()] = $customer->getEmail();
-            }
+            $customers[$customer->getId()] = $customer->getEmail();
         }
+
         return $customers;
     }
 }
