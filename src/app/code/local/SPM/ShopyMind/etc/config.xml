@@ -36,63 +36,30 @@
            </SPM_ShopyMind_Model_Observer>
        </observers>
   </sales_order_invoice_pay>
+    <admin_system_config_changed_section_shopymind_configuration>
+        <observers>
+            <spm_shopymind_model_observer>
+                <type>singleton</type>
+                <class>shopymind/observer</class>
+                <method>adminSystemConfigChangedSectionShopymindConfiguration</method>
+            </spm_shopymind_model_observer>
+        </observers>
+    </admin_system_config_changed_section_shopymind_configuration>
 </events>
     </global>
-
-    <admin>
-        <routers>
-            <shopymind>
-                <use>admin</use>
-                <args>
-                    <module>SPM_ShopyMind</module>
-                    <frontName>shopymind</frontName>
-                </args>
-            </shopymind>
-        </routers>
-    </admin>
 
     <adminhtml>
         <translate>
             <modules>
-                <spm_adminhtml>
+                <shopymind_configuration>
                     <files>
                         <shopymind>SPM_ShopyMind.csv</shopymind>
                     </files>
-                </spm_adminhtml>
+                </shopymind_configuration>
             </modules>
         </translate>
 
-        <menu>
-            <shopymind_adminform translate="title" module="shopymind">
-               <title>ShopyMind</title>
-               <sort_order>100</sort_order>
-               <action>shopymind/adminhtml_configuration</action>
-            </shopymind_adminform>
-        </menu>
 
-        <acl>
-            <resources>
-                <admin>
-                    <children>
-                        <catalog>
-                            <children>
-                                <shopymind_adminform>
-                                    <title>My Form</title>
-                                </shopymind_adminform>
-                            </children>
-                        </catalog>
-                    </children>
-                </admin>
-            </resources>
-        </acl>
-
-        <layout>
-            <updates>
-                <shopymind>
-                    <file>shopymind.xml</file>
-                </shopymind>
-            </updates>
-        </layout>
     </adminhtml>
     <frontend>
     <secure_url>

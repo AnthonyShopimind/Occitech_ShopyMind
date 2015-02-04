@@ -11,4 +11,14 @@ class SPM_ShopyMind_Test_Config_Main extends EcomDev_PHPUnit_Test_Case_Config
 			'newOrderObserver'
 		);
 	}
+
+    public function testItObservesAdminSystemConfigChangedShopymindConfiguration()
+    {
+        $this->assertEventObserverDefined(
+            'global',
+            'admin_system_config_changed_section_shopymind_configuration',
+            'shopymind/observer',
+            'adminSystemConfigChangedSectionShopymindConfiguration'
+        );
+    }
 }
