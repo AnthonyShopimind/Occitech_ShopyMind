@@ -1525,6 +1525,9 @@ class ShopymindClient_Callback {
             )
         ;
 
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
+        $scope->restrictProductCollection($collection);
+
         $products = array();
         foreach ($collection as $product) {
             /** @var Mage_Catalog_Model_Product $product */

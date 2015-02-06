@@ -81,4 +81,27 @@ class SPM_ShopyMind_Model_Scope
         ));
     }
 
+    public function restrictProductCollection(Varien_Data_Collection_Db $collection)
+    {
+        $this->guardAgainstInvalidProductCollection($collection);
+
+        if ($this->scope == self::SCOPE_STORE) {
+            $collection->addStoreFilter($this->id);
+        } elseif ($this->scope == self::SCOPE_WEBSITE) {
+            $collection->addWebsiteFilter($this->id);
+        }
+    }
+
+    private function guardAgainstInvalidProductCollection($collection)
+    {
+        // This allows to ensure a correct collection is used with a wide compatibility range (1.5 -> 1.9)
+        $isValid = (
+            $collection instanceof Mage_Catalog_Model_Resource_Eav_Mysql4_Product_Collection
+            || $collection instanceof Mage_Catalog_Model_Resource_Product_Collection
+        );
+        if (!$isValid) {
+            throw new RuntimeException('Incorrect collection passed for filtering products by scope');
+        }
+    }
+
 }

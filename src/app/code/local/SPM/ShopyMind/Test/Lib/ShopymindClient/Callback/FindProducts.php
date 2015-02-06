@@ -42,7 +42,7 @@ QUERY
 
     public function testResultsCanBeFilteredByShop()
     {
-        $this->markTestIncomplete();
+        $this->markTestIncomplete('It seems that the product is not filtered properly: error in fixtures?');
         $result = ShopymindClient_Callback::findProducts('website-2', false, 'Premier');
 
         $expected = array(array_merge($this->aProduct, array(
