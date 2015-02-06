@@ -1513,9 +1513,22 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
+        if (strlen($search) < self::SEARCH_MIN_LENGTH) {
+            return array();
+        }
+
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection
-            ->addAttributeToFilter('name', array('like' => '%' . $search . '%'))
+            ->addAttributeToFilter(array(
+                array(
+                    'attribute' => 'name',
+                    'like' => '%' . $search . '%'
+                ),
+                array(
+                    'attribute' => 'sku',
+                    'like' => '%' . $search . '%'
+                ),
+            ))
             ->addAttributeToSort('name', Varien_Data_Collection_Db::SORT_ORDER_ASC)
             ->addAttributeToFilter('status', array(
                 'in' => Mage::getModel('catalog/product_status')->getVisibleStatusIds())

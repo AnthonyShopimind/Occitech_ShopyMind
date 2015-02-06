@@ -79,17 +79,14 @@ QUERY
 
     public function testResultsCanBeFilteredBySKU()
     {
-        $this->markTestIncomplete();
+        $result = ShopymindClient_Callback::findProducts(false, false, '42-pr');
+        $this->assertEquals(array($this->aProduct), $result);
     }
 
     public function testAnEmptyArrayIsReturnedWhenSearchIs2CharsLong()
     {
-        $this->markTestIncomplete();
-    }
-
-    public function testSimpleProductsDoNotHaveCombinations()
-    {
-        $this->markTestIncomplete();
+        $result = ShopymindClient_Callback::findProducts(false, false, 'pr');
+        $this->assertEquals(array(), $result);
     }
 
     public function testConfigurableProductsHaveCorrectCombinations()

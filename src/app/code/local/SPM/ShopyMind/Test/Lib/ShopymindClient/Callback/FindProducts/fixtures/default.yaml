@@ -79,7 +79,7 @@ eav:
   catalog_product:
    - entity_id: 1
      name: First simple product
-     sku: first_simple_product
+     sku: sku42-pr
      type_id: simple
      attribute_set_id: 4
      status: 1
