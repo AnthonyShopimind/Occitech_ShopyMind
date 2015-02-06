@@ -1504,4 +1504,46 @@ class ShopymindClient_Callback {
         return $options;
     }
 
+    public static function findProducts($id_shop, $lang = false, $search)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $collection = Mage::getModel('catalog/product')->getCollection();
+        $collection
+            ->addAttributeToFilter('name', array('like' => '%' . $search . '%'))
+            ->addAttributeToSort('name', Varien_Data_Collection_Db::SORT_ORDER_ASC)
+            ->addAttributeToFilter('status', array(
+                'in' => Mage::getModel('catalog/product_status')->getVisibleStatusIds())
+            )
+            ->addAttributeToFilter('visibility', array(
+                'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
+            )
+        ;
+
+        $products = array();
+        foreach ($collection as $product) {
+            /** @var Mage_Catalog_Model_Product $product */
+            $data = array(
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'combinations' => array()
+            );
+            $products[] = $data;
+        }
+        return $products;
+        /**
+        WHERE (
+            c.`name` LIKE "%' . pSQL($search) . '%"
+         * OR b.`reference` LIKE "%' . pSQL($search) . '%"
+         * OR b.`reference` LIKE "%' . pSQL($search) . '%"
+         * OR b.`ean13` LIKE "%' . pSQL($search) . '%"
+         * OR b.`id_product` LIKE "%' . pSQL($search) . '%")
+         * AND b.`active` = 1
+         */
+    }
 }
