@@ -28,6 +28,8 @@ if [ ! -d ${MAGENTO_INSTALL_DIR} ]; then
     cp phpunit.xml.dist ${MAGENTO_INSTALL_DIR}
 fi
 
+${MAGECI_BIN} phpunit ${MAGENTO_INSTALL_DIR} "--group setup"
+
 if [ ! ${MAGE_CI_SETUP_ONLY} ]; then
     ${MAGECI_BIN} phpunit ${MAGENTO_INSTALL_DIR}
 fi
