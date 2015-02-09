@@ -6,6 +6,7 @@ eav:
      type_id: "configurable"
      has_options: 1
      required_options: 1
+     status: 1
      name: "LEGGING configurable"
 
 tables:
