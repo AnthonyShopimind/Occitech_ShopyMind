@@ -2,7 +2,6 @@
 
 /**
  * @loadSharedFixture
- * @group tdd
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_FindProducts extends EcomDev_PHPUnit_Test_Case
 {
@@ -89,19 +88,33 @@ QUERY
         $this->assertEquals(array(), $result);
     }
 
+    /**
+     * @loadFixture
+     */
     public function testConfigurableProductsHaveCorrectCombinations()
     {
-        $this->markTestIncomplete();
+        $result = ShopymindClient_Callback::findProducts(false, false, 'configurable');
+        $expectedConfigurableProduct = array(
+            'id' => 2,
+            'name' => 'First configurable product',
+            'combinations' => array(
+                array(
+                    'id' => 1,
+                    'name' => 'First simple product'
+                )
+            )
+        );
+        $this->assertEquals(array($expectedConfigurableProduct), $result);
     }
 
-    public function testResultsAreLimitedTo10()
+    public function testResultsAreLimitedTo100()
     {
-        $this->markTestIncomplete('Check if needed and the max size');
+        $this->markTestIncomplete('To be tested and confirmed');
     }
 
     public function testBundleProductsHaveNoCombinations()
     {
-        $this->markTestIncomplete('?? TODO ??');
+        $this->markTestIncomplete('To be tested and confirmed');
     }
 
 }

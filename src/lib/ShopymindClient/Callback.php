@@ -1536,6 +1536,7 @@ class ShopymindClient_Callback {
             ->addAttributeToFilter('visibility', array(
                 'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
             )
+            ->setPage(1, 100) // limit to prevent abuses
         ;
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
@@ -1547,19 +1548,32 @@ class ShopymindClient_Callback {
             $data = array(
                 'id' => $product->getId(),
                 'name' => $product->getName(),
-                'combinations' => array()
+                'combinations' => self::combinationsOfProduct($product)
             );
             $products[] = $data;
         }
         return $products;
-        /**
-        WHERE (
-            c.`name` LIKE "%' . pSQL($search) . '%"
-         * OR b.`reference` LIKE "%' . pSQL($search) . '%"
-         * OR b.`reference` LIKE "%' . pSQL($search) . '%"
-         * OR b.`ean13` LIKE "%' . pSQL($search) . '%"
-         * OR b.`id_product` LIKE "%' . pSQL($search) . '%")
-         * AND b.`active` = 1
-         */
+    }
+
+    private static function combinationsOfProduct(Mage_Catalog_Model_Product $product)
+    {
+        static $nameAttributeId = null;
+        if (is_null($nameAttributeId)) {
+            $nameAttributeId = Mage::getModel('eav/entity_attribute')->loadByCode(Mage_Catalog_Model_Product::ENTITY, 'name')->getId();
+        }
+
+        $combinations = array();
+        if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
+            $combinations = array_map(
+                function ($childProduct) {
+                    return array(
+                        'id'   => $childProduct->getId(),
+                        'name' => $childProduct->getName()
+                    );
+                },
+                Mage::getModel('catalog/product_type_configurable')->getUsedProducts(array($nameAttributeId), $product)
+            );
+        }
+        return $combinations;
     }
 }
