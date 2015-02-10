@@ -82,6 +82,16 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
         $this->assertFalse($isMultiStore);
     }
 
+    public function testStoreViewsWithDifferentLanguagesIsNotMultiStore()
+    {
+        $initialValue = Mage::app()->getStore(1)->getConfig('general/locale/code');
+        Mage::app()->getStore(1)->setConfig('general/locale/code', 'fr_FR');
+        $isMultiStore = $this->SUT->isMultiStore();
+        Mage::app()->getStore(1)->setConfig('general/locale/code', $initialValue);
+
+        $this->assertFalse($isMultiStore);
+    }
+
     public function testSendCorrectStoreInformationsToShopyMind()
     {
         $this->SUT->expects($this->once())

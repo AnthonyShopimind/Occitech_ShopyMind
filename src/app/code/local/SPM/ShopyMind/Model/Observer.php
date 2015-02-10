@@ -90,11 +90,12 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
 
     public function isMultiStore()
     {
-        $activeStores = array_filter(Mage::app()->getStores(), function($store) {
-            return $store->getIsActive();
-        });
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId(false);
+        $storeLangCodes = array_map(function (Mage_Core_Model_Store $store) {
+            return $store->getConfig('general/locale/code');
+        }, $scope->stores());
 
-        return count($activeStores) > 1;
+        return array_unique($storeLangCodes) !== $storeLangCodes;
     }
 
     public function sendInformationForShopyMindForStore($storeCode = null)
