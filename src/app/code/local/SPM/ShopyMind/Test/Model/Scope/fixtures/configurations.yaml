@@ -1,0 +1,3 @@
+config:
+  default/foo/bar: hello
+  websites/b2c/foo/bar: baz

@@ -32,6 +32,26 @@ class SPM_ShopyMind_Model_Scope
         return new self($id, $scope, $isoLangCode);
     }
 
+    public static function fromMagentoCodes($websiteCode, $storeCode)
+    {
+        if (!is_null($storeCode)) {
+            $id = Mage::getModel('core/store')->load($storeCode)->getId();
+            $scope = self::SCOPE_STORE;
+        } elseif (!is_null($websiteCode)) {
+            $id = Mage::getModel('core/website')->load($websiteCode)->getId();
+            $scope = self::SCOPE_WEBSITE;
+        } else {
+            $id = 0;
+            $scope = self::SCOPE_DEFAULT;
+        }
+        return new self($id, $scope, false);
+    }
+
+    public function shopyMindId()
+    {
+        return sprintf('%s-%s', $this->scope, $this->id);
+    }
+
     public function stores()
     {
         $stores = array_filter(Mage::app()->getStores(), array($this, 'isInScope'));
@@ -74,6 +94,18 @@ class SPM_ShopyMind_Model_Scope
         }, $this->stores());
     }
 
+    public function getConfig($path)
+    {
+        list($scope, $id) = $this->magentoScopeValues();
+        return Mage::getConfig()->getNode($path, $scope, $id);
+    }
+
+    public function saveConfig($path, $value)
+    {
+        list($scope, $id) = $this->magentoScopeValues();
+        return Mage::getConfig()->saveConfig($path, $value, $scope, $id);
+    }
+
     public function restrictCollection(Varien_Data_Collection_Db $collection, $storeIdField = 'store_id')
     {
         $collection->addFieldToFilter($storeIdField, array(
@@ -102,6 +134,16 @@ class SPM_ShopyMind_Model_Scope
         if (!$isValid) {
             throw new RuntimeException('Incorrect collection passed for filtering products by scope');
         }
+    }
+
+    private function magentoScopeValues()
+    {
+        if ($this->scope === self::SCOPE_WEBSITE) {
+            return array('website', (int) $this->id);
+        } elseif ($this->scope === self::SCOPE_STORE) {
+            return array('store', (int) $this->id);
+        }
+        return array('default', null);
     }
 
 }

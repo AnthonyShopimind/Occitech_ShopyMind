@@ -2,6 +2,7 @@
 
 /**
  * @loadSharedFixture
+ * @doNotIndexAll
  */
 class SPM_ShopyMind_Test_Model_Scope extends EcomDev_PHPUnit_Test_Case
 {
@@ -39,6 +40,58 @@ class SPM_ShopyMind_Test_Model_Scope extends EcomDev_PHPUnit_Test_Case
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId(false, 'FR');
         $result = $scope->storeIds();
         $this->assertEquals(array(2), $result);
+    }
+
+    public function testShopymindIdRemainsIdentical()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('website-2');
+        $this->assertEquals('website-2', $scope->shopyMindId());
+    }
+
+    public function testShopymindIdForGlobalScopeHasCorrectValue()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId(false);
+        $this->assertEquals('default-0', $scope->shopyMindId());
+    }
+
+    public function testFromCodesIsGlobalScopeWhenNoCode()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes(null, null);
+        $this->assertEquals('default-0', $scope->shopyMindId());
+    }
+
+    public function testFromCodesIsWebsiteScopeWhenOnlyWebsiteCode()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes('b2c', null);
+        $this->assertEquals('website-1', $scope->shopyMindId());
+    }
+
+    public function testFromCodesIsStoreScopeWhenBothWebsiteAndStoreCodes()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes('b2b', 'b2b_en');
+        $this->assertEquals('store-3', $scope->shopyMindId());
+    }
+
+    /**
+     * @loadFixture configurations
+     * @group tdd
+     */
+    public function testConfigWillRetrieveWebsiteConfig()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes('b2c', null);
+        $value = $scope->getConfig('foo/bar');
+        $this->assertEquals('baz', $value);
+    }
+
+    /**
+     * @loadFixture configurations
+     * @group tdd
+     */
+    public function testConfigWillRetrieveDefaultConfigWhenWebsiteHasNot()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes('b2b', null);
+        $value = $scope->getConfig('foo/bar');
+        $this->assertEquals('hello', $value);
     }
 
 }

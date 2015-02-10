@@ -43,3 +43,6 @@ config:
   default/general/locale/timezone: Europe/London
   default/currency/options/default: GBP
   default/general/store_information/phone: +33102030405
+  stores/default/customer/address/dob_show: opt
+  stores/default/shopymind/configuration/birthrequired: 0
+  stores/second_website_store/shopymind/configuration/birthrequired: 1

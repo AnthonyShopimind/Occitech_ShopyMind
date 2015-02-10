@@ -20,43 +20,40 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     const OPTIONAL_CUSTOMER_DOB = 'opt';
     const REQUIRED_CUSTOMER_DOB = 'req';
 
-    public function __construct() {
-    }
     public function newOrderObserver($observer) {
         try {
-            $m = new Mage();
-            $mageVersion = $m->getVersion();
             $order = $observer->getEvent()->getInvoice()->getOrder();
             ShopymindClient_Callback::checkNewOrder($order);
         } catch ( Exception $e ) {
+            Mage::log($e->getMessage(), Zend_Log::ERR);
         }
     }
     public static function getUserLocale($id_customer, $store_id) {
         $locale_shop = Mage::getStoreConfig('general/locale/code', $store_id);
         $customer = Mage::getModel('customer/customer')->load($id_customer);
         $defaultBilling = $customer->getDefaultBillingAddress();
-        if ($defaultBilling)
+        if ($defaultBilling) {
             return substr($locale_shop, 0, 3) . $defaultBilling->getCountry();
+        }
         return $locale_shop;
     }
 
     public function adminSystemConfigChangedSectionShopymindConfiguration(Varien_Event_Observer $observer)
     {
-        $this->updateDateOfBirthCustomerAttributeFrom($observer);
-        if ($this->hasShopyMindClientConfiguration()) {
-             $this->sendInformationsForShopyMindForStore($observer->getStore());
-        }
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes($observer->getWebsite(), $observer->getStore());
+
+        $this->updateDateOfBirthCustomerAttributeFrom($scope);
+        $this->sendInformationToShopyMindFor($scope);
     }
 
-    private function updateDateOfBirthCustomerAttributeFrom(Varien_Event_Observer $observer)
+    public function updateDateOfBirthCustomerAttributeFrom(SPM_ShopyMind_Model_Scope $scope)
     {
-        list($scope, $scopeId) = $this->getScopeFromEvent($observer);
-        $isBirthDateRequired =  $this->isDateOfBirthRequiredForModule($observer);
-        $showDateOfBirth = $isBirthDateRequired ? self::REQUIRED_CUSTOMER_DOB : self::OPTIONAL_CUSTOMER_DOB;
+        $isBirthDateRequired = $this->isDateOfBirthRequiredForModule($scope);
 
-        $Config = Mage::getModel('core/config');
-        $Config->saveConfig(self::CUSTOMER_SHOW_DOB_CONFIG_PATH, $showDateOfBirth, $scope, $scopeId);
-        $Config->reinit();
+        $scope->saveConfig(
+            self::CUSTOMER_SHOW_DOB_CONFIG_PATH,
+            $isBirthDateRequired ? self::REQUIRED_CUSTOMER_DOB : self::OPTIONAL_CUSTOMER_DOB
+        );
 
         $EavEntity = Mage::getModel('eav/entity_setup', 'core_setup');
         $customerEntityTypeId = Mage::getModel('customer/customer')->getEntityTypeId();
@@ -64,80 +61,61 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             'is_required' => $isBirthDateRequired ? self::REQUIRED : self::OPTIONAL,
             'is_visible' => true,
         );
-
         $EavEntity->updateAttribute($customerEntityTypeId, 'dob', $dobSettings);
+
         Mage::app()->reinitStores();
     }
 
-    private function getScopeFromEvent(Varien_Event_Observer $observer)
+    public function isDateOfBirthRequiredForModule(SPM_ShopyMind_Model_Scope $scope)
     {
-        if (!is_null($observer->getStore())) {
-            $scope = 'stores';
-            $scopeId = Mage::getModel('core/store')->load($observer->getStore(), 'code')->getId();
-        } else {
-            $scope = 'default';
-            $scopeId = 0;
-        }
-        return array($scope, $scopeId);
-    }
-
-    public function isDateOfBirthRequiredForModule(Varien_Event_Observer $observer)
-    {
-        $store = null;
-        if (!is_null($observer->getStore())) {
-            $store = Mage::getModel('core/store')->load($observer->getStore(), 'code');
-        }
-
-        $isDateOfBirthRequired = Mage::getStoreConfig('shopymind/configuration/birthrequired', $store);
+        $isDateOfBirthRequired = $scope->getConfig('shopymind/configuration/birthrequired');
         return ($isDateOfBirthRequired == self::REQUIRED) || ($isDateOfBirthRequired == self::LEGACY_REQUIRED);
     }
 
     public function isMultiStore()
     {
-        $activeStores = array_filter(Mage::app()->getStores(), function($store) {
-            return $store->getIsActive();
-        });
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes(null, null);
+        $storeLangCodes = array_map(function (Mage_Core_Model_Store $store) {
+            return $store->getConfig('general/locale/code');
+        }, $scope->stores());
 
-        return count($activeStores) > 1;
+        return array_unique($storeLangCodes) !== $storeLangCodes;
     }
 
-    public function sendInformationsForShopyMindForStore($storeCode = null)
+    public function sendInformationToShopyMindFor(SPM_ShopyMind_Model_Scope $scope)
     {
-        if (!is_null($storeCode)) {
-            $currentStore =  Mage::getModel('core/store')->load($storeCode, 'code');
-        } else {
-            $currentStore =  Mage::app()->getDefaultStoreView();
+        if (!$this->hasShopyMindClientConfiguration()) {
+            return;
         }
 
+        $locale = $scope->getConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE);
         $this->dispatchToShopyMind(
-            Mage::getStoreConfig('shopymind/configuration/apiidentification', $currentStore),
-            Mage::getStoreConfig('shopymind/configuration/apipassword', $currentStore),
-            substr(Mage::app()->getLocale()->getDefaultLocale(),0,2),
-            Mage::getStoreConfig('currency/options/default', $currentStore),
+            $scope->getConfig('shopymind/configuration/apiidentification'),
+            $scope->getConfig('shopymind/configuration/apipassword'),
+            substr($locale, 0, 2),
+            $scope->getConfig('currency/options/default'),
             Mage::getUrl('contacts'),
-            Mage::getStoreConfig('general/store_information/phone', $currentStore),
-            Mage::getStoreConfig('general/locale/timezone', $currentStore),
+            $scope->getConfig('general/store_information/phone'),
+            $scope->getConfig('general/locale/timezone'),
             $this->isMultiStore(),
-            $currentStore->getId()
+            $scope->shopyMindId()
         );
     }
 
     public function dispatchToShopyMind($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId)
     {
-        if ($this->hasShopyMindClientConfiguration()) {
-            $configurationClient = $this->getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
+        $configurationClient = $this->getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
 
-            if (!$configurationClient->testConnection()) {
-                Mage::throwException($this->__('Error when test connection'));
+        if (!$configurationClient->testConnection()) {
+            Mage::throwException($this->__('Error when test connection'));
+        } else {
+            // Connexion au serveur et sauvegarde des informations
+            $connect = $configurationClient->connectServer();
+            if ($connect !== true) {
+                Mage::throwException($this->__('Error when connect to server'));
             } else {
-                // Connexion au serveur et sauvegarde des informations
-                $connect = $configurationClient->connectServer();
-                if ($connect !== true) {
-                    Mage::throwException($this->__('Error when connect to server'));
-                } else {
-                    $message = $this->__('Your form has been submitted successfully.');
-                    Mage::getSingleton('adminhtml/session')->addSuccess($message);
-                }
+                $message = $this->__('Your form has been submitted successfully.');
+                Mage::getSingleton('adminhtml/session')->addSuccess($message);
             }
         }
     }
