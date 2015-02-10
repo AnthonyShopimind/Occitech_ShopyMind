@@ -1,5 +1,17 @@
 <?php
 
+if (Mage::getVersion() < 1.6) :
+    class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_FindProducts extends PHPUnit_Framework_TestCase
+    {
+        public function testNothing()
+        {
+            $this->markTestSkipped(
+                'Impossible to run the testsuite on Magento 1.5 since the fixture loader is broken:
+                see https://github.com/EcomDev/EcomDev_PHPUnit/pull/229'
+            );
+        }
+    }
+else :
 /**
  * @loadSharedFixture
  */
@@ -118,3 +130,5 @@ QUERY
     }
 
 }
+
+endif;
