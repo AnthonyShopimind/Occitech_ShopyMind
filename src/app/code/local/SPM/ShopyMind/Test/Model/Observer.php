@@ -2,6 +2,7 @@
 
 /**
  * @loadSharedFixture
+ * @group tdd
  */
 class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
 {
@@ -97,7 +98,7 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
                 1
             );
 
-        $this->SUT->sendInformationsForShopyMindForStore('default');
+        $this->SUT->sendInformationForShopyMindForStore('default');
     }
 
     public function testSendDefaultStoreInformationsToShopyMindWhenNoStoreCodePassed()
@@ -116,7 +117,7 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
                 1
             );
 
-        $this->SUT->sendInformationsForShopyMindForStore();
+        $this->SUT->sendInformationForShopyMindForStore();
     }
 
     private function generateShopymindConfigurationChangedEvent($storeCode = null)

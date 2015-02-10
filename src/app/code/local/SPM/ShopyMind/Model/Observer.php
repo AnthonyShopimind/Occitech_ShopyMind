@@ -20,32 +20,28 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     const OPTIONAL_CUSTOMER_DOB = 'opt';
     const REQUIRED_CUSTOMER_DOB = 'req';
 
-    public function __construct() {
-    }
     public function newOrderObserver($observer) {
         try {
-            $m = new Mage();
-            $mageVersion = $m->getVersion();
             $order = $observer->getEvent()->getInvoice()->getOrder();
             ShopymindClient_Callback::checkNewOrder($order);
         } catch ( Exception $e ) {
+            Mage::log($e->getMessage(), Zend_Log::ERR);
         }
     }
     public static function getUserLocale($id_customer, $store_id) {
         $locale_shop = Mage::getStoreConfig('general/locale/code', $store_id);
         $customer = Mage::getModel('customer/customer')->load($id_customer);
         $defaultBilling = $customer->getDefaultBillingAddress();
-        if ($defaultBilling)
+        if ($defaultBilling) {
             return substr($locale_shop, 0, 3) . $defaultBilling->getCountry();
+        }
         return $locale_shop;
     }
 
     public function adminSystemConfigChangedSectionShopymindConfiguration(Varien_Event_Observer $observer)
     {
         $this->updateDateOfBirthCustomerAttributeFrom($observer);
-        if ($this->hasShopyMindClientConfiguration()) {
-             $this->sendInformationsForShopyMindForStore($observer->getStore());
-        }
+        $this->sendInformationForShopyMindForStore($observer->getStore());
     }
 
     private function updateDateOfBirthCustomerAttributeFrom(Varien_Event_Observer $observer)
@@ -101,8 +97,12 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         return count($activeStores) > 1;
     }
 
-    public function sendInformationsForShopyMindForStore($storeCode = null)
+    public function sendInformationForShopyMindForStore($storeCode = null)
     {
+        if (!$this->hasShopyMindClientConfiguration()) {
+            return;
+        }
+
         if (!is_null($storeCode)) {
             $currentStore =  Mage::getModel('core/store')->load($storeCode, 'code');
         } else {
@@ -124,20 +124,18 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
 
     public function dispatchToShopyMind($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId)
     {
-        if ($this->hasShopyMindClientConfiguration()) {
-            $configurationClient = $this->getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
+        $configurationClient = $this->getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
 
-            if (!$configurationClient->testConnection()) {
-                Mage::throwException($this->__('Error when test connection'));
+        if (!$configurationClient->testConnection()) {
+            Mage::throwException($this->__('Error when test connection'));
+        } else {
+            // Connexion au serveur et sauvegarde des informations
+            $connect = $configurationClient->connectServer();
+            if ($connect !== true) {
+                Mage::throwException($this->__('Error when connect to server'));
             } else {
-                // Connexion au serveur et sauvegarde des informations
-                $connect = $configurationClient->connectServer();
-                if ($connect !== true) {
-                    Mage::throwException($this->__('Error when connect to server'));
-                } else {
-                    $message = $this->__('Your form has been submitted successfully.');
-                    Mage::getSingleton('adminhtml/session')->addSuccess($message);
-                }
+                $message = $this->__('Your form has been submitted successfully.');
+                Mage::getSingleton('adminhtml/session')->addSuccess($message);
             }
         }
     }
