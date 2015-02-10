@@ -2,18 +2,17 @@
 
 /**
  * @loadSharedFixture
- * @group tdd
  */
 class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
 {
-    /**
-     * @var SPM_ShopyMind_Model_Observer
-     */
+    private $scope;
     private $SUT;
 
     protected function setUp()
     {
         parent::setUp();
+
+        $this->scope = $this->getMock('SPM_ShopyMind_Model_Scope', array('getConfig', 'saveConfig'), array(), '', false);
 
         $this->SUT = $this->getModelMock('shopymind/observer', array('dispatchToShopyMind'));
         $this->replaceByMock('model', 'shopymind/observer', $this->SUT);
@@ -22,50 +21,50 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
 
     public function testIsDateOfBirthRequiredForModuleOnGlobalScope()
     {
-        $event = $this->generateShopymindConfigurationChangedEvent();
-        $this->assertFalse($this->SUT->isDateOfBirthRequiredForModule($event));
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes(null, null);
+        $this->assertFalse($this->SUT->isDateOfBirthRequiredForModule($scope));
     }
 
     public function testIsDateOfBirthRequiredForModuleWithLegacyConfig()
     {
-        Mage::app()->getStore(0)->setConfig('shopymind/configuration/birthrequired', 'no');
-        $event = $this->generateShopymindConfigurationChangedEvent();
-        $this->assertFalse($this->SUT->isDateOfBirthRequiredForModule($event));
-    }
-    public function testIsDateOfBirthRequiredForModuleOnStoreScope()
-    {
-        $event = $this->generateShopymindConfigurationChangedEvent('second_website_store');
-        $this->assertTrue($this->SUT->isDateOfBirthRequiredForModule($event));
+        $this->givenConfiguration('shopymind/configuration/birthrequired', 'yes');
+        $this->assertTrue($this->SUT->isDateOfBirthRequiredForModule($this->scope));
     }
 
-    public function testSaveShouldUpdateCustomerConfigWithDateOfBirthRequirementOnStoreScope()
+    public function testSaveShouldUpdateCustomerConfigWithDateOfBirthRequiredItIsRequiredForScope()
     {
-        $this->expectsConfigIsSavedWith('customer/address/dob_show', SPM_ShopyMind_Model_Observer::REQUIRED_CUSTOMER_DOB, 'stores', 2);
-        $event = $this->generateShopymindConfigurationChangedEvent('second_website_store');
-        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
+        $this->givenConfiguration('shopymind/configuration/birthrequired', 'yes');
+        $this->expectConfigurationChanged(
+            'customer/address/dob_show',
+            SPM_ShopyMind_Model_Observer::REQUIRED_CUSTOMER_DOB
+        );
+        $this->SUT->updateDateOfBirthCustomerAttributeFrom($this->scope);
     }
 
-    public function testSaveShouldUpdateCustomerDobAttributeRequirementOnStoreScope()
+    public function testSaveShouldUpdateCustomerConfigWithDateOfBirthNotRequiredItIsOptionalForScope()
     {
+        $this->givenConfiguration('shopymind/configuration/birthrequired', 'no');
+        $this->expectConfigurationChanged(
+            'customer/address/dob_show',
+            SPM_ShopyMind_Model_Observer::OPTIONAL_CUSTOMER_DOB
+        );
+        $this->SUT->updateDateOfBirthCustomerAttributeFrom($this->scope);
+    }
+
+    public function testSaveShouldUpdateCustomerDobAttributeRequirementWhenRequired()
+    {
+        $this->givenConfiguration('shopymind/configuration/birthrequired', 'yes');
         $this->expectsAttributeIsUpdatedWith(1, 'dob', array('is_required' => 1, 'is_visible' => true));
 
-        $event = $this->generateShopymindConfigurationChangedEvent('second_website_store');
-        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
+        $this->SUT->updateDateOfBirthCustomerAttributeFrom($this->scope);
     }
 
-    public function testSaveShouldUpdateCustomerConfigWithDateOfBirthRequirementOnGlobalScope()
+    public function testSaveShouldUpdateCustomerDobAttributeRequirementWhenOptional()
     {
-        $this->expectsConfigIsSavedWith('customer/address/dob_show', SPM_ShopyMind_Model_Observer::OPTIONAL_CUSTOMER_DOB, 'default', 0);
-        $event = $this->generateShopymindConfigurationChangedEvent();
-        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
-    }
-
-    public function testSaveShouldUpdateCustomerDobAttributeRequirementOnGlobalScope()
-    {
+        $this->givenConfiguration('shopymind/configuration/birthrequired', 'no');
         $this->expectsAttributeIsUpdatedWith(1, 'dob', array('is_required' => 0, 'is_visible' => true));
 
-        $event = $this->generateShopymindConfigurationChangedEvent();
-        $this->SUT->adminSystemConfigChangedSectionShopymindConfiguration($event);
+        $this->SUT->updateDateOfBirthCustomerAttributeFrom($this->scope);
     }
 
     public function testIsMultiStore()
@@ -105,49 +104,11 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
                 '+33102030405',
                 'Europe/London',
                 true,
-                1
+                'default-0'
             );
 
-        $this->SUT->sendInformationForShopyMindForStore('default');
-    }
-
-    public function testSendDefaultStoreInformationsToShopyMindWhenNoStoreCodePassed()
-    {
-        $this->SUT->expects($this->once())
-            ->method('dispatchToShopyMind')
-            ->with(
-                $this->anything(),
-                $this->anything(),
-                $this->anything(),
-                $this->anything(),
-                $this->anything(),
-                $this->anything(),
-                $this->anything(),
-                $this->anything(),
-                1
-            );
-
-        $this->SUT->sendInformationForShopyMindForStore();
-    }
-
-    private function generateShopymindConfigurationChangedEvent($storeCode = null)
-    {
-        return $this->generateObserver(array('store' => $storeCode), 'admin_system_config_changed_section_shopymind_configuration');
-    }
-
-    private function expectsConfigIsSavedWith($configPath, $configValue, $scope, $scopeId)
-    {
-        $Config = $this->getModelMock('core/config', array('saveConfig'));
-        $Config->expects($this->once())
-            ->method('saveConfig')
-            ->with(
-                $this->equalTo($configPath),
-                $this->equalTo($configValue),
-                $this->equalTo($scope),
-                $this->equalTo($scopeId)
-            );
-
-        $this->replaceByMock('model', 'core/config', $Config);
+        $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes(null, null);
+        $this->SUT->sendInformationToShopyMindFor($scope);
     }
 
     private function expectsAttributeIsUpdatedWith($entityTypeId, $attributeCode, $attributeValue)
@@ -173,5 +134,18 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
             ->will($this->returnValue('http://magento.local/contacts/contacts/index'));
 
         $this->replaceByMock('model', 'core/url', $MockedUrl);
+    }
+
+    private function givenConfiguration($path, $value)
+    {
+        $this->scope->expects($this->any())->method('getConfig')
+            ->with($path)
+            ->will($this->returnValue($value));
+    }
+
+    private function expectConfigurationChanged($path, $value)
+    {
+        $this->scope->expects($this->once())->method('saveConfig')
+            ->with($path, $value);
     }
 }
