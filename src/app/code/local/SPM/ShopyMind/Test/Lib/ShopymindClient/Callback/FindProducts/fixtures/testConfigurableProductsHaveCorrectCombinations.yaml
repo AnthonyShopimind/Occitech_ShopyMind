@@ -1,0 +1,21 @@
+eav:
+  catalog_product:
+   - entity_id: 2
+     name: First configurable product
+     sku: sku43-configurable-pr
+     type_id: configurable
+     attribute_set_id: 4
+     status: 1
+     visibility: 4
+     has_options: 1
+     required_options: 1
+     super_attributes:
+       - color
+     configurable_children:
+       - 1
+     category_ids:
+      - 1
+      - 2
+     website_ids:
+      - b2c
+      - b2b

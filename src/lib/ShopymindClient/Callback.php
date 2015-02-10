@@ -1893,4 +1893,77 @@ class ShopymindClient_Callback {
             }
         }
     }
+
+    public static function findProducts($id_shop, $lang = false, $search)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        if (strlen($search) < self::SEARCH_MIN_LENGTH) {
+            return array();
+        }
+
+        $collection = Mage::getModel('catalog/product')->getCollection();
+        $collection
+            ->addAttributeToFilter(array(
+                array(
+                    'attribute' => 'name',
+                    'like' => '%' . $search . '%'
+                ),
+                array(
+                    'attribute' => 'sku',
+                    'like' => '%' . $search . '%'
+                ),
+            ))
+            ->addAttributeToSort('name', Varien_Data_Collection_Db::SORT_ORDER_ASC)
+            ->addAttributeToFilter('status', array(
+                'in' => Mage::getModel('catalog/product_status')->getVisibleStatusIds())
+            )
+            ->addAttributeToFilter('visibility', array(
+                'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
+            )
+            ->setPage(1, 100) // limit to prevent abuses
+        ;
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
+        $scope->restrictProductCollection($collection);
+
+        $products = array();
+        foreach ($collection as $product) {
+            /** @var Mage_Catalog_Model_Product $product */
+            $data = array(
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'combinations' => self::combinationsOfProduct($product)
+            );
+            $products[] = $data;
+        }
+        return $products;
+    }
+
+    private static function combinationsOfProduct(Mage_Catalog_Model_Product $product)
+    {
+        static $nameAttributeId = null;
+        if (is_null($nameAttributeId)) {
+            $nameAttributeId = Mage::getModel('eav/entity_attribute')->loadByCode(Mage_Catalog_Model_Product::ENTITY, 'name')->getId();
+        }
+
+        $combinations = array();
+        if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
+            $combinations = array_map(
+                function ($childProduct) {
+                    return array(
+                        'id'   => $childProduct->getId(),
+                        'name' => $childProduct->getName()
+                    );
+                },
+                Mage::getModel('catalog/product_type_configurable')->getUsedProducts(array($nameAttributeId), $product)
+            );
+        }
+        return $combinations;
+    }
 }
