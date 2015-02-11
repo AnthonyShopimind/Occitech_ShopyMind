@@ -90,15 +90,15 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
 
         $locale = $scope->getConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE);
         $this->dispatchToShopyMind(
-            $scope->getConfig('shopymind/configuration/apiidentification'),
-            $scope->getConfig('shopymind/configuration/apipassword'),
-            substr($locale, 0, 2),
-            $scope->getConfig('currency/options/default'),
-            Mage::getUrl('contacts'),
-            $scope->getConfig('general/store_information/phone'),
-            $scope->getConfig('general/locale/timezone'),
-            $this->isMultiStore(),
-            $scope->shopyMindId()
+            (string) $scope->getConfig('shopymind/configuration/apiidentification'),
+            (string) $scope->getConfig('shopymind/configuration/apipassword'),
+            (string) substr($locale, 0, 2),
+            (string) $scope->getConfig('currency/options/default'),
+            (string) Mage::getUrl('contacts'),
+            (string) $scope->getConfig('general/store_information/phone'),
+            (string) $scope->getConfig('general/locale/timezone'),
+            (string) $this->isMultiStore(),
+            (string) $scope->shopyMindId()
         );
     }
 
