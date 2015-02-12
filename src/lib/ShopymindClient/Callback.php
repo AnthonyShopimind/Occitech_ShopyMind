@@ -479,10 +479,6 @@ class ShopymindClient_Callback {
 
     private static function productsOfCart($cartId)
     {
-        if (!self::isStoreEmulated()) {
-            throw new RuntimeException('Please emulate a store!');
-        }
-
         $resultProducts = Mage::getModel('sales/quote')->load($cartId)->getAllVisibleItems();
         if (empty($resultProducts) || !is_array($resultProducts)) {
             return array();
