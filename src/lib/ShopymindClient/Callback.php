@@ -533,7 +533,7 @@ class ShopymindClient_Callback {
      * )
      *
      * @param int $id_shop Magento store id
-     * @param string $dateReference From which date ; format Y-m-d H:i:s
+     * @param string $dateReference At which date ; format Y-m-d H:i:s
      * @param array $timezones Timezones to use
      * @param float $amount Minimum amount for fetched carts
      * @param float $amountMax Maximum amount for fetched carts
@@ -558,15 +558,18 @@ class ShopymindClient_Callback {
         if (! $timezonesWhere)
             return false;
         $query = 'SELECT `order_last`.`entity_id`, `order_primary`.`customer_id`, `order_primary`.`customer_email`,
-            SUM((`order_primary`.`base_total_invoiced`)) AS Total
+            SUM((`order_primary`.`base_total_invoiced`*`order_primary`.`base_to_order_rate`)) AS Total
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0) AND `order_last`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d %H:%i:%s"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0) AND `order_last`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d %H:%i:%s"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last2` ON (((`order_last2`.`customer_id` IS NOT NULL AND `order_last2`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last2`.`customer_id` IS NULL OR `order_last2`.`customer_id` = 0) AND `order_last2`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last2`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d"))
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
             LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
             WHERE DATE_FORMAT(DATE_SUB("' . $dateReference . '",INTERVAL ' . (int) $duration . ' DAY),"%Y-%m-%d %H:%i:%s") <= DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d %H:%i:%s")
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
+            AND `order_last2`.`base_total_invoiced` IS NOT NULL
             AND `order_last`.`entity_id` IS NULL
+            AND `order_last2`.`entity_id` IS NOT NULL
             AND `order_primary`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
             GROUP BY `order_primary`.`customer_email`
     		HAVING `Total` >= ' . (float) $amount . '
@@ -604,7 +607,7 @@ class ShopymindClient_Callback {
      * )
      *
      * @param int $id_shop Magento store id
-     * @param string $dateReference From which date ; format Y-m-d H:i:s
+     * @param string $dateReference At which date ; format Y-m-d H:i:s
      * @param array $timezones Timezones to use
      * @param float $nbOrder Minimum orders amount
      * @param float $nbOrderMax Maximum orders amount
@@ -631,13 +634,16 @@ class ShopymindClient_Callback {
         $query = 'SELECT `order_last`.`entity_id`, `order_primary`.`customer_id`, `order_primary`.`customer_email`,
             COUNT(`order_primary`.`entity_id`) AS Total
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0) AND `order_last`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d %H:%i:%s"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0) AND `order_last`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d %H:%i:%s"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last2` ON (((`order_last2`.`customer_id` IS NOT NULL AND `order_last2`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last2`.`customer_id` IS NULL OR `order_last2`.`customer_id` = 0) AND `order_last2`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last2`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d"))
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
             LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
             WHERE DATE_FORMAT(DATE_SUB("' . $dateReference . '",INTERVAL ' . (int) $duration . ' DAY),"%Y-%m-%d %H:%i:%s") <= DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d %H:%i:%s")
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
+            AND `order_last2`.`base_total_invoiced` IS NOT NULL
             AND `order_last`.`entity_id` IS NULL
+            AND `order_last2`.`entity_id` IS NOT NULL
             AND `order_primary`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
             GROUP BY `order_primary`.`customer_email`
     		HAVING `Total` >= ' . (int) $nbOrder . '
