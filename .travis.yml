@@ -22,4 +22,4 @@ before_script:
   - MAGE_CI_SETUP_ONLY=1 composer test ${MAGENTO_VERSION}
 
 script:
-  - composer test ${MAGENTO_VERSION}
+  - COMPOSER_PROCESS_TIMEOUT=3600 composer test ${MAGENTO_VERSION}
