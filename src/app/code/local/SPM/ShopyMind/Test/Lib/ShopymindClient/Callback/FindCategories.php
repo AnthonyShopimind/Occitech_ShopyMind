@@ -1,9 +1,20 @@
 <?php
-
+if (Mage::getVersion() < 1.6) :
+    class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_FindCategories extends PHPUnit_Framework_TestCase
+    {
+        public function testNothing()
+        {
+            $this->markTestSkipped(
+                'Impossible to run the testsuite on Magento 1.5 since the fixture loader is broken:
+                see https://github.com/EcomDev/EcomDev_PHPUnit/pull/229'
+            );
+        }
+    }
+else :
 /**
  * @loadSharedFixture
  */
-class FindCategories extends EcomDev_PHPUnit_Test_Case
+class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_FindCategories extends EcomDev_PHPUnit_Test_Case
 {
 
     public function testItReturnsAnEmptyArrayWhenNoCategoriesMatch()
@@ -69,3 +80,4 @@ class FindCategories extends EcomDev_PHPUnit_Test_Case
     }
 
 }
+endif;
