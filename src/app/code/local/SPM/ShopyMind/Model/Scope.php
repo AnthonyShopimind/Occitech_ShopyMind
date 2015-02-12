@@ -136,6 +136,39 @@ class SPM_ShopyMind_Model_Scope
         }
     }
 
+    public function restrictCategoryCollection(Varien_Data_Collection_Db $collection)
+    {
+        $this->guardAgainstInvalidCategoryCollection($collection);
+
+        if ($this->scope === self::SCOPE_DEFAULT) {
+            return;
+        }
+
+        if ($this->scope === self::SCOPE_STORE) {
+            $stores = $this->stores();
+            $rootCategoryId = $stores[0]->getRootCategoryId();
+        } elseif ($this->scope === self::SCOPE_WEBSITE) {
+            $rootCategoryId = Mage::app()->getWebsite($this->id)->getDefaultGroup()->getRootCategoryId();
+        }
+
+        $collection->addAttributeToFilter(array(
+            array('attribute' => 'path', 'like' => "%/$rootCategoryId/%"),
+            array('attribute' => 'path', 'like' => "%/$rootCategoryId%"),
+        ));
+    }
+
+    private function guardAgainstInvalidCategoryCollection($collection)
+    {
+        // This allows to ensure a correct collection is used with a wide compatibility range (1.5 -> 1.9)
+        $isValid = (
+            $collection instanceof Mage_Catalog_Model_Resource_Eav_Mysql4_Category_Collection
+            || $collection instanceof Mage_Catalog_Model_Resource_Category_Collection
+        );
+        if (!$isValid) {
+            throw new RuntimeException('Incorrect collection passed for filtering categories by scope');
+        }
+    }
+
     private function magentoScopeValues()
     {
         if ($this->scope === self::SCOPE_WEBSITE) {
