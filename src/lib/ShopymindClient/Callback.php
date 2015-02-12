@@ -514,7 +514,7 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Get the most spender customers for a defined period in time
+     * Get the most spender customers for a defined date and having no order after the said date
      *
      * Example of expected result:
      * array(
