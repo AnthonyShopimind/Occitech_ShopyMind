@@ -356,7 +356,7 @@ class ShopymindClient_Callback {
      * Retrieve customer which have their signup anniversary corresponding to $dateReference
      *
      * @param int $storeId
-     * @param string $dateReference
+     * @param string $dateReference usually today's date. The date used to determine the signup birthday (only the day / month are useful)
      * @param array $timezones
      * @param bool $justCount
      *
@@ -373,11 +373,8 @@ class ShopymindClient_Callback {
 
         $customerCollection = Mage::getModel('customer/customer')
             ->getCollection()
-            ->addFieldToFilter('created_at', array(
-                'date' => true,
-                'from' => date('Y-m-d', strtotime($dateReference)),
-                'to' =>  date('Y-m-d', strtotime($dateReference . ' + 1 day'))
-            ))
+            ->addFieldToFilter('created_at', array('like' => date('%-m-d%', strtotime($dateReference))))
+            ->addFieldToFilter('created_at', array('nlike' => date('Y-m-d%', strtotime($dateReference))))
             ->addAttributeToSelect('entity_id');
 
         SPM_ShopyMind_Model_Scope::fromShopymindId($storeId)->restrictCollection($customerCollection);
