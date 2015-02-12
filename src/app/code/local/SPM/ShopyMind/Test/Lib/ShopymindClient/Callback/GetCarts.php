@@ -6,6 +6,8 @@
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetCarts extends EcomDev_PHPUnit_Test_Case
 {
+    protected $_aCart;
+
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
@@ -30,6 +32,51 @@ QUERY
         }
     }
 
+    public function setUp()
+    {
+        $this->_aCart = array(
+            'sum_cart' => 173.88999999999999,
+            'currency' => 'USD',
+            'tax_rate' => '1.0000',
+            'id_cart' => '1',
+            'link_cart' => 'checkout/cart/',
+            'articles' => array (
+                array (
+                    'id' => 1,
+                    'description' => 'LEGGING',
+                    'price' => '13.0000',
+                    'image_url' => $this->placeholderImageUrl(),
+                    'product_url' => 'catalog/product/view/id/1/s/legging/',
+                    'id_combination' => false,
+                    'qty' => '2.0000',
+                    'product_categories' => array(1, 2),
+                    'product_manufacturer' => null, // See test below
+                ),
+            ),
+            'customer' => array(
+                'id_customer' => '1234',
+                'optin' => false,
+                'customer_since' => '0000-00-00 00:00:00',
+                'last_name' => 'Oliver',
+                'first_name' => 'April',
+                'email_address' => 'april.oliver90@example.com',
+                'phone1' => '',
+                'phone2' => '',
+                'gender' => '2',
+                'birthday' => 0,
+                'locale' => '_00',
+                'date_last_order' => 0,
+                'nb_order' => '0',
+                'sum_order' => 0,
+                'groups' => array ('1'),
+                'store_id' => '1',
+                'nb_order_year' => '0',
+                'sum_order_year' => 0
+            ),
+        );
+
+        parent::setUp();
+    }
     public function testGetCartsReturnEmptyListIfTheCartIdDoesNotExists()
     {
         $this->assertEmpty(ShopymindClient_Callback::getCarts('store-1', 1));
@@ -51,46 +98,7 @@ QUERY
         $results = ShopymindClient_Callback::getCarts('store-1', 1);
 
         $expectedResult = array(
-            array(
-                'sum_cart' => 173.88999999999999,
-                'currency' => 'USD',
-                'tax_rate' => '1.0000',
-                'id_cart' => '1',
-                'link_cart' => 'checkout/cart/',
-                'articles' => array (
-                    array (
-                        'id' => 1,
-                        'description' => 'LEGGING',
-                        'price' => '13.0000',
-                        'image_url' => $this->placeholderImageUrl(),
-                        'product_url' => 'catalog/product/view/id/1/s/legging/',
-                        'id_combination' => false,
-                        'qty' => '2.0000',
-                        'product_categories' => array(1, 2),
-                        'product_manufacturer' => null, // See test below
-                    ),
-                ),
-                'customer' => array(
-                    'id_customer' => '1234',
-                    'optin' => false,
-                    'customer_since' => '0000-00-00 00:00:00',
-                    'last_name' => 'Oliver',
-                    'first_name' => 'April',
-                    'email_address' => 'april.oliver90@example.com',
-                    'phone1' => '',
-                    'phone2' => '',
-                    'gender' => '2',
-                    'birthday' => 0,
-                    'locale' => '_00',
-                    'date_last_order' => 0,
-                    'nb_order' => '0',
-                    'sum_order' => 0,
-                    'groups' => array ('1'),
-                    'store_id' => '1',
-                    'nb_order_year' => '0',
-                    'sum_order_year' => 0
-                ),
-            ),
+            $this->_aCart,
         );
         $this->assertEquals($expectedResult, $results);
     }
@@ -102,51 +110,13 @@ QUERY
     {
         $results = ShopymindClient_Callback::getCarts('store-1', array(1, 2));
 
+        $anotherCart = array_merge($this->_aCart, array('id_cart' => '2'));
+        $anotherCart['articles'][0]['qty'] = '1.0000';
+
         $expectedResult = array(
-            array(
-                'sum_cart' => 173.88999999999999,
-                'currency' => 'USD',
-                'tax_rate' => '1.0000',
-                'id_cart' => '1',
-                'link_cart' => 'checkout/cart/',
-                'articles' => array (
-                    array (
-                        'id' => 1,
-                        'description' => 'LEGGING',
-                        'price' => '13.0000',
-                        'image_url' => $this->placeholderImageUrl(),
-                        'product_url' => 'catalog/product/view/id/1/s/legging/',
-                        'id_combination' => false,
-                        'qty' => '2.0000',
-                        'product_categories' => array(1, 2),
-                        'product_manufacturer' => null, // See test below
-                    ),
-                ),
-                'customer' => array(
-                    'id_customer' => '1234',
-                    'optin' => false,
-                    'customer_since' => '0000-00-00 00:00:00',
-                    'last_name' => 'Oliver',
-                    'first_name' => 'April',
-                    'email_address' => 'april.oliver90@example.com',
-                    'phone1' => '',
-                    'phone2' => '',
-                    'gender' => '2',
-                    'birthday' => 0,
-                    'locale' => '_00',
-                    'date_last_order' => 0,
-                    'nb_order' => '0',
-                    'sum_order' => 0,
-                    'groups' => array ('1'),
-                    'store_id' => '1',
-                    'nb_order_year' => '0',
-                    'sum_order_year' => 0
-                ),
-            ),
+            $this->_aCart,
+            $anotherCart,
         );
-        $expectedResult[] = $expectedResult[0];
-        $expectedResult[1]['id_cart'] = '2';
-        $expectedResult[1]['articles'][0]['qty'] = '1.0000';
 
         $this->assertEquals($expectedResult, $results);
     }
