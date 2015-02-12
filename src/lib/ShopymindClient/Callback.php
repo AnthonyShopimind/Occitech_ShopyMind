@@ -1966,4 +1966,38 @@ class ShopymindClient_Callback {
         }
         return $combinations;
     }
+
+    public static function findCategories($id_shop, $lang = false, $search) {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        if (strlen($search) < self::SEARCH_MIN_LENGTH) {
+            return array();
+        }
+
+        $collection = Mage::getModel('catalog/category')->getCollection();
+        $collection
+            ->addAttributeToFilter('name', array('like' => '%' . $search . '%'))
+            ->addIsActiveFilter()
+            ->addOrderField('name')
+        ;
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
+        $scope->restrictCategoryCollection($collection);
+
+        $categories = array();
+        foreach($collection as $category) {
+            $categories[] = array(
+                'id' => $category->getId(),
+                'name' => $category->getName()
+            );
+        }
+
+        return $categories;
+    }
+
 }
