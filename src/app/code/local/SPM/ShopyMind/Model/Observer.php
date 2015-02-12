@@ -107,14 +107,14 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         $configurationClient = $this->getShopyMindClientConfiguration($apiIdentifiant, $apiPassword, $defaultLanguage, $defaultCurrency, $contactPageUrl, $phoneNumber, $timezone, $isMultiStore, $storeId);
 
         if (!$configurationClient->testConnection()) {
-            Mage::throwException($this->__('Error when test connection'));
+            Mage::throwException(Mage::helper('shopymind')->__('Error when testing connection'));
         } else {
             // Connexion au serveur et sauvegarde des informations
             $connect = $configurationClient->connectServer();
             if ($connect !== true) {
-                Mage::throwException($this->__('Error when connect to server'));
+                Mage::throwException(Mage::helper('shopymind')->__('Error when connecting to the server'));
             } else {
-                $message = $this->__('Your form has been submitted successfully.');
+                $message = Mage::helper('shopymind')->__('Your form has been submitted successfully.');
                 Mage::getSingleton('adminhtml/session')->addSuccess($message);
             }
         }
