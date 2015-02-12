@@ -57,7 +57,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_FindManufacturers extends 
     public function testManufacturersAreOrderedByName()
     {
         $manufacturers = ShopymindClient_Callback::findManufacturers(false, false, 'cars');
-        $values = array_map(function($manufacturer) { return $manufacturer['value']; }, $manufacturers);
+        $values = array_map(function($manufacturer) { return $manufacturer['name']; }, $manufacturers);
 
         $expectedValues = array('Peugeot cars', 'Renault cars', 'Volvo cars');
         $this->assertEquals($expectedValues, $values);
