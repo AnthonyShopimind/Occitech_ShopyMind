@@ -426,7 +426,7 @@ class ShopymindClient_Callback {
         }
 
         $return = array();
-        $now = date('Y-m-d H:i:s', strtotime('now', static::$now)); // useful to allow simulating time for testing purposes
+        $now = date('Y-m-d H:i:s', empty(static::$now) ? time() : strtotime('now', static::$now)); // useful to allow simulating time for testing purposes
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
