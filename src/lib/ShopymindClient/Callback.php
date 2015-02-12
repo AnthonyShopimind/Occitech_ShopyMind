@@ -1601,7 +1601,7 @@ class ShopymindClient_Callback {
 
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
         $params = self::formatOrderData($orderData, $spm_key, $voucherUsed);
-        
+
         $spm_key = ShopymindClient_Bin_Notify::newOrder($params);
         if ($spm_key && isset($spm_key ['idRemindersSend']) && $spm_key ['idRemindersSend']) {
             $tablePrefix = Mage::getConfig()->getTablePrefix();
@@ -1743,7 +1743,7 @@ class ShopymindClient_Callback {
         });
         return $options;
     }
-    
+
     private static function returnCollectionDataOrCount(Varien_Data_Collection $collection, $justCount)
     {
         if ($justCount) {
@@ -1800,7 +1800,7 @@ class ShopymindClient_Callback {
 
         return $customers;
     }
-    
+
     /**
      * Get customers who have not orders since $dateReference
      *
