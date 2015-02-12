@@ -176,7 +176,7 @@ class SPM_ShopyMind_Model_Scope
         } elseif ($this->scope === self::SCOPE_STORE) {
             return array('store', (int) $this->id);
         }
-        return array('default', null);
+        return array('default', 0);
     }
 
 }
