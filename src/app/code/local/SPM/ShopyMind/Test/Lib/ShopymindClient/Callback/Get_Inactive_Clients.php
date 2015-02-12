@@ -38,7 +38,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
             ),
         );
 
-        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2015-01-31 23:59:59', array(array('country' => 'US', 'region' => 'AL')), 3);
+        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2014-11-24', array(array('country' => 'US', 'region' => 'AL')), 1);
 
         $this->assertEquals($expected, $actual);
     }
@@ -59,7 +59,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
 
     public function testItCanCountResults()
     {
-        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2015-01-31 23:59:59', array(array('country' => 'US', 'region' => 'AL')), 3, false, true);
+        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2014-11-24', array(array('country' => 'US', 'region' => 'AL')), 1, false, true);
 
         $this->assertEquals(array('count' => 1), $actual);
     }

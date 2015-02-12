@@ -1825,7 +1825,8 @@ class ShopymindClient_Callback {
 
         $collection = Mage::getResourceModel('sales/order_collection')
             ->addAttributeToSelect('customer_id')
-            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')));
+            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')))
+            ->addAttributeToFilter('DATE(main_table.created_at)', array('eq' => date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))));
 
         SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)
             ->restrictCollection($collection, 'main_table.store_id');
@@ -1839,7 +1840,7 @@ class ShopymindClient_Callback {
             ->joinLeft(
                 array('recent_orders' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')),
                 sprintf(
-                    'main_table.customer_id = recent_orders.customer_id AND recent_orders.created_at > "%s" AND recent_orders.status IN ("processing", "complete")',
+                    'main_table.customer_id = recent_orders.customer_id AND DATE(recent_orders.created_at) > "%s" AND recent_orders.status IN ("processing", "complete")',
                     date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
                 ),
                 null
