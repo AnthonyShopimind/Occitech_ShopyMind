@@ -2000,4 +2000,52 @@ class ShopymindClient_Callback {
         return $categories;
     }
 
+
+    /**
+     * Returns the details of the requested cart(s)
+     *
+     * @param integer $id_shop Shop id
+     * @param integer|array $id_cart Cart id(s) to get details from
+     *
+     * @return array
+     */
+    public static function getCarts($id_shop, $id_cart)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $collection = Mage::getResourceModel('sales/quote_collection')
+            ->addFieldToFilter('entity_id', array('in' => (array) $id_cart));
+
+        SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)
+            ->restrictCollection($collection);
+
+        $results = array();
+
+        foreach ($collection as $quote) {
+            self::startLangEmulationByStoreId($quote->getStoreId());
+            $cartProducts = self::productsOfCart($quote->getId());
+            $results[] = array(
+                'sum_cart' => ($quote->getBaseGrandTotal() / $quote->getStoreToBaseRate()),
+                'currency' => $quote->getBaseCurrencyCode(),
+                'tax_rate' => $quote->getStoreToBaseRate(),
+                'id_cart' => $quote->getId(),
+                'link_cart' => str_replace(
+                    basename($_SERVER ['SCRIPT_NAME']) . '/',
+                    '',
+                    Mage::getUrl('checkout/cart', array('_nosid' => true)
+                    )),
+                'articles' => $cartProducts,
+                'customer' => self::getUser(($quote->getCustomerId() ? $quote->getCustomerId() : $quote->getCustomerEmail()), true)
+            );
+            self::stopLangEmulation();
+        }
+
+        return $results;
+    }
+
 }
