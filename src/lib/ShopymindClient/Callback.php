@@ -1837,7 +1837,7 @@ class ShopymindClient_Callback {
 
         $collection->getSelect()
             ->joinLeft(
-                array('recent_orders' => 'sales_flat_order'),
+                array('recent_orders' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')),
                 sprintf(
                     'main_table.customer_id = recent_orders.customer_id AND recent_orders.created_at > "%s" AND recent_orders.status IN ("processing", "complete")',
                     date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
