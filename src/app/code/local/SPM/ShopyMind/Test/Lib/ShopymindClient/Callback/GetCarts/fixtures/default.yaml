@@ -53,6 +53,7 @@ eav:
      url_key: "legging"
      url_path: "legging.html"
      manufacturer: 42 # Must be simulated by mock because I have not found a way to load attributes correctly - TODO Make it DRY
+     status: 1
 
  customer:
    - entity_id: 1234
