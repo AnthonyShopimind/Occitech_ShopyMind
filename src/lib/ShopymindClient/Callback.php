@@ -1367,7 +1367,7 @@ class ShopymindClient_Callback {
 
         $conditions = self::ordersConditionsForCustomer($customerIdOrEmail, $sinceAgo);
         $query = sprintf(
-            'SELECT SUM(`base_total_invoiced`/base_to_order_rate) AS `sumOrder` FROM `' . $tablePrefix . 'sales_flat_order` WHERE %s',
+            'SELECT SUM(`base_total_invoiced`*base_to_order_rate) AS `sumOrder` FROM `' . $tablePrefix . 'sales_flat_order` WHERE %s',
             implode(' AND ', $conditions)
         );
         $result = $read->fetchRow($query);
