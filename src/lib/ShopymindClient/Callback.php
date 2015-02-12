@@ -371,37 +371,35 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
-
         $customerCollection = Mage::getModel('customer/customer')
             ->getCollection()
-            ->addFieldToFilter('created_at', array('date' => true, 'from' => date('Y-m-d', strtotime($dateReference)), 'to' =>  date('Y-m-d', strtotime($dateReference . ' + 1 day'))))
+            ->addFieldToFilter('created_at', array(
+                'date' => true,
+                'from' => date('Y-m-d', strtotime($dateReference)),
+                'to' =>  date('Y-m-d', strtotime($dateReference . ' + 1 day'))
+            ))
             ->addAttributeToSelect('entity_id');
-        $scope->restrictCollection($customerCollection);
+
+        SPM_ShopyMind_Model_Scope::fromShopymindId($storeId)->restrictCollection($customerCollection);
 
         if (!empty($timezones)) {
             $customerCollection->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing');
 
             $countryIds = array_map(
                 function($zone) { return $zone['country']; },
-                array_filter($timezones,
-                    function($zone) { return !empty($zone['country']); }
-                )
+                array_filter($timezones, function($zone) { return !empty($zone['country']); })
             );
-
-            $regionIds = array_map(
-                function($zone) { return $zone['region']; },
-                array_filter($timezones,
-                    function($zone) { return !empty($zone['region']); }
-                )
-            );
-
             if (!empty($countryIds)) {
                 $customerCollection->addAttributeToFilter('customer_country_id', array('in' => $countryIds));
             }
 
+            $regionIds = array_map(
+                function($zone) { return $zone['region']; },
+                array_filter($timezones, function($zone) { return !empty($zone['region']); })
+            );
             if (!empty($regionIds)) {
-                $customerCollection->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing')
+                $customerCollection
+                    ->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing')
                     ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), array('code' => array('in' => $regionIds)), 'inner');
             }
 

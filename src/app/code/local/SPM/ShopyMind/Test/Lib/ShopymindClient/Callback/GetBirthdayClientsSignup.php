@@ -5,9 +5,9 @@
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetBirthdayClientsSignup extends EcomDev_PHPUnit_Test_Case
 {
-    public function testGetBirthdayClientsSignupShoulReturnEmptyIfNoCustomersMatchFilters() {
+    public function testGetBirthdayClientsSignupShoulReturnEmptyIfNoCustomersMatchFilters()
+    {
         $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2015-10-21 12:34:56', array());
-
         $this->assertEmpty($results);
     }
 
@@ -19,28 +19,37 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetBirthdayClientsSignup e
     }
 
     public function testGetBirthdayClientsSignupShoulReturnClientInCorrectCountry() {
-        $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2014-10-21 12:34:56', array(array('country' => 'US')));
+        $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2014-10-21 12:34:56', array(
+            array('country' => 'US')
+        ));
 
         $expected = array('3', '4');
         $this->assertCustomerIdsEquals($expected, $results);
     }
 
     public function testGetBirthdayClientsSignupShoulReturnClientInCorrectCountryAndRegion() {
-        $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2014-10-21 12:34:56', array(array('country' => 'US', 'region' => 'AL')));
+        $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2014-10-21 12:34:56', array(
+            array('country' => 'US', 'region' => 'AL')
+        ));
 
         $expected = array('3');
         $this->assertCustomerIdsEquals($expected, $results);
     }
 
     public function testGetBirthdayClientsSignupShoulReturnClientInCorrectRegion() {
-        $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2014-10-21 12:34:56', array(array('region' => 'AL')));
+        $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2014-10-21 12:34:56', array(
+            array('region' => 'AL')
+        ));
 
         $expected = array('3');
         $this->assertCustomerIdsEquals($expected, $results);
     }
 
     public function testGetBirthdayClientsSignupShoulReturnClientInCorrectRegionsAndCountries() {
-        $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2014-10-21 12:34:56', array(array('country' => 'US', 'region' => 'AL'), array('country' => 'FR')));
+        $results = ShopymindClient_Callback::getBirthdayClientsSignUp(false, '2014-10-21 12:34:56', array(
+            array('country' => 'US', 'region' => 'AL'),
+            array('country' => 'FR')
+        ));
 
         $expected = array('3');
         $this->assertCustomerIdsEquals($expected, $results);
@@ -61,7 +70,10 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetBirthdayClientsSignup e
     }
 
     private function assertCustomerIdsEquals($expected, $results) {
-        $customerIds = array_map(function($customer) { return $customer['customer']['id_customer']; }, $results);
+        $customerIds = array_map(
+            function($customer) { return $customer['customer']['id_customer']; },
+            $results
+        );
         $this->assertEquals($expected, $customerIds);
     }
 }
