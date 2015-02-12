@@ -1727,11 +1727,11 @@ class ShopymindClient_Callback {
         $toShopyMindFormat = function($optionData) {
             return array(
                 'id' => $optionData['value'],
-                'value' => $optionData['label'],
+                'name' => $optionData['label'],
             );
         };
         $matchesSearch = function($option) use ($search) {
-            return stripos($option['value'], $search) !== false;
+            return stripos($option['name'], $search) !== false;
         };
         $options = array_filter(
             array_map($toShopyMindFormat, $attribute->getSource()->getAllOptions(false)),
@@ -1739,7 +1739,7 @@ class ShopymindClient_Callback {
         );
 
         usort($options, function($optA, $optB) {
-            return strcmp($optA['value'], $optB['value']);
+            return strcmp($optA['name'], $optB['name']);
         });
         return $options;
     }
