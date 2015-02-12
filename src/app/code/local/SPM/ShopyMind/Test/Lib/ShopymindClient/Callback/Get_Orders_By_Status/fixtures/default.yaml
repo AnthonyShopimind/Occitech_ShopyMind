@@ -40,6 +40,7 @@ eav:
      sku: some_sku
      type_id: simple
      attribute_set_id: 4
+     status: 1
      category_ids:
          - 2
      price: 13.00

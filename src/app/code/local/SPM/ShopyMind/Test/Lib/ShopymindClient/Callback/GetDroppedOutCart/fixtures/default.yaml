@@ -42,6 +42,7 @@ eav:
      name: LEGGING
      weight: 0.4000
      price: 13.0000
+     status: 1
      category_ids:
       - 2
       - 1
