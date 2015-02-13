@@ -74,7 +74,6 @@ class SPM_ShopyMind_Test_Model_Scope extends EcomDev_PHPUnit_Test_Case
 
     /**
      * @loadFixture configurations
-     * @group tdd
      */
     public function testConfigWillRetrieveWebsiteConfig()
     {
@@ -85,7 +84,6 @@ class SPM_ShopyMind_Test_Model_Scope extends EcomDev_PHPUnit_Test_Case
 
     /**
      * @loadFixture configurations
-     * @group tdd
      */
     public function testConfigWillRetrieveDefaultConfigWhenWebsiteHasNot()
     {
