@@ -379,28 +379,7 @@ class ShopymindClient_Callback {
 
         SPM_ShopyMind_Model_Scope::fromShopymindId($storeId)->restrictCollection($customerCollection);
 
-        if (!empty($timezones)) {
-            $customerCollection->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing');
-
-            $countryIds = array_map(
-                function($zone) { return $zone['country']; },
-                array_filter($timezones, function($zone) { return !empty($zone['country']); })
-            );
-            if (!empty($countryIds)) {
-                $customerCollection->addAttributeToFilter('customer_country_id', array('in' => $countryIds));
-            }
-
-            $regionIds = array_map(
-                function($zone) { return $zone['region']; },
-                array_filter($timezones, function($zone) { return !empty($zone['region']); })
-            );
-            if (!empty($regionIds)) {
-                $customerCollection
-                    ->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing')
-                    ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), array('code' => array('in' => $regionIds)), 'inner');
-            }
-
-        }
+        self::restrictCustomerCollectionBillingAddressToTimezones($timezones, $customerCollection);
 
         return self::returnCollectionDataOrCount($customerCollection, $justCount);
     }
@@ -2054,6 +2033,39 @@ class ShopymindClient_Callback {
         }
 
         return $results;
+    }
+
+    private static function restrictCustomerCollectionBillingAddressToTimezones($timezones, Varien_Data_Collection_Db $customerCollection)
+    {
+        if (!empty($timezones)) {
+            $customerCollection->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing');
+
+            $countryIds = array_map(
+                function ($zone) {
+                    return $zone['country'];
+                },
+                array_filter($timezones, function ($zone) {
+                    return !empty($zone['country']);
+                })
+            );
+            if (!empty($countryIds)) {
+                $customerCollection->addAttributeToFilter('customer_country_id', array('in' => $countryIds));
+            }
+
+            $regionIds = array_map(
+                function ($zone) {
+                    return $zone['region'];
+                },
+                array_filter($timezones, function ($zone) {
+                    return !empty($zone['region']);
+                })
+            );
+            if (!empty($regionIds)) {
+                $customerCollection
+                    ->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing')
+                    ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), array('code' => array('in' => $regionIds)), 'inner');
+            }
+        }
     }
 
 }
