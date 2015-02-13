@@ -1825,8 +1825,7 @@ class ShopymindClient_Callback {
 
         $collection = Mage::getResourceModel('sales/order_collection')
             ->addAttributeToSelect('customer_id')
-            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')))
-            ->addAttributeToFilter('DATE(main_table.created_at)', array('eq' => date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))));
+            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')));
 
         SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)
             ->restrictCollection($collection, 'main_table.store_id');
@@ -1846,6 +1845,17 @@ class ShopymindClient_Callback {
                 null
             )
             ->where('recent_orders.entity_id IS NULL');
+
+        $collection->getSelect()
+            ->joinLeft(
+                array('orders_at_date' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')),
+                sprintf(
+                    'main_table.customer_id = orders_at_date.customer_id AND DATE(orders_at_date.created_at) = "%s" AND orders_at_date.status IN ("processing", "complete")',
+                    date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
+                ),
+                null
+            )
+            ->where('orders_at_date.entity_id IS NOT NULL');
 
         if ($justCount) {
             return self::counterResponse($collection);
