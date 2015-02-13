@@ -371,38 +371,66 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
-        $customerCollection = Mage::getModel('customer/customer')
-            ->getCollection()
-            ->addFieldToFilter('created_at', array('like' => date('%-m-d%', strtotime($dateReference))))
-            ->addFieldToFilter('created_at', array('nlike' => date('Y-m-d%', strtotime($dateReference))))
-            ->addAttributeToSelect('entity_id');
+        $return = array ();
+        $signUpDate = date('m-d', strtotime($dateReference));
+        $timezonesWhere = self::generateTimezonesWhere($timezones);
+        if (! $timezonesWhere)
+            return false;
+        $tablePrefix = Mage::getConfig()->getTablePrefix();
+        $resource = Mage::getSingleton('core/resource');
 
-        SPM_ShopyMind_Model_Scope::fromShopymindId($storeId)->restrictCollection($customerCollection);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
 
-        if (!empty($timezones)) {
-            $customerCollection->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing');
+        $readConnection = $resource->getConnection('core_read');
+        $query = 'SELECT `customer_primary_table`.`entity_id`
+         FROM `' . $tablePrefix . 'customer_entity` AS `customer_primary_table`
+         LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_default_billing_jt` ON (`customer_default_billing_jt`.`entity_id` = `customer_primary_table`.`entity_id`) AND (`customer_default_billing_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'default_billing') . ')
+         LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_country` ON (`customer_default_billing_jt`.`value` = `customer_default_billing_country`.`entity_id`) AND (`customer_default_billing_country`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
+         LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt` ON (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`) AND (`customer_default_billing_state_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR `customer_default_billing_state_jt`.`attribute_id` IS NULL)
+         LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `customer_default_billing_state_jt`.`value`)
+        WHERE  DATE_FORMAT(`customer_primary_table`.`created_at`,"%m-%d") = "' . $signUpDate . '"
+        AND  DATE_FORMAT(`customer_primary_table`.`created_at`,"%Y-%m-%d") != "' . date('Y-m-d', strtotime($dateReference)) . '"
+        AND ' . $timezonesWhere . '
+        AND `customer_primary_table`.`is_active` = 1
+        AND `customer_primary_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
+        GROUP BY `customer_primary_table`.`entity_id`';
+        $results = $readConnection->fetchAll($query);
 
-            $countryIds = array_map(
-                function($zone) { return $zone['country']; },
-                array_filter($timezones, function($zone) { return !empty($zone['country']); })
-            );
-            if (!empty($countryIds)) {
-                $customerCollection->addAttributeToFilter('customer_country_id', array('in' => $countryIds));
+        if ($results && is_array($results) && sizeof($results)) {
+            foreach ( $results as $row ) {
+                if (! $row ['entity_id'])
+                    continue;
+                $return [] = array (
+                    'customer' => self::getUser($row ['entity_id'])
+                );
             }
+        }
+        $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
+        if ($timezonesWhere) {
+            // Guest customer
+            $query = 'SELECT `order_primary`.`customer_email`
+	            FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
+	            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
+	            LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
+	            WHERE `order_primary`.`customer_is_guest` = 1
+	            AND DATE_FORMAT(`order_primary`.`created_at`,"%m-%d") = "' . $signUpDate . '"
+	            AND DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d") != "' . date('Y-m-d', strtotime($dateReference)) . '"
+	            AND ' . $timezonesWhere . '
+	            GROUP BY `order_primary`.`customer_email`';
+            $results = $readConnection->fetchAll($query);
 
-            $regionIds = array_map(
-                function($zone) { return $zone['region']; },
-                array_filter($timezones, function($zone) { return !empty($zone['region']); })
-            );
-            if (!empty($regionIds)) {
-                $customerCollection
-                    ->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing')
-                    ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), array('code' => array('in' => $regionIds)), 'inner');
+            if ($results && is_array($results) && sizeof($results)) {
+                foreach ( $results as $row ) {
+                    $return [] = array (
+                        'customer' => self::getUser($row ['customer_email'])
+                    );
+                }
             }
-
         }
 
-        return self::returnCollectionDataOrCount($customerCollection, $justCount);
+        return ($justCount ? array (
+            'count' => sizeof($return)
+        ) : $return);
     }
 
     /**

@@ -2,7 +2,6 @@
 
 /**
  * @loadSharedFixture
- * @group tdd
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Amount extends EcomDev_PHPUnit_Test_Case
 {
