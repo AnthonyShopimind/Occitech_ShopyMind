@@ -38,7 +38,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
             ),
         );
 
-        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2014-11-24', array(array('country' => 'US', 'region' => 'AL')), 1);
+        $timezones = array(
+            array('country' => 'US', 'region' => 'AL'),
+            false
+        );
+        $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2014-11-24', $timezones, 1);
 
         $this->assertEquals($expected, $actual);
     }
