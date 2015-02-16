@@ -83,6 +83,20 @@ class ShopymindClient_Bin_Configuration {
     protected $_timezone;
 
     /**
+     * Multi-boutiques activé ?
+     *
+     * @var boolean
+     */
+    protected $_multishopEnabled;
+
+    /**
+     * Id de la boutique (multi-boutiques)
+     *
+     * @var string
+     */
+    protected $_shopIdShop;
+
+    /**
      * Constructeur de l'objet config
      *
      * @return void
@@ -98,9 +112,9 @@ class ShopymindClient_Bin_Configuration {
      * @param string $passwordAPI
      * @param string $defaultLang
      * @param string $defaultCurrency
-     * @return ShopymindClient_Bin_Configuration
+     * @return ShopymindClient_Configuration
      */
-    public static function factory($identifiantAPI, $passwordAPI, $defaultLang, $defaultCurrency, $contactPage = null, $phoneNumber = null, $timezone = null) {
+    public static function factory($identifiantAPI, $passwordAPI, $defaultLang, $defaultCurrency, $contactPage = null, $phoneNumber = null, $timezone = null,$multishop_enabled = null,$shop_id_shop = null) {
         $config = new self;
         $config->setApiIdentification($identifiantAPI)
                ->setApiPassword($passwordAPI)
@@ -108,8 +122,9 @@ class ShopymindClient_Bin_Configuration {
                ->setDefaultCurrency($defaultCurrency)
                ->setContactPage($contactPage)
                ->setPhoneNumber($phoneNumber)
-               ->setTimezone($timezone);
-
+               ->setTimezone($timezone)
+               ->setMultishopEnabled($multishop_enabled)
+        	   ->setShopIdShop($shop_id_shop);
         return $config;
     }
 
@@ -162,6 +177,14 @@ class ShopymindClient_Bin_Configuration {
 
         if ($this->getTimezone() !== null) {
             $data['timezone'] = $this->getTimezone();
+        }
+
+        if ($this->getMultishopEnabled() !== null) {
+            $data['multishopEnabled'] = $this->getMultishopEnabled();
+        }
+
+        if ($this->getShopIdShop() !== null) {
+        	$data['shopIdShop'] = $this->getShopIdShop();
         }
 
         require_once dirname(__FILE__) . '/../Src/Client.php';
@@ -366,6 +389,46 @@ class ShopymindClient_Bin_Configuration {
      */
     public function setTimezone($timezone) {
         $this->_timezone = $timezone;
+        return $this;
+    }
+
+    /**
+     * Permet de récupérer le statut de l'option multi-boutiques
+     *
+     * @return boolean
+     */
+    public function getMultishopEnabled() {
+        return (bool) $this->_multishopEnabled;
+    }
+
+    /**
+     * Permet de modifier le statut de l'option multi-boutiques
+     *
+     * @param boolean $timezone
+     * @return ShopymindClient_Configuration
+     */
+    public function setMultishopEnabled($multishopEnabled) {
+        $this->_multishopEnabled = (bool) $multishopEnabled;
+        return $this;
+    }
+
+    /**
+     * Permet de récupérer l'id de la boutique (multi-boutiques)
+     *
+     * @return string
+     */
+    public function getShopIdShop() {
+        return $this->_shopIdShop;
+    }
+
+    /**
+     * Permet de modifier l'id de la boutique (multi-boutiques)
+     *
+     * @param string $shopIdShop
+     * @return ShopymindClient_Configuration
+     */
+    public function setShopIdShop($shopIdShop) {
+        $this->_shopIdShop = $shopIdShop;
         return $this;
     }
 
