@@ -1637,7 +1637,9 @@ class ShopymindClient_Callback {
                 __FUNCTION__
             ), func_get_args());
         }
-        if ($justCount) $count = 0;
+        if ($justCount) {
+            $count = 0;
+        }
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
 
         $customerCollection = Mage::getModel('customer/customer')
@@ -1652,22 +1654,20 @@ class ShopymindClient_Callback {
             $customerCollection->getSelect()->limit($limit, $start);
         }
 
-
-
         $customers = array();
         foreach($customerCollection as $customer) {
             if ($justCount) {
                 $count++;
-            }
-            else
+            } else {
                 $customers[] = array (
                     'customer' => self::getUser($customer['entity_id'])
                 );
+            }
         }
 
         //Add guest customer
         $guestCollection = Mage::getResourceModel('sales/order_collection')
-        ->addAttributeToSelect('customer_email');
+            ->addAttributeToSelect('customer_email');
 
         $scope->restrictCollection($guestCollection);
 
@@ -1683,12 +1683,13 @@ class ShopymindClient_Callback {
 
 
         foreach ($guestCollection as $customer) {
-            if ($justCount)
+            if ($justCount) {
                 $count++;
-            else
+            } else {
                 $customers[] = array (
                     'customer' => self::getUser($customer['customer_email'])
                 );
+            }
         }
 
         if ($justCount) {
