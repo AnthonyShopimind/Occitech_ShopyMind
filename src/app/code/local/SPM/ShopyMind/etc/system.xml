@@ -41,12 +41,10 @@
                             <frontend_type>text</frontend_type>
                             <config_path>shopymind/configuration/apiidentification</config_path>
                             <sort_order>1</sort_order>
-                            <validate>required-entry</validate>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <validate>required-entry</validate>
-                            <can_be_empty>0</can_be_empty>
+                            <can_be_empty>1</can_be_empty>
                         </api_key>
                         <api_password translate="label">
                             <label>API Password</label>
@@ -56,8 +54,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <validate>required-entry</validate>
-                            <can_be_empty>0</can_be_empty>
+                            <can_be_empty>1</can_be_empty>
                         </api_password>
                         <birth_required translate="label comment">
                             <label>Date of birth is required ?</label>

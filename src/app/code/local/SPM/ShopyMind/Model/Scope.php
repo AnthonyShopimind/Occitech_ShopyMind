@@ -47,6 +47,15 @@ class SPM_ShopyMind_Model_Scope
         return new self($id, $scope, false);
     }
 
+    public static function fromRequest() {
+        $currentStore = Mage::app()->getStore();
+        if ($currentStore->isAdmin()) {
+            $request = Mage::app()->getRequest();
+            return self::fromMagentoCodes($request->getParam('website'), $request->getParam('store'));
+        }
+        return self::fromMagentoCodes($currentStore->getWebsite()->getCode(), $currentStore->getCode());
+    }
+
     public function shopyMindId()
     {
         return sprintf('%s-%s', $this->scope, $this->id);
