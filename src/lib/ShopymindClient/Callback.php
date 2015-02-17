@@ -1912,6 +1912,7 @@ class ShopymindClient_Callback {
         if ($justCount) {
             return self::counterResponse($collection);
         }
+        $customers = array();
         foreach ( $collection as $order ) {
 
             $customers [] = array (
