@@ -79,6 +79,6 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetContacts extends EcomDe
         $result = ShopymindClient_Callback::getContacts('store-1', 0, false, '1970-01-01', true);
 
         $expected = 4;
-        $this->assertEquals($expected, $result['count']);
+        $this->assertEquals($expected, $result);
     }
 }
