@@ -24,6 +24,3 @@ before_script:
 script:
   - COMPOSER_PROCESS_TIMEOUT=3600 composer test ${MAGENTO_VERSION}
 
-after_script:
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover magento_1.9.1.0/var/phpunit/coverage.xml
