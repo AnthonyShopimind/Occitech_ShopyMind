@@ -155,7 +155,7 @@ class ShopymindClient_Callback {
                 $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($row ['email']);
                 $return [] = array (
                         'id_customer' => $row ['entity_id'],
-                        'store_id' => $row ['store_id'],
+                        'shop_id_shop' => $row ['store_id'],
                         'optin' => $subscriber->isSubscribed(),
                         'customer_since' => $row ['created_at'],
                         'last_name' => $row ['lastname'],
@@ -371,66 +371,24 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
-        $return = array ();
-        $signUpDate = date('m-d', strtotime($dateReference));
-        $timezonesWhere = self::generateTimezonesWhere($timezones);
-        if (! $timezonesWhere)
-            return false;
-        $tablePrefix = Mage::getConfig()->getTablePrefix();
-        $resource = Mage::getSingleton('core/resource');
+        $customerCollection = Mage::getModel('customer/customer')
+            ->getCollection()
+            ->addFieldToFilter('created_at', array('like' => date('%-m-d%', strtotime($dateReference))))
+            ->addFieldToFilter('created_at', array('nlike' => date('Y-m-d%', strtotime($dateReference))))
+            ->addAttributeToSelect('entity_id');
 
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
+        SPM_ShopyMind_Model_Scope::fromShopymindId($storeId)->restrictCollection($customerCollection);
 
-        $readConnection = $resource->getConnection('core_read');
-        $query = 'SELECT `customer_primary_table`.`entity_id`
-         FROM `' . $tablePrefix . 'customer_entity` AS `customer_primary_table`
-         LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_default_billing_jt` ON (`customer_default_billing_jt`.`entity_id` = `customer_primary_table`.`entity_id`) AND (`customer_default_billing_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'default_billing') . ')
-         LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_country` ON (`customer_default_billing_jt`.`value` = `customer_default_billing_country`.`entity_id`) AND (`customer_default_billing_country`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
-         LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt` ON (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`) AND (`customer_default_billing_state_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR `customer_default_billing_state_jt`.`attribute_id` IS NULL)
-         LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `customer_default_billing_state_jt`.`value`)
-        WHERE  DATE_FORMAT(`customer_primary_table`.`created_at`,"%m-%d") = "' . $signUpDate . '"
-        AND  DATE_FORMAT(`customer_primary_table`.`created_at`,"%Y-%m-%d") != "' . date('Y-m-d', strtotime($dateReference)) . '"
-        AND ' . $timezonesWhere . '
-        AND `customer_primary_table`.`is_active` = 1
-        AND `customer_primary_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
-        GROUP BY `customer_primary_table`.`entity_id`';
-        $results = $readConnection->fetchAll($query);
-
-        if ($results && is_array($results) && sizeof($results)) {
-            foreach ( $results as $row ) {
-                if (! $row ['entity_id'])
-                    continue;
-                $return [] = array (
-                    'customer' => self::getUser($row ['entity_id'])
-                );
-            }
-        }
-        $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
-        if ($timezonesWhere) {
-            // Guest customer
-            $query = 'SELECT `order_primary`.`customer_email`
-	            FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-	            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
-	            LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
-	            WHERE `order_primary`.`customer_is_guest` = 1
-	            AND DATE_FORMAT(`order_primary`.`created_at`,"%m-%d") = "' . $signUpDate . '"
-	            AND DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d") != "' . date('Y-m-d', strtotime($dateReference)) . '"
-	            AND ' . $timezonesWhere . '
-	            GROUP BY `order_primary`.`customer_email`';
-            $results = $readConnection->fetchAll($query);
-
-            if ($results && is_array($results) && sizeof($results)) {
-                foreach ( $results as $row ) {
-                    $return [] = array (
-                        'customer' => self::getUser($row ['customer_email'])
-                    );
-                }
-            }
+        $timezonesWhere = self::generateTimezonesWhere($timezones, 'at_customer_country_id', 'value', 'directory_country_region');
+        if (!empty($timezonesWhere)) {
+            $customerCollection
+                ->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing', null, 'left')
+                ->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing', null, 'left')
+                ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), null, 'left');
+            $customerCollection->getSelect()->where($timezonesWhere);
         }
 
-        return ($justCount ? array (
-            'count' => sizeof($return)
-        ) : $return);
+        return self::returnCollectionDataOrCount($customerCollection, $justCount);
     }
 
     /**
@@ -485,12 +443,13 @@ class ShopymindClient_Callback {
                         'currency' => $row['base_currency_code'],
                         'tax_rate' => $row['store_to_base_rate'],
                         'id_cart' => $row['entity_id'],
+                        'date_cart' => $row['created_at'],
                         'link_cart' => str_replace(
                             basename($_SERVER ['SCRIPT_NAME']) . '/',
                             '',
                             Mage::getUrl('checkout/cart', array('_nosid' => true)
                         )),
-                        'articles' => $cartProducts,
+                        'products' => $cartProducts,
                         'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']), true)
                     );
                 }
@@ -1655,6 +1614,9 @@ class ShopymindClient_Callback {
                 __FUNCTION__
             ), func_get_args());
         }
+        if ($justCount) {
+            $count = 0;
+        }
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($storeId);
 
         $customerCollection = Mage::getModel('customer/customer')
@@ -1669,16 +1631,48 @@ class ShopymindClient_Callback {
             $customerCollection->getSelect()->limit($limit, $start);
         }
 
-        if ($justCount) {
-            return self::counterResponse($customerCollection);
-        }
-
         $customers = array();
         foreach($customerCollection as $customer) {
-            $customers[] = array (
-                'customer' => self::getUser($customer['entity_id'])
-            );
+            if ($justCount) {
+                $count++;
+            } else {
+                $customers[] = array (
+                    'customer' => self::getUser($customer['entity_id'])
+                );
+            }
         }
+
+        //Add guest customer
+        $guestCollection = Mage::getResourceModel('sales/order_collection')
+            ->addAttributeToSelect('customer_email');
+
+        $scope->restrictCollection($guestCollection);
+
+        if (!is_null($lastUpdate)) {
+            $guestCollection->addFieldToFilter('updated_at', array('gteq' => $lastUpdate));
+        }
+
+        $guestCollection->addFieldToFilter('customer_is_guest', 1);
+
+        if (!is_null($limit)) {
+            $guestCollection->getSelect()->limit($limit, $start);
+        }
+
+
+        foreach ($guestCollection as $customer) {
+            if ($justCount) {
+                $count++;
+            } else {
+                $customers[] = array (
+                    'customer' => self::getUser($customer['customer_email'])
+                );
+            }
+        }
+
+        if ($justCount) {
+            return $count;
+        }
+
         return $customers;
     }
 
@@ -1823,6 +1817,28 @@ class ShopymindClient_Callback {
             $customers[$customer->getId()] = $customer->getEmail();
         }
 
+        //Add guest customer
+        $guestCollection = Mage::getResourceModel('sales/order_collection')
+        ->addAttributeToSelect('customer_email');
+
+        $scope->restrictCollection($guestCollection);
+
+        if (!is_null($lastUpdate)) {
+            $guestCollection->addFieldToFilter('updated_at', array('gteq' => $lastUpdate));
+        }
+
+        $guestCollection->addFieldToFilter('customer_is_guest', 1);
+
+        if (!is_null($limit)) {
+            $guestCollection->getSelect()->limit($limit, $start);
+        }
+
+
+        foreach ($guestCollection as $customer) {
+            if(!in_array($customer->getCustomerEmail(),$customers))
+                $customers[$customer->getCustomerEmail()] = $customer->getCustomerEmail();
+        }
+
         return $customers;
     }
 
@@ -1838,12 +1854,11 @@ class ShopymindClient_Callback {
      *
      * @return bool|array|int
      */
-    public static function getInactiveClients($id_shop, $dateReference, $timezones, $nbMonthsLastOrder, $relaunchOlder = false, $justCount = false)
-    {
+    public static function getInactiveClients($id_shop, $dateReference, $timezones, $nbMonthsLastOrder, $relaunchOlder = false, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
-            return call_user_func_array(array(
-                'ShopymindClient_CallbackOverride',
-                __FUNCTION__
+            return call_user_func_array(array (
+                    'ShopymindClient_CallbackOverride',
+                    __FUNCTION__
             ), func_get_args());
         }
 
@@ -1851,48 +1866,35 @@ class ShopymindClient_Callback {
             return false;
         }
 
-        $collection = Mage::getResourceModel('sales/order_collection')
-            ->addAttributeToSelect('customer_id')
-            ->addAttributeToFilter('main_table.status', array('in' => array('processing', 'complete')));
+        $collection = Mage::getResourceModel('sales/order_collection')->addAttributeToSelect('customer_id')->addAttributeToSelect('customer_email')->addAttributeToFilter('main_table.status', array (
+                'in' => array (
+                        'processing',
+                        'complete'
+                )
+        ));
 
-        SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)
-            ->restrictCollection($collection, 'main_table.store_id');
+        SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)->restrictCollection($collection, 'main_table.store_id');
 
-        $collection->getSelect()
-            ->distinct(true);
+        $collection->getSelect()->distinct(true);
 
         self::restrictOrdersCollectionBillingAddressesToTimezones($collection, $timezones);
 
-        $collection->getSelect()
-            ->joinLeft(
-                array('recent_orders' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')),
-                sprintf(
-                    'main_table.customer_id = recent_orders.customer_id AND DATE(recent_orders.created_at) > "%s" AND recent_orders.status IN ("processing", "complete")',
-                    date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
-                ),
-                null
-            )
-            ->where('recent_orders.entity_id IS NULL');
+        $collection->getSelect()->joinLeft(array (
+                'recent_orders' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')
+        ), sprintf('(main_table.customer_id = recent_orders.customer_id OR main_table.customer_email = recent_orders.customer_email) AND DATE(recent_orders.created_at) > "%s" AND recent_orders.status IN ("processing", "complete")', date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))), null)->where('recent_orders.entity_id IS NULL');
 
-        $collection->getSelect()
-            ->joinLeft(
-                array('orders_at_date' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')),
-                sprintf(
-                    'main_table.customer_id = orders_at_date.customer_id AND DATE(orders_at_date.created_at) = "%s" AND orders_at_date.status IN ("processing", "complete")',
-                    date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))
-                ),
-                null
-            )
-            ->where('orders_at_date.entity_id IS NOT NULL');
+        $collection->getSelect()->joinLeft(array (
+                'orders_at_date' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')
+        ), sprintf('(main_table.customer_id = orders_at_date.customer_id OR main_table.customer_email = orders_at_date.customer_email) AND DATE(orders_at_date.created_at) = "%s" AND orders_at_date.status IN ("processing", "complete")', date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))), null)->where('orders_at_date.entity_id IS NOT NULL');
 
         if ($justCount) {
             return self::counterResponse($collection);
         }
-
         $customers = array();
-        foreach ($collection as $order) {
-            $customers[] = array (
-                'customer' => self::getUser($order['customer_id'])
+        foreach ( $collection as $order ) {
+
+            $customers [] = array (
+                    'customer' => self::getUser(($order ['customer_id'] ? $order ['customer_id'] : $order ['customer_email']))
             );
         }
 
@@ -2070,12 +2072,14 @@ class ShopymindClient_Callback {
                 'currency' => $quote->getBaseCurrencyCode(),
                 'tax_rate' => $quote->getStoreToBaseRate(),
                 'id_cart' => $quote->getId(),
+                'date_cart' =>$quote->getCreatedAt(),
+                'date_upd' => $quote->getUpdatedAt(),
                 'link_cart' => str_replace(
                     basename($_SERVER ['SCRIPT_NAME']) . '/',
                     '',
                     Mage::getUrl('checkout/cart', array('_nosid' => true)
                     )),
-                'articles' => $cartProducts,
+                'products' => $cartProducts,
                 'customer' => self::getUser(($quote->getCustomerId() ? $quote->getCustomerId() : $quote->getCustomerEmail()), true)
             );
             self::stopLangEmulation();

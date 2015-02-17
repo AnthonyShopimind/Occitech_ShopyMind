@@ -31,7 +31,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
                     'nb_order' => '0',
                     'sum_order' => 0,
                     'groups' => array('1'),
-                    'store_id' => '1',
+                    'shop_id_shop' => '1',
                     'nb_order_year' => '0',
                     'sum_order_year' => 0,
                 ),

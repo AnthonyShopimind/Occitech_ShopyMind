@@ -26,7 +26,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Amount
                     'nb_order' => '2',
                     'sum_order' => '180.00000000',
                     'groups' => array('1'),
-                    'store_id' => '1',
+                    'shop_id_shop' => '1',
                     'nb_order_year' => '2',
                     'sum_order_year' => '180.00000000',
                 ),

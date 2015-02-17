@@ -8,7 +8,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
 
     private $aCustomer = array(
         'id_customer'     => 1,
-        'store_id'        => 1,
+        'shop_id_shop'    => 1,
         'optin'           => false,
         'customer_since'  => '2014-10-21 14:10:59',
         'last_name'       => 'Oliver',
@@ -119,7 +119,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         $expectedData = array(
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
-                'store_id' => 2,
+                'shop_id_shop' => 2,
                 'customer_since' => '2015-01-21 14:14:04',
                 'last_name' => 'Doe',
                 'first_name' => 'Jane',
@@ -154,7 +154,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         $expectedData = array(
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
-                'store_id' => 2,
+                'shop_id_shop' => 2,
                 'customer_since' => '2015-01-21 14:14:04',
                 'last_name' => 'Doe',
                 'first_name' => 'Jane',
