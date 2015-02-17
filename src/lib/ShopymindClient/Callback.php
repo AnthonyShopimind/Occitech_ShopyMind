@@ -379,36 +379,13 @@ class ShopymindClient_Callback {
 
         SPM_ShopyMind_Model_Scope::fromShopymindId($storeId)->restrictCollection($customerCollection);
 
-        if (!empty($timezones)) {
-            $customerCollection->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing',null, 'left');
-
-            $countryIds = array_map(
-                function($zone) { return $zone['country']; },
-                array_filter($timezones, function($zone) { return !empty($zone['country']); })
-            );
-            $nullCondition = null;
-            foreach($timezones as $timezone) {
-                if(!is_array($timezone) && (bool)$timezone === false) {
-                    $nullCondition = array('null' => false);
-                    break;
-                }
-            }
-            if (!empty($countryIds)) {
-                $customerCollection->addAttributeToFilter('customer_country_id', array(array('in' => $countryIds),$nullCondition));
-            }elseif($nullCondition !== null) {
-                $customerCollection->addAttributeToFilter('customer_country_id', array($nullCondition));
-            }
-
-            $regionIds = array_map(
-                function($zone) { return $zone['region']; },
-                array_filter($timezones, function($zone) { return !empty($zone['region']); })
-            );
-            if (!empty($regionIds)) {
-                $customerCollection
-                    ->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing')
-                    ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), array('code' => array('in' => $regionIds)), 'left');
-            }
-
+        $timezonesWhere = self::generateTimezonesWhere($timezones, 'at_customer_country_id', 'value', 'directory_country_region');
+        if (!empty($timezonesWhere)) {
+            $customerCollection
+                ->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing', null, 'left')
+                ->joinAttribute('customer_region_id', 'customer_address/region_id', 'default_billing', null, 'left')
+                ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), null, 'left');
+            $customerCollection->getSelect()->where($timezonesWhere);
         }
 
         return self::returnCollectionDataOrCount($customerCollection, $justCount);
