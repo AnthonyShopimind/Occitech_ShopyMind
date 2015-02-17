@@ -40,7 +40,9 @@ QUERY
             'tax_rate' => '1.0000',
             'id_cart' => '1',
             'link_cart' => 'checkout/cart/',
-            'articles' => array (
+            'date_cart' => '2014-01-29 12:45:46',
+            'date_upd' => '2014-01-30 13:45:46',
+            'products' => array (
                 array (
                     'id' => 1,
                     'description' => 'LEGGING',
@@ -69,7 +71,7 @@ QUERY
                 'nb_order' => '0',
                 'sum_order' => 0,
                 'groups' => array ('1'),
-                'store_id' => '1',
+                'shop_id_shop' => '1',
                 'nb_order_year' => '0',
                 'sum_order_year' => 0
             ),
@@ -110,8 +112,15 @@ QUERY
     {
         $results = ShopymindClient_Callback::getCarts('store-1', array(1, 2));
 
-        $anotherCart = array_merge($this->_aCart, array('id_cart' => '2'));
-        $anotherCart['articles'][0]['qty'] = '1.0000';
+        $anotherCart = array_merge(
+            $this->_aCart,
+            array(
+                'id_cart' => '2',
+                'date_cart' => '2014-01-30 12:45:46',
+                'date_upd' => '2014-01-31 13:45:46',
+            )
+        );
+        $anotherCart['products'][0]['qty'] = '1.0000';
 
         $expectedResult = array(
             $this->_aCart,

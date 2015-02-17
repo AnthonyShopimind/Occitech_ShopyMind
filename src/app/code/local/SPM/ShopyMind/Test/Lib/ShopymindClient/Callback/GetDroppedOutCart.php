@@ -63,7 +63,8 @@ QUERY
                 'tax_rate' => '1.0000',
                 'id_cart' => '1',
                 'link_cart' => 'checkout/cart/',
-                'articles' => array (
+                'date_cart' => '2014-01-29 12:45:46',
+                'products' => array (
                     array (
                         'id' => 1,
                         'description' => 'LEGGING',
@@ -92,7 +93,7 @@ QUERY
                     'nb_order' => '0',
                     'sum_order' => 0,
                     'groups' => array ('1'),
-                    'store_id' => '1',
+                    'shop_id_shop' => '1',
                     'nb_order_year' => '0',
                     'sum_order_year' => 0
                 ),
@@ -119,7 +120,7 @@ QUERY
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
         $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 'store-1', 10 * 60);
 
-        $this->assertEquals(42, $results[0]['articles'][0]['product_manufacturer']);
+        $this->assertEquals(42, $results[0]['products'][0]['product_manufacturer']);
     }
 
     /**
@@ -141,7 +142,7 @@ QUERY
             'product_categories' => array(),
             'product_manufacturer' => null,
         ));
-        $this->assertEquals($expectedResult, $results[0]['articles']);
+        $this->assertEquals($expectedResult, $results[0]['products']);
     }
 
     /**
