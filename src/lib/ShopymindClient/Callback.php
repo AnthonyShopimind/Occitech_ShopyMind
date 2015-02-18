@@ -1046,15 +1046,21 @@ class ShopymindClient_Callback {
      * @param string $lang
      * @return boolean void
      */
-    public static function startLangEmulationByIsoLang($lang) {
+    public static function startLangEmulationByIsoLang($lang,$id_shop) {
         if (self::$appEmulation !== false)
             return;
+        if (!empty($id_shop)) {
+            list($scope, $website_id_needed) = explode('-', $id_shop);
+        }
         $stores = Mage::app()->getStores();
+
         foreach ( $stores as $store ) {
             $store_id = $store->getId();
+            $website_id = $store->getWebsite()->getId();
             $locale_store = Mage::getStoreConfig('general/locale/code', $store_id);
-            if ($lang === substr($locale_store, 0, - 3)) {
+            if ($lang === substr($locale_store, 0, - 3) && (!isset($website_id_needed) || $website_id_needed == $website_id)) {
                 self::startLangEmulationByStoreId($store_id);
+                break;
             }
         }
     }
@@ -1115,7 +1121,7 @@ class ShopymindClient_Callback {
                     __FUNCTION__
             ), func_get_args());
         if ($lang)
-            self::startLangEmulationByIsoLang($lang);
+            self::startLangEmulationByIsoLang($lang,$id_shop);
         $return = array ();
         // Lien vers panier
         $return ['link_cart'] = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', Mage::getUrl('checkout/cart', array (
@@ -1173,7 +1179,7 @@ class ShopymindClient_Callback {
                     __FUNCTION__
             ), func_get_args());
         if ($lang)
-            self::startLangEmulationByIsoLang($lang);
+            self::startLangEmulationByIsoLang($lang,$id_shop);
         $return = array ();
 
         $collection = array ();
@@ -1563,8 +1569,9 @@ class ShopymindClient_Callback {
             $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`email` = "' . $orderData ['customer_email'] . '") AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) AND DATE_FORMAT(`date_add`,"%Y-%m-%d %H:%i:%s") < DATE_FORMAT("' . $orderData ['created_at'] . '","%Y-%m-%d %H:%i:%s") AND `is_converted` = 0 ORDER BY `date_add` DESC');
 
         if ($spm_key && isset($spm_key ['spm_key']) && $spm_key ['spm_key']) {
-
             self::sendOrderToSPM($order, $orderData, $spm_key ['spm_key'], $voucherUsed);
+        }else {
+            self::sendOrderToSPM($order, $orderData, false, $voucherUsed);
         }
     }
 
@@ -1700,7 +1707,7 @@ class ShopymindClient_Callback {
             'idRemindersSend' => $spm_key,
             'shopIdShop' => $orderData['store_id'],
             'orderIsConfirm' => ($orderData['state'] == Mage_Sales_Model_Order::STATE_PROCESSING || $orderData['state'] == Mage_Sales_Model_Order::STATE_COMPLETE) ? true : false,
-            'idStatus' => $orderData['state'],
+            'idStatus' => $orderData['status'],
             'idCart' => $orderData['quote_id'],
             'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
             'idOrder' => $orderData['entity_id'],

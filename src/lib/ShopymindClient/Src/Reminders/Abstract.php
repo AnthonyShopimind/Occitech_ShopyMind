@@ -27,6 +27,12 @@ abstract class ShopymindClient_Src_Reminders_Abstract {
     protected $_alreadySend = false;
 
     /**
+     * Permet de récupérer l'id de la boutique (multi-boutiques)
+     *
+     * @var boolean
+     */
+    protected $_shopIdShop = false;
+    /**
      * Permet de compter le nombre de clients affectés par une campagne
      *
      * @var boolean
@@ -121,6 +127,25 @@ abstract class ShopymindClient_Src_Reminders_Abstract {
             $this->_justCount = true;
         }
 
+        return $this;
+    }
+    /**
+     * Permet de récupérer l'id de la boutique (multi-boutiques)
+     *
+     * @return string
+     */
+    public function getShopIdShop() {
+        return $this->_shopIdShop;
+    }
+
+    /**
+     * Permet de modifier l'id de la boutique (multi-boutiques)
+     *
+     * @param string $shopIdShop
+     * @return ShopymindClient_Configuration
+     */
+    public function setShopIdShop($shopIdShop) {
+        $this->_shopIdShop = $shopIdShop;
         return $this;
     }
 

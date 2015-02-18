@@ -98,7 +98,7 @@ class ShopymindClient_Src_Reminders_MissingClients extends ShopymindClient_Src_R
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getMissingClients')) {
-            return ShopymindClient_Callback::getMissingClients($this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getRelaunchOlder(), $this->getJustCount());
+            return ShopymindClient_Callback::getMissingClients($this->getShopIdShop(),$this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getRelaunchOlder(), $this->getJustCount());
         }
 
         return null;

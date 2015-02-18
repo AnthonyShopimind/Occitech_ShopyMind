@@ -63,7 +63,7 @@ class ShopymindClient_Src_Reminders_DroppedOutCart extends ShopymindClient_Src_R
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getDroppedOutCart')) {
-            return ShopymindClient_Callback::getDroppedOutCart($this->getIntervalAction(), $this->getJustCount());
+            return ShopymindClient_Callback::getDroppedOutCart($this->getShopIdShop(),$this->getIntervalAction(), $this->getJustCount());
         }
 
         return null;

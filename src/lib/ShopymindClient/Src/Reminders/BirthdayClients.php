@@ -46,7 +46,7 @@ class ShopymindClient_Src_Reminders_BirthdayClients extends ShopymindClient_Src_
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getBirthdayClients')) {
-            return ShopymindClient_Callback::getBirthdayClients($this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getJustCount());
+            return ShopymindClient_Callback::getBirthdayClients($this->getShopIdShop(), $this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getJustCount());
         }
 
         return null;

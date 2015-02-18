@@ -174,7 +174,7 @@ class ShopymindClient_Src_Reminders_GoodClientsByNumberOrders extends ShopymindC
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getGoodClientsByNumberOrders')) {
-            return ShopymindClient_Callback::getGoodClientsByNumberOrders($this->getDateReference(), $this->getTimezones(), $this->getNumber(), $this->getNumberMax(), $this->getNbDays(), $this->getNbDaysLastOrder(), $this->getJustCount());
+            return ShopymindClient_Callback::getGoodClientsByNumberOrders($this->getShopIdShop(),$this->getDateReference(), $this->getTimezones(), $this->getNumber(), $this->getNumberMax(), $this->getNbDays(), $this->getNbDaysLastOrder(), $this->getJustCount());
         }
 
         return null;
