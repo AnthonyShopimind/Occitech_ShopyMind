@@ -50,7 +50,9 @@ class SPM_ShopyMind_AjaxController extends Mage_Core_Controller_Front_Action {
                     $json_return ['success'] = 0;
                     $json_return ['error'] = $e->getMessage();
                 }
-                ob_clean();
+                if (ob_get_level()) {
+                    ob_clean();
+                }
                 echo json_encode($json_return);
                 die();
             break;
