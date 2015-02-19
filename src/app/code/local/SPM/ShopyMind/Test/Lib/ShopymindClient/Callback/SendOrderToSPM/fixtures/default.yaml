@@ -57,6 +57,7 @@ tables:
       created_at: 2015-01-01 10:00:00
       store_id: 1
       state: new
+      status: pending
       order_currency_code: EUR
       base_grand_total: 100.0000
       quote_id: 1
