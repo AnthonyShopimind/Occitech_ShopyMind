@@ -1578,17 +1578,21 @@ class ShopymindClient_Callback {
     /**
      * Envoi des ventes générées suite à une relance à ShopyMind
      *
-     * @param object $order
+     * @param Mage_Sales_Model_Order $order
      * @param array $orderData
      * @param string $spm_key
      * @param array $voucherUsed
      */
     public static function sendOrderToSPM($order, $orderData, $spm_key, $voucherUsed) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
+        }
+
+        $initialStore = Mage::app()->getSafeStore()->getId();
+        Mage::app()->setCurrentStore($order->getStoreId());
 
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
         $params = self::formatOrderData($orderData, $spm_key, $voucherUsed);
@@ -1599,6 +1603,7 @@ class ShopymindClient_Callback {
             $write = Mage::getSingleton('core/resource')->getConnection('core_write');
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
+        Mage::app()->setCurrentStore($initialStore);
     }
 
     /**
