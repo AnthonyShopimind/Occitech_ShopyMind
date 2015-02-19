@@ -105,13 +105,13 @@ class SPM_ShopyMind_Model_Scope
 
     public function getConfig($path)
     {
-        list($scope, $id) = $this->magentoScopeValues();
+        list($scope, $id) = $this->magentoConfigScopeValues();
         return Mage::getConfig()->getNode($path, $scope, $id);
     }
 
     public function saveConfig($path, $value)
     {
-        list($scope, $id) = $this->magentoScopeValues();
+        list($scope, $id) = $this->magentoConfigScopeValues();
         return Mage::getConfig()->saveConfig($path, $value, $scope, $id);
     }
 
@@ -178,12 +178,14 @@ class SPM_ShopyMind_Model_Scope
         }
     }
 
-    private function magentoScopeValues()
+    private function magentoConfigScopeValues()
     {
+        // Scope must have a plural form since in Magento 1.5.x
+        // the core_config_data.scope was an enum('default','websites','stores','config')
         if ($this->scope === self::SCOPE_WEBSITE) {
-            return array('website', (int) $this->id);
+            return array('websites', (int) $this->id);
         } elseif ($this->scope === self::SCOPE_STORE) {
-            return array('store', (int) $this->id);
+            return array('stores', (int) $this->id);
         }
         return array('default', 0);
     }
