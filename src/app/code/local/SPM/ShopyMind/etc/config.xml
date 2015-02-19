@@ -7,45 +7,45 @@
     </modules>
 
     <global>
-   <resources>
-   <shopymind_setup>
-   <!-- ajout du setup pour le module. Le dossier SQL du module contiendra un dossier avec ce nom "scriptsql_setup"-->
-   <setup>
-   	<module>SPM_ShopyMind</module>
-   </setup>
-   <connection> <use>core_setup</use> </connection>
-   </shopymind_setup>
-   </resources>
+        <resources>
+            <shopymind_setup>
+                <!-- ajout du setup pour le module. Le dossier SQL du module contiendra un dossier avec ce nom "scriptsql_setup"-->
+                <setup>
+                    <module>SPM_ShopyMind</module>
+                </setup>
+                <connection> <use>core_setup</use> </connection>
+            </shopymind_setup>
+        </resources>
         <helpers>
             <shopymind>
                 <class>SPM_ShopyMind_Helper</class>
             </shopymind>
         </helpers>
         <models>
-                        <shopymind>
-                                <class>SPM_ShopyMind_Model</class>
-                        </shopymind>
-                </models>
-                <events>
-  <sales_order_invoice_pay>
-	<observers>
-	   <SPM_ShopyMind_Model_Observer>
-	       <type>singleton</type>
-	       <class>shopymind/observer</class>
-	       <method>newOrderObserver</method>
-           </SPM_ShopyMind_Model_Observer>
-       </observers>
-  </sales_order_invoice_pay>
-    <admin_system_config_changed_section_shopymind_configuration>
-        <observers>
-            <spm_shopymind_model_observer>
-                <type>singleton</type>
-                <class>shopymind/observer</class>
-                <method>adminSystemConfigChangedSectionShopymindConfiguration</method>
-            </spm_shopymind_model_observer>
-        </observers>
-    </admin_system_config_changed_section_shopymind_configuration>
-</events>
+            <shopymind>
+                <class>SPM_ShopyMind_Model</class>
+            </shopymind>
+        </models>
+        <events>
+            <sales_order_invoice_pay>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <type>singleton</type>
+                        <class>shopymind/observer</class>
+                        <method>newOrderObserver</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </sales_order_invoice_pay>
+            <admin_system_config_changed_section_shopymind_configuration>
+                <observers>
+                    <spm_shopymind_model_observer>
+                        <type>singleton</type>
+                        <class>shopymind/observer</class>
+                        <method>adminSystemConfigChangedSectionShopymindConfiguration</method>
+                    </spm_shopymind_model_observer>
+                </observers>
+            </admin_system_config_changed_section_shopymind_configuration>
+        </events>
     </global>
 
     <adminhtml>
@@ -58,19 +58,18 @@
                 </shopymind_configuration>
             </modules>
         </translate>
-
-
     </adminhtml>
+
     <frontend>
-    <secure_url>
+        <secure_url>
             <shopymind_ajax>/shopymind/index</shopymind_ajax>
         </secure_url>
-    <layout>
-        <updates>
-            <shopymind>
-                <file>shopymind.xml</file>
-            </shopymind>
-        </updates>
-    </layout>
-</frontend>
+        <layout>
+            <updates>
+                <shopymind>
+                    <file>shopymind.xml</file>
+                </shopymind>
+            </updates>
+        </layout>
+    </frontend>
 </config>
