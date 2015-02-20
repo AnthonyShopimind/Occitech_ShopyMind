@@ -1,23 +1,8 @@
 <script type="text/javascript">
-var xmlhttp;
-if (window.XMLHttpRequest) {
-  xmlhttp=new XMLHttpRequest();
-}
-else {
-  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-}
-xmlhttp.open("GET","<?php echo Mage::getUrl('shopymind/ajax/index', array('action' => 'frontCheck','spm_key' => (isset($_GET['spm_key']) && $_GET['spm_key'] ? $_GET['spm_key']:0)));?>",true);
-xmlhttp.setRequestHeader('Content-type','application/json; charset=utf-8');
-xmlhttp.onreadystatechange = function(){
-    if (xmlhttp.readyState != 4) return;
-    if (xmlhttp.status != 200 && xmlhttp.status != 304) {
-        return;
-    }
-    var result = JSON.parse(xmlhttp.responseText);
-    if(typeof(result.optinkey) !== 'undefined' && result.optinkey) {
-		var img = new Image();
-		img.src='https://client.shopymind.com/optin/'+result.optinkey+'.png';
-	}
-}
-xmlhttp.send();
+		var _spmq = <?php echo $this->getUserInfosJson();?>;
+		(function() {
+		var spm = document.createElement('script'); spm.type = 'text/javascript'; spm.async = true;
+		spm.src = '<?php echo $this->getClientUrl();?>/remote/script.js?<?php echo $this->getUserInfosEncode();?>';
+		var s_spm = document.getElementsByTagName('script')[0]; s_spm.parentNode.insertBefore(spm, s_spm);
+		})();
 </script>

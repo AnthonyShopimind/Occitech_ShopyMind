@@ -49,6 +49,8 @@ class ShopymindClient_Callback {
                 SELECT
                     `customer_default_phone`.`value` as `phone`,
                     `customer_default_billing_country`.`value` as `country_code`,
+                    `customer_default_billing_state`.`code` as `region_code`,
+                    `customer_default_billing_postcode`.`value` as `postcode`,
                     `customer_primary_table`.`entity_id`,
                     `customer_primary_table`.`store_id`,
                     `customer_firstname_table`.`value` as `firstname`,
@@ -80,6 +82,10 @@ class ShopymindClient_Callback {
                 ON
                     (`customer_default_billing_jt`.`value` = `customer_default_billing_country`.`entity_id`)
                     AND (`customer_default_billing_country`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
+                LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_postcode`
+                ON
+                    (`customer_default_billing_jt`.`value` = `customer_default_billing_postcode`.`entity_id`)
+                    AND (`customer_default_billing_postcode`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'postcode') . ')
                 LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_phone`
                 ON
                     (`customer_default_billing_jt`.`value` = `customer_default_phone`.`entity_id`)
@@ -106,6 +112,8 @@ class ShopymindClient_Callback {
                   SELECT
                     `quote_address`.`telephone` as `phone`,
                     `quote_address`.`country_id` as `country_code`,
+                    `quote_address`.`region_id` as `region_code`,
+                    `quote_address`.`postcode`,
                     `quote_address`.`email` AS `entity_id`, `quote`.`store_id`,
                     `quote_address`.`firstname`,
                     `quote_address`.`lastname`,
@@ -166,6 +174,8 @@ class ShopymindClient_Callback {
                         'gender' => (isset($row ['gender_id']) && ($row ['gender_id'] == 1 || $row ['gender_id'] == 2) ? $row ['gender_id'] : 0),
                         'birthday' => (isset($row ['birthday']) ? $row ['birthday'] : 0),
                         'locale' => self::getUserLocale($row ['entity_id'], $row ['store_id'], $row ['country_code']),
+                        'region' => $row ['region_code'],
+                        'postcode' => $row ['postcode'],
                         'date_last_order' => self::getDateLastOrder($row ['entity_id']),
                         'nb_order' => self::countCustomerOrder($row['entity_id'], null),
                         'sum_order' => self::sumCustomerOrder($row['entity_id']),

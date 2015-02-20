@@ -18,34 +18,6 @@ class SPM_ShopyMind_AjaxController extends Mage_Core_Controller_Front_Action {
                     );
                     // Check if cart following a reminder
                     ShopymindClient_Callback::checkNewCart();
-
-                    // Get optin client for future retargeting service
-                    if (Mage::getSingleton('customer/session')->isLoggedIn()) {
-                        $cookie = Mage::app()->getCookie();
-                        $email = Mage::getSingleton('customer/session')->getCustomer()->getEmail();
-                        $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
-                        if ($subscriber->isSubscribed()) {
-                            $customer = Mage::helper('customer')->getCustomer()->getData();
-                            $params = array (
-                                    'last_name' => @$customer ['lastname'],
-                                    'first_name' => @$customer ['firstname'],
-                                    'email_address' => @$customer ['email'],
-                                    'birthday' => @$customer ['dob'],
-                                    'locale' => self::getUserLocale($customer ['entity_id'], $customer ['store_id']),
-                                    'gender' => @$customer ['gender'],
-                                    'ip' => Mage::helper('core/http')->getRemoteAddr()
-                            );
-                            $signature = sha1(serialize($params));
-                            if ($cookie->get('spmoptinchecksum') != '' && $cookie->get('spmoptinchecksum') == $signature) {
-                            } else {
-                                $optinkey = ShopymindClient_Bin_Notify::addOptInClient($params);
-                                if ($optinkey) {
-                                    $cookie->set('spmoptinchecksum', $signature, ((3600 * 24) * 365));
-                                    $json_return ['optinkey'] = $optinkey;
-                                }
-                            }
-                        }
-                    }
                 } catch ( Exception $e ) {
                     $json_return ['success'] = 0;
                     $json_return ['error'] = $e->getMessage();

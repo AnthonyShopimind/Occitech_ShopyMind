@@ -7,6 +7,11 @@
     </modules>
 
     <global>
+    	<blocks>
+            <spm_shopymind>
+                <class>SPM_ShopyMind_Block</class>
+            </spm_shopymind>
+        </blocks>
         <resources>
             <shopymind_setup>
                 <!-- ajout du setup pour le module. Le dossier SQL du module contiendra un dossier avec ce nom "scriptsql_setup"-->
@@ -76,9 +81,9 @@
 
         <layout>
             <updates>
-                <shopymind>
+                <spm_shopymind module="SPM_ShopyMind">
                     <file>shopymind.xml</file>
-                </shopymind>
+                </spm_shopymind>
             </updates>
         </layout>
     </frontend>
