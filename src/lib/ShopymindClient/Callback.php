@@ -445,7 +445,7 @@ class ShopymindClient_Callback {
         $results = $readConnection->fetchAll($query);
         if (!empty($results) && is_array($results)) {
             foreach($results as $row) {
-                self::startLangEmulationByStoreId($row['store_id']);
+                self::startStoreEmulationByStoreId($row['store_id']);
                 $cartProducts = self::productsOfCart($row['entity_id']);
                 if (!empty($cartProducts)) {
                     $return[] = array(
@@ -463,7 +463,7 @@ class ShopymindClient_Callback {
                         'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']), true)
                     );
                 }
-                self::stopLangEmulation();
+                self::stopStoreEmulation();
             }
         }
         return ($justCount ? array('count' => count($return)) : $return);
@@ -813,7 +813,7 @@ class ShopymindClient_Callback {
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                self::startLangEmulationByStoreId($row ['store_id']);
+                self::startStoreEmulationByStoreId($row ['store_id']);
                 $orderedProducts = self::productsOfCart($row['quote_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
@@ -829,7 +829,7 @@ class ShopymindClient_Callback {
                     );
                 }
 
-                self::stopLangEmulation();
+                self::stopStoreEmulation();
             }
         }
         return ($justCount ? array (
@@ -1042,12 +1042,11 @@ class ShopymindClient_Callback {
      * @param int $store_id
      * @return boolean void
      */
-    public static function startLangEmulationByStoreId($store_id) {
+    public static function startStoreEmulationByStoreId($store_id) {
         if ($store_id == Mage::app()->getStore()->getId())
             return false;
-        $storeCode = Mage::app()->getStore($store_id)->getCode();
         self::$appEmulation = Mage::getSingleton('core/app_emulation');
-        self::$initialEnvironmentInfo = self::$appEmulation->startEnvironmentEmulation($storeCode);
+        self::$initialEnvironmentInfo = self::$appEmulation->startEnvironmentEmulation($store_id);
     }
 
     /**
@@ -1056,7 +1055,7 @@ class ShopymindClient_Callback {
      * @param string $lang
      * @return boolean void
      */
-    public static function startLangEmulationByIsoLang($lang,$id_shop) {
+    public static function startStoreEmulationByIsoLang($lang,$id_shop) {
         if (self::$appEmulation !== false)
             return;
         if (!empty($id_shop)) {
@@ -1069,7 +1068,7 @@ class ShopymindClient_Callback {
             $website_id = $store->getWebsite()->getId();
             $locale_store = Mage::getStoreConfig('general/locale/code', $store_id);
             if ($lang === substr($locale_store, 0, - 3) && (!isset($website_id_needed) || $website_id_needed == $website_id)) {
-                self::startLangEmulationByStoreId($store_id);
+                self::startStoreEmulationByStoreId($store_id);
                 break;
             }
         }
@@ -1086,7 +1085,7 @@ class ShopymindClient_Callback {
      * @param string $lang
      * @return boolean void
      */
-    public static function stopLangEmulation() {
+    public static function stopStoreEmulation() {
         if (self::$appEmulation === false)
             return;
         self::$appEmulation->stopEnvironmentEmulation(self::$initialEnvironmentInfo);
@@ -1131,7 +1130,7 @@ class ShopymindClient_Callback {
                     __FUNCTION__
             ), func_get_args());
         if ($lang)
-            self::startLangEmulationByIsoLang($lang,$id_shop);
+            self::startStoreEmulationByIsoLang($lang,$id_shop);
         $return = array ();
         // Lien vers panier
         $return ['link_cart'] = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', Mage::getUrl('checkout/cart', array (
@@ -1140,7 +1139,7 @@ class ShopymindClient_Callback {
         // Article au hasard
         $return ['articles'] = self::getProducts($id_shop, $lang, false, true);
         if ($lang)
-            self::stopLangEmulation();
+            self::stopStoreEmulation();
         return $return;
     }
 
@@ -1189,7 +1188,7 @@ class ShopymindClient_Callback {
                     __FUNCTION__
             ), func_get_args());
         if ($lang)
-            self::startLangEmulationByIsoLang($lang,$id_shop);
+            self::startStoreEmulationByIsoLang($lang,$id_shop);
         $return = array ();
 
         $collection = array ();
@@ -1228,7 +1227,7 @@ class ShopymindClient_Callback {
             }
         }
         if ($lang)
-            self::stopLangEmulation();
+            self::stopStoreEmulation();
         return $return;
     }
 
@@ -1457,91 +1456,6 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Vérification d'un panier initié suite à une relance
-     */
-    public static function checkNewCart() {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        $cookie = Mage::app()->getCookie();
-        $cart_id = self::getSessionCartId();
-        $customer_id = self::getSessionCustomerId();
-        $customer_email = self::getSessionCustomerEmail();
-        $vouchersCart = (array) Mage::getSingleton('checkout/session')->getQuote()->getCouponCode();
-        $key_checked = md5($cart_id . '-' . $customer_id . '-' . $customer_email . '-' . serialize($vouchersCart));
-        if ((! isset($_GET ['spm_key']) || ! $_GET ['spm_key']) && (! $cookie->get('spmkeychecked') || $key_checked !== $cookie->get('spmkeychecked')) && ! $cookie->get('spmcartoorder') && ! $cookie->get('spmcartoorder_persistent') && $cart_id) {
-            $tablePrefix = Mage::getConfig()->getTablePrefix();
-            $read = Mage::getSingleton('core/resource')->getConnection('core_read');
-            $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`id_cart` = ' . (int) $cart_id . ') AND `is_converted` = 0 AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) ORDER BY `date_add` DESC');
-            if (! $spm_key && $customer_id)
-                $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`id_customer` = ' . (int) $customer_id . ') AND `is_converted` = 0 AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) ORDER BY `date_add` DESC');
-            if (! $spm_key && $customer_email !== null && $customer_email !== false && $customer_email)
-                $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`email` = "' . $customer_email . '") AND `is_converted` = 0 AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) ORDER BY `date_add` DESC');
-            if (! $spm_key) {
-                if ($vouchersCart && sizeof($vouchersCart)) {
-                    foreach ( $vouchersCart as $voucher ) {
-                        if (! $spm_key && $voucher)
-                            $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`voucher_number` = "' . addslashes($voucher) . '") AND `is_converted` = 0 AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) ORDER BY `date_add` DESC');
-                        else
-                            break;
-                    }
-                }
-            }
-            if ($spm_key && isset($spm_key ['spm_key']) && $spm_key ['spm_key']) {
-                $_GET ['spm_key'] = $spm_key ['spm_key'];
-                $cookie->delete('spmkeychecked');
-            } else {
-                $cookie->set('spmkeychecked', $key_checked, 0);
-            }
-        }
-        if ((isset($_GET ['spm_key']) && $_GET ['spm_key']) || $cookie->get('spmcartoorder') || $cookie->get('spmcartoorder_persistent')) {
-            $quote = Mage::getSingleton('checkout/cart')->getQuote();
-            if (! $cart_id || (! $customer_id && ! $customer_email) || ! $quote->getGrandTotal()) {
-                if (isset($_GET ['spm_key']) && $_GET ['spm_key']) {
-                    $cookie->set('spmcartoorder_persistent', $_GET ['spm_key'], 657000);
-                    $cookie->set('spmcartoorder', $_GET ['spm_key'], 0);
-                }
-            } else {
-
-                $tablePrefix = Mage::getConfig()->getTablePrefix();
-
-                if (isset($_GET ['spm_key']) && $_GET ['spm_key'])
-                    $spm_key = $_GET ['spm_key'];
-                elseif ($cookie->get('spmcartoorder') != '')
-                    $spm_key = $cookie->get('spmcartoorder');
-                elseif ($cookie->get('spmcartoorder_persistent') != '') {
-                    $spm_key = $cookie->get('spmcartoorder_persistent');
-                    $read = Mage::getSingleton('core/resource')->getConnection('core_read');
-                    $test = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE `spm_key` = "' . addslashes($spm_key) . '" AND `is_converted` = 1');
-                    if ($test && isset($test ['spm_key']))
-                        return;
-                }
-
-                // Cart already registred
-                if ($cookie->get('spmlastcartregister') && $cookie->get('spmlastcartregister') == $spm_key . $cart_id)
-                    return;
-                $now = date('Y-m-d H:i:s');
-                $write = Mage::getSingleton('core/resource')->getConnection('core_write');
-                $write->query('INSERT INTO `' . $tablePrefix . 'spmcartoorder` (`id_cart`,`id_customer`,`email`,`spm_key`,`date_upd`) values (' . (int) $cart_id . ',' . (int) $customer_id . ',"' . addslashes($customer_email) . '","' . addslashes($spm_key) . '","' . $now . '") ON DUPLICATE KEY UPDATE id_cart = ' . (int) $cart_id . ',id_customer = ' . (int) $customer_id . ', email="' . addslashes($customer_email) . '", spm_key="' . addslashes($spm_key) . '", date_upd="' . $now . '"');
-                include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
-                if (ShopymindClient_Bin_Notify::newCart(array (
-                        'idRemindersSend' => $spm_key,
-                        'idCart' => $cart_id,
-                        'totalCart' => $quote->getGrandTotal(),
-                        'currencyCart' => $quote->getQuoteCurrencyCode(),
-                        'taxRateCart' => $quote->getStoreToQuoteRate()
-                ))) {
-                    $cookie->set('spmlastcartregister', $spm_key . $cart_id, 0); /* keep cookie to avoid session problem */
-                    $cookie->delete('spmcartoorder');
-                    $cookie->delete('spmcartoorder_persistent');
-                }
-            }
-        }
-    }
-
-    /**
      * Remontée des ventes vers ShopyMind
      *
      * @param array $order
@@ -1553,36 +1467,12 @@ class ShopymindClient_Callback {
                     __FUNCTION__
             ), func_get_args());
         $orderData = $order->getData();
-        $read = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $tablePrefix = Mage::getConfig()->getTablePrefix();
-        $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`id_cart` = ' . (int) $orderData ['quote_id'] . ') AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) AND DATE_FORMAT(`date_add`,"%Y-%m-%d %H:%i:%s") < DATE_FORMAT("' . $orderData ['created_at'] . '","%Y-%m-%d %H:%i:%s") AND `is_converted` = 0 ORDER BY `date_add` DESC');
-
         $voucherUsed = array ();
         $vouchersOrder = $order->getCouponCode();
         if ($vouchersOrder)
             $voucherUsed [] = $vouchersOrder;
 
-        if (sizeof($voucherUsed) && ! $spm_key) {
-            foreach ( $voucherUsed as $voucher ) {
-                if (! $spm_key && $voucher)
-                    $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`voucher_number` = "' . addslashes($voucher) . '") AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) AND DATE_FORMAT(`date_add`,"%Y-%m-%d %H:%i:%s") < DATE_FORMAT("' . $orderData ['created_at'] . '","%Y-%m-%d %H:%i:%s") AND `is_converted` = 0 ORDER BY `date_add` DESC');
-                else
-                    break;
-            }
-        }
-
-        if (! $spm_key)
-            $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`id_order` = ' . (int) $orderData ['entity_id'] . ') AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) AND DATE_FORMAT(`date_add`,"%Y-%m-%d %H:%i:%s") < DATE_FORMAT("' . $orderData ['created_at'] . '","%Y-%m-%d %H:%i:%s") AND `is_converted` = 0 ORDER BY `date_add` DESC');
-        if (! $spm_key && isset($orderData ['customer_id']) && $orderData ['customer_id'])
-            $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`id_customer` = ' . (int) $orderData ['customer_id'] . ') AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) AND DATE_FORMAT(`date_add`,"%Y-%m-%d %H:%i:%s") < DATE_FORMAT("' . $orderData ['created_at'] . '","%Y-%m-%d %H:%i:%s") AND `is_converted` = 0 ORDER BY `date_add` DESC');
-        if (! $spm_key && isset($orderData ['customer_email']) && $orderData ['customer_email'])
-            $spm_key = $read->fetchRow('SELECT `spm_key` FROM `' . $tablePrefix . 'spmcartoorder` WHERE (`email` = "' . $orderData ['customer_email'] . '") AND `date_upd` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL 1 MONTH) AND DATE_FORMAT(`date_add`,"%Y-%m-%d %H:%i:%s") < DATE_FORMAT("' . $orderData ['created_at'] . '","%Y-%m-%d %H:%i:%s") AND `is_converted` = 0 ORDER BY `date_add` DESC');
-
-        if ($spm_key && isset($spm_key ['spm_key']) && $spm_key ['spm_key']) {
-            self::sendOrderToSPM($order, $orderData, $spm_key ['spm_key'], $voucherUsed);
-        }else {
-            self::sendOrderToSPM($order, $orderData, false, $voucherUsed);
-        }
+        self::sendOrderToSPM($order, $orderData, false, $voucherUsed);
     }
 
     /**
@@ -1600,20 +1490,18 @@ class ShopymindClient_Callback {
                     __FUNCTION__
             ), func_get_args());
         }
+        self::startStoreEmulationByStoreId($order->getStoreId());
 
-        $initialStore = Mage::app()->getSafeStore()->getId();
-        Mage::app()->setCurrentStore($order->getStoreId());
 
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
         $params = self::formatOrderData($orderData, $spm_key, $voucherUsed);
-
         $spm_key = ShopymindClient_Bin_Notify::newOrder($params);
         if ($spm_key && isset($spm_key ['idRemindersSend']) && $spm_key ['idRemindersSend']) {
             $tablePrefix = Mage::getConfig()->getTablePrefix();
             $write = Mage::getSingleton('core/resource')->getConnection('core_write');
             $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
         }
-        Mage::app()->setCurrentStore($initialStore);
+        self::stopStoreEmulation();
     }
 
     /**
@@ -1715,7 +1603,7 @@ class ShopymindClient_Callback {
      * @return array $params
      */
     private static function formatOrderData($orderData, $spm_key, $voucherUsed) {
-        self::startLangEmulationByStoreId($orderData['store_id']);
+
         $quote = Mage::getSingleton('sales/quote')->load($orderData ['quote_id']);
 
         $params = array (
@@ -1735,8 +1623,6 @@ class ShopymindClient_Callback {
             'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email'])),
             'shipping_number' => self::getShippingNumbersForOrderId(2),
         );
-
-        self::stopLangEmulation();
         return $params;
     }
 
@@ -2087,7 +1973,7 @@ class ShopymindClient_Callback {
         $results = array();
 
         foreach ($collection as $quote) {
-            self::startLangEmulationByStoreId($quote->getStoreId());
+            self::startStoreEmulationByStoreId($quote->getStoreId());
             $cartProducts = self::productsOfCart($quote->getId());
             $results[] = array(
                 'sum_cart' => ($quote->getBaseGrandTotal() / $quote->getStoreToBaseRate()),
@@ -2104,10 +1990,67 @@ class ShopymindClient_Callback {
                 'products' => $cartProducts,
                 'customer' => self::getUser(($quote->getCustomerId() ? $quote->getCustomerId() : $quote->getCustomerEmail()), true)
             );
-            self::stopLangEmulation();
+            self::stopStoreEmulation();
         }
 
         return $results;
+    }
+    
+
+    /**
+     * Create customer
+     * 
+     * @param integer $id_shop
+     * @param string $lang
+     * @param array $customer_infos
+     * @return boolean|array
+     */
+    public static function createCustomer($id_shop, $lang, $customer_infos)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+        $return = true;
+        
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop,$lang);
+        if(isset($scope->stores()[0]))
+            $store = $scope->stores()[0];
+        else {
+            $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+            if(isset($scope->stores()[0]))
+                $store = $scope->stores()[0];
+            else $return = false;
+        }
+        if($return) {
+            $customer = Mage::getModel("customer/customer");
+            $customer
+            ->setFirstname($customer_infos['firstName'])
+            ->setLastname($customer_infos['lastName'])
+            ->setEmail($customer_infos['email'])
+            ->setPassword($customer_infos['password'])
+            ->setDob($customer_infos['dob'])
+            ->getGender(($customer_infos['gender'] == 'mr'  ? 1 : 2));
+            
+            $customer
+            ->setStore($store)
+            ->setWebsiteId($store->getWebsiteId());
+    
+            try{
+                $customer->save();
+                $customer->setConfirmation(null);
+                $customer->save();
+                $customer->sendNewAccountEmail('registered','',$store->getId());
+            }
+            catch (Exception $e) {
+                Mage::log($e->getMessage(), Zend_Log::ERR);
+                $return = false;
+            }
+        }
+        
+        return ($return ? self::getUser($customer->getId()) : false);
     }
 
 }

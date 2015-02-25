@@ -37,7 +37,6 @@ if ($server->isValid() === true) {
         $params = $server->retrieveParams();
         if (method_exists('ShopymindClient_Callback', 'deleteUnusedVouchers')) {
             $response['deleteUnusedVouchers'] = ShopymindClient_Callback::deleteUnusedVouchers();
-            $response['deleteOldKeyAccess'] = ShopymindClient_Callback::deleteOldKeyAccess();
         }
         $server->sendResponse($response, true);
     } elseif ($server->getTypeRequest() === 'getTestData') {
@@ -187,6 +186,14 @@ if ($server->isValid() === true) {
             $params = $server->retrieveParams();
             $server->sendResponse(array(
                 'shops' => ShopymindClient_Callback::getShops()
+            ), true);
+        }
+    }elseif ($server->getTypeRequest() === 'createCustomer') {
+        require_once dirname(__FILE__) . '/Callback.php';
+        if (method_exists('ShopymindClient_Callback', 'createCustomer')) {
+            $params = $server->retrieveParams();
+            $server->sendResponse(array(
+                'customer' => ShopymindClient_Callback::createCustomer((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['lang']) ? $params['lang'] : false),$params['customerInfos'])
             ), true);
         }
     }elseif ($server->getTypeRequest() === 'relaunch') {
