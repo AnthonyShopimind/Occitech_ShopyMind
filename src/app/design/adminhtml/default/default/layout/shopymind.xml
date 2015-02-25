@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<layout>
-    <shopymind_adminhtml_configuration_index>
-        <update handle="shopymind_configuration_index"/>
-        <reference name="content">
-            <block type="adminhtml/template" name="configuration" template="shopymind/configuration.phtml"/>
-        </reference>
-    </shopymind_adminhtml_configuration_index>
-</layout>
