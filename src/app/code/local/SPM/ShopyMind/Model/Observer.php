@@ -20,9 +20,10 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     const OPTIONAL_CUSTOMER_DOB = 'opt';
     const REQUIRED_CUSTOMER_DOB = 'req';
 
-    public function newOrderObserver($observer) {
+    public function orderUpdateObserver(Varien_Event_Observer $observer) {
+
         try {
-            $order = $observer->getEvent()->getInvoice()->getOrder();
+            $order=$observer->getOrder();
             ShopymindClient_Callback::checkNewOrder($order);
         } catch ( Exception $e ) {
             Mage::log($e->getMessage(), Zend_Log::ERR);

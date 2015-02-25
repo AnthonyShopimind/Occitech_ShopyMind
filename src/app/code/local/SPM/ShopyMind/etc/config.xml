@@ -12,15 +12,6 @@
                 <class>SPM_ShopyMind_Block</class>
             </spm_shopymind>
         </blocks>
-        <resources>
-            <shopymind_setup>
-                <!-- ajout du setup pour le module. Le dossier SQL du module contiendra un dossier avec ce nom "scriptsql_setup"-->
-                <setup>
-                    <module>SPM_ShopyMind</module>
-                </setup>
-                <connection> <use>core_setup</use> </connection>
-            </shopymind_setup>
-        </resources>
         <helpers>
             <shopymind>
                 <class>SPM_ShopyMind_Helper</class>
@@ -32,15 +23,15 @@
             </shopymind>
         </models>
         <events>
-            <sales_order_invoice_pay>
+            <sales_order_save_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
                         <type>singleton</type>
                         <class>shopymind/observer</class>
-                        <method>newOrderObserver</method>
+                        <method>orderUpdateObserver</method>
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
-            </sales_order_invoice_pay>
+            </sales_order_save_after>
             <admin_system_config_changed_section_shopymind_configuration>
                 <observers>
                     <spm_shopymind_model_observer>
@@ -65,10 +56,6 @@
     </adminhtml>
 
     <frontend>
-        <secure_url>
-            <shopymind_ajax>/shopymind/index</shopymind_ajax>
-        </secure_url>
-
         <routers>
             <shopymind>
                 <use>standard</use>
