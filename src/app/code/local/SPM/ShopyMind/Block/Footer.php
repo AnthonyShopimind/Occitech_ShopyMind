@@ -129,9 +129,9 @@ class SPM_ShopyMind_Block_Footer extends Mage_Core_Block_Template {
                     'email_address' => $customerSession->getEmail(),
                     'birthday' => $customerSession->getDob(),
                     'gender' => $customerSession->getGender(),
-                    'postcode' => $primaryAddress->getPostcode(),
-                    'region' => $primaryAddress->getRegionCode(),
-                    'country' => $primaryAddress->getCountryId()
+                    'postcode' => (is_object($primaryAddress) ? $primaryAddress->getPostcode() : ''),
+                    'region' => (is_object($primaryAddress) ? $primaryAddress->getRegionCode() : ''),
+                    'country' => (is_object($primaryAddress) ? $primaryAddress->getCountryId() : ''),
             );
         } else
             $currentUserInfos ['user'] = null;
