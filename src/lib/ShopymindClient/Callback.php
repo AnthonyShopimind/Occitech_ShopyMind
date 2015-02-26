@@ -408,7 +408,7 @@ class ShopymindClient_Callback {
      * @param bool $justCount
      * @return array Either the cart details, or an array with the counter: array('count' => xx)
      */
-    public static function getDroppedOutCart($id_shop, $nbSeconds, $justCount = false) {
+    public static function getDroppedOutCart($id_shop, $nbSeconds, $nbSecondsMaxInterval, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array(
                 'ShopymindClient_CallbackOverride',
@@ -433,7 +433,7 @@ class ShopymindClient_Callback {
           )
           WHERE
             (`quote_table`.`reserved_order_id` = "" OR `quote_table`.`reserved_order_id` IS NULL)
-            AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") >= DATE_SUB("' . $now . '", INTERVAL ' . ($nbSeconds * 2) . ' SECOND))
+            AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") >= DATE_SUB("' . $now . '", INTERVAL ' . ($nbSeconds + $nbSecondsMaxInterval) . ' SECOND))
             AND (DATE_FORMAT(`quote_table`.`updated_at`,"%Y-%m-%d %H:%i:%s") <= DATE_SUB("' . $now . '", INTERVAL ' . ($nbSeconds) . ' SECOND))
             AND (`quote_table`.`items_count` > 0)
             AND (`quote_table`.`customer_id` IS NOT NULL OR `quote_table`.`customer_email` IS NOT NULL)
