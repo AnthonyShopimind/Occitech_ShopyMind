@@ -112,7 +112,7 @@ class ShopymindClient_Callback {
                   SELECT
                     `quote_address`.`telephone` as `phone`,
                     `quote_address`.`country_id` as `country_code`,
-                    `quote_address`.`region_id` as `region_code`,
+                    `directory_country_region`.`code` as `region_code`,
                     `quote_address`.`postcode`,
                     `quote_address`.`email` AS `entity_id`, `quote`.`store_id`,
                     `quote_address`.`firstname`,
@@ -126,6 +126,7 @@ class ShopymindClient_Callback {
                   INNER JOIN `' . $tablePrefix . 'sales_flat_quote` AS `quote` ON (
                     `quote`.`entity_id` = `quote_address`.`quote_id`
                   )
+                  INNER JOIN `' . $tablePrefix . 'directory_country_region` AS `directory_country_region` ON(`directory_country_region`.`region_id` = `quote_address`.`region_id`)
                   WHERE
                     `quote_address`.`email` IN("' . (implode('", "', (array) $idOrEmails)) . '")
                     AND `quote_address`.`address_type` = "billing"
@@ -136,6 +137,8 @@ class ShopymindClient_Callback {
                   SELECT
                     `order_address`.`telephone` as `phone`,
                     `order_address`.`country_id` as `country_code`,
+                    `directory_country_region`.`code` as `region_code`,
+                    `order_address`.`postcode`,
                     `order_address`.`email` AS `entity_id`,
                     `order`.`store_id`,
                     `order_address`.`firstname`,
@@ -149,6 +152,7 @@ class ShopymindClient_Callback {
                   INNER JOIN `' . $tablePrefix . 'sales_flat_order` AS `order` ON (
                     `order`.`entity_id` = `order_address`.`parent_id`
                   )
+                  INNER JOIN `' . $tablePrefix . 'directory_country_region` AS `directory_country_region` ON(`directory_country_region`.`region_id` = `order_address`.`region_id`)
                   WHERE
                     `order_address`.`email` IN("' . (implode('", "', (array) $idOrEmails)) . '")
                     AND `order_address`.`address_type` = "billing"
@@ -389,7 +393,10 @@ class ShopymindClient_Callback {
 
         SPM_ShopyMind_Model_Scope::fromShopymindId($storeId)->restrictCollection($customerCollection);
 
-        $timezonesWhere = self::generateTimezonesWhere($timezones, 'at_customer_country_id', 'value', 'directory_country_region');
+        $attributeAliasMethod = new ReflectionMethod($customerCollection, '_getAttributeTableAlias');
+        $attributeAliasMethod->setAccessible(true);
+        $country_id_alias = $attributeAliasMethod->invoke($customerCollection, 'customer_country_id');
+        $timezonesWhere = self::generateTimezonesWhere($timezones, $country_id_alias, 'value', 'directory_country_region');
         if (!empty($timezonesWhere)) {
             $customerCollection
                 ->joinAttribute('customer_country_id', 'customer_address/country_id', 'default_billing', null, 'left')
@@ -955,9 +962,7 @@ class ShopymindClient_Callback {
         } elseif ($type == 'shipping') {
             $coupon->setSimpleFreeShipping(1);
         }
-        $coupon->setDiscountStep('0')->setApplyToShipping('0')->setTimesUsed('0')->setIsRss('0')->setCouponType('2')->setUsesPerCoupon(1)->setCustomerGroupIds(self::getAllCustomerGroupsIds())->setWebsiteIds(array (
-                '1'
-        ))->setCouponCode($coupon_code);
+        $coupon->setDiscountStep('0')->setApplyToShipping('0')->setTimesUsed('0')->setIsRss('0')->setCouponType('2')->setUsesPerCoupon(1)->setCustomerGroupIds(self::getAllCustomerGroupsIds())->setWebsiteIds(self::getAllWebsitesIds())->setCouponCode($coupon_code);
         if ($minimumOrder) {
             $condition = Mage::getModel('salesrule/rule_condition_address')->setType('salesrule/rule_condition_address')->setAttribute('base_subtotal')->setOperator('>=')->setValue((int) $minimumOrder);
             $coupon->getConditions()->addCondition($condition);
@@ -966,7 +971,23 @@ class ShopymindClient_Callback {
             return $coupon_code;
         return false;
     }
-
+    /**
+     *
+     * Get all websites ids
+     */
+    public static function getAllWebsitesIds(){
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+            return call_user_func_array(array (
+                    'ShopymindClient_CallbackOverride',
+                    __FUNCTION__
+            ), func_get_args());
+        $websites = Mage::getModel('core/website')->getCollection();
+        $websiteIds = array();
+        foreach ($websites as $website){
+            $websiteIds[] = $website->getId();
+        }
+        return $websiteIds;
+    }
     /**
      * Récupération des IDs de groupes de client
      *
@@ -1995,11 +2016,11 @@ class ShopymindClient_Callback {
 
         return $results;
     }
-    
+
 
     /**
      * Create customer
-     * 
+     *
      * @param integer $id_shop
      * @param string $lang
      * @param array $customer_infos
@@ -2014,10 +2035,10 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
         $return = true;
-        
+
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop,$lang);
         $stores = $scope->stores();
-        
+
         if(is_array($stores) && count($stores)) {
             $store = $stores[0];
         }
@@ -2037,11 +2058,11 @@ class ShopymindClient_Callback {
             ->setPassword($customer_infos['password'])
             ->setDob($customer_infos['dob'])
             ->getGender(($customer_infos['gender'] == 'mr'  ? 1 : 2));
-            
+
             $customer
             ->setStore($store)
             ->setWebsiteId($store->getWebsiteId());
-    
+
             try{
                 $customer->save();
                 $customer->setConfirmation(null);
@@ -2053,7 +2074,7 @@ class ShopymindClient_Callback {
                 $return = false;
             }
         }
-        
+
         return ($return ? self::getUser($customer->getId()) : false);
     }
 
