@@ -1135,7 +1135,53 @@ class ShopymindClient_Callback {
         }
         return $return;
     }
+    
+    /**
+     * Récupération des langues disponibles
+     * @param unknown $id_shop
+     * @return mixed|multitype:unknown
+     */
+    public static function getLangs($id_shop) {
+    	if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+    		return call_user_func_array(array (
+    				'ShopymindClient_CallbackOverride',
+    				__FUNCTION__
+    		), func_get_args());
+    	$return = array ();
+    	if (!empty($id_shop)) {
+    		list($scope, $website_id_needed) = explode('-', $id_shop);
+    	}
+    	$stores = Mage::app()->getStores();
+    		
+    	foreach ( $stores as $store ) {
+    		$store_id = $store->getId();
+    		$website_id = $store->getWebsite()->getId();
+    		$locale_store = Mage::getStoreConfig('general/locale/code', $store_id);
+    		$iso_lang = substr($locale_store, 0, - 3);
+    		if ((!isset($website_id_needed) || $website_id_needed == $website_id)) {
+    			$return[$iso_lang] = $iso_lang;
+    		}
+    	}
+    	return $return;
+    }
 
+    /**
+     * Récupération des boutiques
+     * @return array
+     */
+    public static function getShops() {
+    	if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+    		return call_user_func_array(array (
+    				'ShopymindClient_CallbackOverride',
+    				__FUNCTION__
+    		), func_get_args());
+    	$return = array ();
+    	$websites = Mage::getModel('core/website')->getCollection();
+    	foreach ($websites as $website){
+    		$return[$website->getId()] = $website->getName();
+    	}    
+    	return $return;
+    }
     /**
      * Get test data
      *
