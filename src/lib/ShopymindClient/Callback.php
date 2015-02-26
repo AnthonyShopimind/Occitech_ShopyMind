@@ -1164,7 +1164,27 @@ class ShopymindClient_Callback {
     	}
     	return $return;
     }
+    /**
+     * Récupération des moyens de livraison
+     * @return array
+     */
+    public static function getCarriers() {
+    	if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+    		return call_user_func_array(array (
+    				'ShopymindClient_CallbackOverride',
+    				__FUNCTION__
+    		), func_get_args());
+    		$return = array ();
+    		$results = Mage::getSingleton('shipping/config')->getActiveCarriers();
 
+    		foreach($results as $_code => $_method)
+    		{
+    			if(!$_title = Mage::getStoreConfig("carriers/$_code/title"))
+                    $_title = $_code;
+                $return[$_code] = $_title . " ($_code)";
+    		}
+    		return $return;
+    }
     /**
      * Récupération des boutiques
      * @return array
