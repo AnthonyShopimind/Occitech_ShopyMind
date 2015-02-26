@@ -2016,12 +2016,16 @@ class ShopymindClient_Callback {
         $return = true;
         
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop,$lang);
-        if(isset($scope->stores()[0]))
-            $store = $scope->stores()[0];
+        $stores = $scope->stores();
+        
+        if(is_array($stores) && count($stores)) {
+            $store = $stores[0];
+        }
         else {
             $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
-            if(isset($scope->stores()[0]))
-                $store = $scope->stores()[0];
+            $stores = $scope->stores();
+            if(is_array($stores) && count($stores))
+                $store = $stores[0];
             else $return = false;
         }
         if($return) {
