@@ -70,7 +70,7 @@ class SZend_Json
             return json_decode($encodedValue, $objectDecodeType);
         }
 
-        require_once 'SZend/Json/Decoder.php';
+        require_once dirname(__FILE__) . '/Json/Decoder.php';
         return SZend_Json_Decoder::decode($encodedValue, $objectDecodeType);
     }
 
@@ -95,7 +95,7 @@ class SZend_Json
             return json_encode($valueToEncode);
         }
 
-        require_once 'SZend/Json/Encoder.php';
+        require_once dirname(__FILE__) . '/Json/Encoder.php';
         return SZend_Json_Encoder::encode($valueToEncode, $cycleCheck);
     }
 
