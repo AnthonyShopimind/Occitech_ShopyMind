@@ -1582,12 +1582,7 @@ class ShopymindClient_Callback {
 
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
         $params = self::formatOrderData($orderData, $spm_key, $voucherUsed);
-        $spm_key = ShopymindClient_Bin_Notify::newOrder($params);
-        if ($spm_key && isset($spm_key ['idRemindersSend']) && $spm_key ['idRemindersSend']) {
-            $tablePrefix = Mage::getConfig()->getTablePrefix();
-            $write = Mage::getSingleton('core/resource')->getConnection('core_write');
-            $write->query('UPDATE `' . $tablePrefix . 'spmcartoorder` SET `is_converted` = 1 WHERE `spm_key` = "' . $spm_key ['idRemindersSend'] . '"');
-        }
+        ShopymindClient_Bin_Notify::newOrder($params);
         self::stopStoreEmulation();
     }
     
