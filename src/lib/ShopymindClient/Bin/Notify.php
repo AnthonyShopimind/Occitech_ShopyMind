@@ -104,5 +104,33 @@ class ShopymindClient_Bin_Notify {
 
         return false;
     }
+    
+    /**
+     * Permet de notifier le serveur d'une nouvelle inscription
+     *
+     * @param array $params = array(
+     *      'idRemindersSend' => '',
+     *      'idCart' => '',
+     *      'idOrder' => '',
+     *      'products' => array,
+     *      'amount' => '',
+     *      'currency' => '',
+     *      'voucherUsed' => array,
+     *      'dateOrder' => ''
+     * )
+     * @return boolean
+     */
+    public static function newCustomer(array $params) {
+        $requestServer = new ShopymindClient_Bin_RequestServer;
+        $requestServer->setRestService('newcustomer');
+    
+        foreach ($params as $key => $value){
+            $requestServer->addParam($key, $value);
+        }
+    
+        if($requestServer->send() === true)
+            return $requestServer->getResponse();
+        return false;
+    }
 
 }

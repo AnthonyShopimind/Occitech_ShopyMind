@@ -1590,6 +1590,26 @@ class ShopymindClient_Callback {
         }
         self::stopStoreEmulation();
     }
+    
+    /**
+     * Envoi des ventes générées suite à une relance à ShopyMind
+     *
+     * @param Mage_Sales_Model_Order $order
+     * @param array $orderData
+     * @param string $spm_key
+     * @param array $voucherUsed
+     */
+    public static function sendCustomerCreationToSPM($idCustomer) {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+        if($idCustomer) {
+            ShopymindClient_Bin_Notify::newCustomer(array('user'=>self::getUser($idCustomer)));
+        }
+    }
 
     /**
      * Allow to retrieve the Magento customers list
