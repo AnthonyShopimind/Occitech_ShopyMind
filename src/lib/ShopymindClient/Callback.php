@@ -417,7 +417,7 @@ class ShopymindClient_Callback {
      * @param bool $justCount
      * @return array Either the cart details, or an array with the counter: array('count' => xx)
      */
-    public static function getDroppedOutCart($id_shop, $nbSeconds, $nbSecondsMaxInterval, $justCount = false) {
+    public static function getDroppedOutCart($id_shop, $nbSeconds, $nbSecondsMaxInterval = 0, $justCount = false) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array(
                 'ShopymindClient_CallbackOverride',
