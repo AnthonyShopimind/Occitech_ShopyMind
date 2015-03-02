@@ -86,7 +86,7 @@ class ShopymindClient_Src_Reminders_OrdersByStatus extends ShopymindClient_Src_R
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getOrdersStatus')) {
-            return ShopymindClient_Callback::getOrdersByStatus($this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getIdStatus(), $this->getJustCount());
+            return ShopymindClient_Callback::getOrdersByStatus($this->getShopIdShop(),$this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getIdStatus(), $this->getJustCount());
         }
 
         return null;

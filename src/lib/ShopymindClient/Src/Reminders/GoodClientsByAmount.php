@@ -155,7 +155,7 @@ class ShopymindClient_Src_Reminders_GoodClientsByAmount extends ShopymindClient_
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getGoodClientsByAmount')) {
-            return ShopymindClient_Callback::getGoodClientsByAmount($this->getDateReference(), $this->getTimezones(), $this->getAmount(), $this->getAmountMax(), $this->getNbDays(), $this->getNbDaysLastOrder(), $this->getJustCount());
+            return ShopymindClient_Callback::getGoodClientsByAmount($this->getShopIdShop(),$this->getDateReference(), $this->getTimezones(), $this->getAmount(), $this->getAmountMax(), $this->getNbDays(), $this->getNbDaysLastOrder(), $this->getJustCount());
         }
 
         return null;

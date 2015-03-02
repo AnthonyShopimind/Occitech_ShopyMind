@@ -119,7 +119,7 @@ class ShopymindClient_Src_Reminders_VoucherUnused extends ShopymindClient_Src_Re
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getVoucherUnused')) {
-            return ShopymindClient_Callback::getVoucherUnused($this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getStartBy(), $this->getJustCount());
+            return ShopymindClient_Callback::getVoucherUnused($this->getShopIdShop(),$this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getStartBy(), $this->getJustCount());
         }
 
         return null;

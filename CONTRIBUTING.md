@@ -22,9 +22,15 @@ If you would like to suggest new features to the ShopyMind product itself [conta
 
 For feature requests related to the Magento integration, you're at home! Feel free to [submit a new issue](https://github.com/occitech/Occitech_ShopyMind/issues)
 
+## Running tests
+
+To run the extension test suite run the `composer run test 1.9.1.0` command from the project root
+(where `1.9.1.0` is the Magento version to test against).
+
 ## Submitting Changes
 
 * Push your changes to a topic branch in your fork of the repository.
+* Ensure the tests are all green
 * Submit a pull request to the repository in the cakephp organization, with the
   correct target branch.
 

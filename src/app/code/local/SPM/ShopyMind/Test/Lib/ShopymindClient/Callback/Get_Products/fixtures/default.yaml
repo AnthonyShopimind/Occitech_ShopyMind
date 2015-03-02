@@ -1,0 +1,78 @@
+scope:
+  website:
+    - website_id: 1
+      code: website_1
+      name: Website 1
+      default_group_id: 1
+    - website_id: 2
+      code: website_2
+      name: website_2
+      default_group_id: 2
+  group:
+    - group_id: 1
+      website_id: 1
+      name: Group 1
+      default_store_id: 1
+      root_category_id: 2
+    - group_id: 2
+      website_id: 2
+      name: Group 2
+      default_store_id: 2
+      root_category_id: 2
+  store:
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: store_1
+      name: Store 1
+      is_active: 1
+    - store_id: 2
+      website_id: 2
+      group_id: 2
+      code: store_2
+      name: Store 2
+      is_active: 1
+
+eav:
+  catalog_product:
+    - entity_id: 1
+      sku: product_1
+      attribute_set_id: 4
+      status: 1
+      website_ids:
+        - website_1
+    - entity_id: 2
+      sku: product_2
+      attribute_set_id: 4
+      status: 1
+      website_ids:
+        - website_1
+
+tables:
+  catalog_product_index_price:
+    - entity_id: 1
+      website_id: 1
+      customer_group_id: 0
+      visibility: 4
+      status: 1
+    - entity_id: 2
+      website_id: 1
+      customer_group_id: 0
+      visibility: 4
+      status: 1
+
+  catalog_product_website:
+    - product_id: 1
+      website_id: 1
+    - product_id: 2
+      website_id: 1
+
+  catalog_category_product_index:
+    - category_id: 2
+      product_id: 1
+      store_id: 1
+      visibility: 4
+    - category_id: 2
+      product_id: 2
+      store_id: 1
+      visibility: 4

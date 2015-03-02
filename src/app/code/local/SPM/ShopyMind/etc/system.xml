@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+    <tabs>
+    <shopymind_configuration translate="label" module="shopymind">
+        <label>ShopyMind</label>
+        <sort_order>102</sort_order>
+    </shopymind_configuration>
+    </tabs>
+    <sections>
+        <shopymind_configuration translate="label">
+            <label>Configuration</label>
+            <tab>shopymind_configuration</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1000</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <shopymind_configuration translate="label comment">
+                    <label>ShopyMind Configuration</label>
+                    <comment>
+                        <![CDATA[
+                            <div style="text-align:center;"><a href="http://www.shopymind.com/" target="_blank"><img src="http://media.shopymind.com/img/logo.png" /></a></div>
+                            <ul class="messages">
+                                <li class="notice-msg">
+                                    Afin d'utiliser shopymind, vous devez créer un compte gratuitement <a href="http://client.shopymind.com/registration/speed" target="_blank">en cliquant ici</a>
+                                </li>
+                            </ul>
+                        ]]>
+                    </comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>5</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <expanded>1</expanded>
+                    <fields>
+                        <api_key translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <config_path>shopymind/configuration/apiidentification</config_path>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </api_key>
+                        <api_password translate="label">
+                            <label>API Password</label>
+                            <frontend_type>password</frontend_type>
+                            <config_path>shopymind/configuration/apipassword</config_path>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </api_password>
+                        <birth_required translate="label comment">
+                            <label>Date of birth is required ?</label>
+                            <comment><![CDATA[ Make the field date of birth required]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>shopymind/configuration/birthrequired</config_path>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <can_be_empty>0</can_be_empty>
+                        </birth_required>
+                    </fields>
+                </shopymind_configuration>
+            </groups>
+        </shopymind_configuration>
+    </sections>
+</config>

@@ -1,0 +1,99 @@
+scope:
+  website:
+    - website_id: 1
+      code: website_1
+      name: Website 1
+      default_group_id: 1
+    - website_id: 2
+      code: website_2
+      name: website_2
+      default_group_id: 2
+  group:
+    - group_id: 1
+      website_id: 1
+      name: Group 1
+      default_store_id: 1
+      root_category_id: 2
+    - group_id: 2
+      website_id: 2
+      name: Group 2
+      default_store_id: 2
+      root_category_id: 2
+  store:
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: store_1
+      name: Store 1
+      is_active: 1
+    - store_id: 2
+      website_id: 1
+      group_id: 1
+      code: store_2
+      name: Store 2
+      is_active: 1
+
+eav:
+  customer:
+    - entity_id: 1
+      entity_type_id: 1
+      attribute_set_id: 0
+      website_id: 1
+      store_id: 1
+      group_id: 1
+      is_active: 1
+      gender: 2
+      firstname: April
+      lastname: Oliver
+      email: april.oliver90@example.com
+      dob: 1990-01-01 00:00:00
+    - entity_id: 2
+      entity_type_id: 1
+      attribute_set_id: 0
+      website_id: 1
+      store_id: 1
+      group_id: 1
+      is_active: 1
+      gender: 1
+      firstname: Gary
+      lastname: Perez
+      email: gary.perez41@example.com
+      dob: 1990-01-02 00:00:00
+
+tables:
+  sales/order:
+    - entity_id: 1
+      customer_id: 1
+      customer_email: april.oliver90@example.com
+      created_at: 2014-12-24 10:00:00
+      store_id: 1
+      status: processing
+    - entity_id: 2
+      customer_id: 2
+      customer_email: gary.perez41@example.com
+      created_at: 2014-10-24 10:00:00
+      store_id: 1
+      status: complete
+    - entity_id: 3
+      customer_id: 1
+      customer_email: april.oliver90@example.com
+      created_at: 2014-10-24 10:00:00
+      store_id: 1
+      status: complete
+
+  sales/order_address:
+    - entity_id: 1
+      parent_id: 1
+      country_id: US
+      region_id: 2
+      address_type: billing
+    - entity_id: 2
+      parent_id: 2
+      country_id: US
+      region_id: 1
+      address_type: billing
+    - entity_id: 3
+      parent_id: 3
+      country_id: US
+      region_id: 3
+      address_type: billing

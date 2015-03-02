@@ -1,0 +1,15 @@
+eav:
+  catalog_product:
+   - entity_id: 2
+     name: Another simple product
+     sku: another_simple_product
+     type_id: simple
+     attribute_set_id: 4
+     status: 1
+     visibility: 1
+     category_ids:
+      - 1
+     website_ids:
+      - b2c
+      - b2b
+     price: 14.00

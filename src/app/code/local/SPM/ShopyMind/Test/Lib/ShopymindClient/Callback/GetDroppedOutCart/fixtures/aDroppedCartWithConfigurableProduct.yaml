@@ -1,0 +1,136 @@
+eav:
+ catalog_product:
+   - entity_id: 2
+     sku: 14156575-XS
+     attribute_set_id: 4
+     type_id: "configurable"
+     has_options: 1
+     required_options: 1
+     status: 1
+     name: "LEGGING configurable"
+
+tables:
+  sales/quote:
+    -   entity_id: 1
+        store_id: 1
+        created_at: "2014-01-29 12:45:46 "
+        updated_at: "2014-01-30 13:45:46"
+        reserved_order_id: null
+        is_active: 1
+        is_virtual: 0
+        is_multi_shipping: 0
+        items_count: 1
+        items_qty: 2.0000
+        orig_order_id: 0
+        store_to_base_rate: 1.0000
+        store_to_quote_rate: 1.0000
+        base_currency_code: "USD"
+        store_currency_code: "USD"
+        quote_currency_code: "USD"
+        grand_total: 173.8900
+        base_grand_total: 173.8900
+        customer_id: 1234
+        customer_tax_class_id: 1
+        customer_group_id: 1
+        customer_email: "april.oliver90@example.com"
+        customer_firstname: "April"
+        customer_lastname: "Oliver"
+        customer_note_notify: 1
+        customer_is_guest: 0
+        remote_ip: "81.36.188.168"
+        global_currency_code: "USD"
+        base_to_global_rate: 1.0000
+        base_to_quote_rate: 1.0000
+        subtotal: 144.9100
+        base_subtotal: 144.9100
+        subtotal_with_discount: 144.9100
+        base_subtotal_with_discount: 144.9100
+        is_changed: 1
+        trigger_recollect: 1
+        is_persistent: 0
+
+  sales/quote_item:
+    - item_id: 1
+      quote_id: 1
+      product_id: 2
+      parent_item_id: null
+      is_virtual: 0
+      sku: 14156575-XS
+      name: "LEGGING Configurable"
+      description: null
+      applied_rule_ids: 0
+      additional_data: null
+      free_shipping: 0
+      is_qty_decimal: 0
+      no_discount: 0
+      weight: 0.4000
+      qty: 2
+      price: 13.0000
+      base_price: 13.0000
+      custom_price: 10.0000
+      discount_percent: 0.0000
+      discount_amount: 0.0000
+      base_discount_amount: 0.0000
+      tax_percent: 0.0000
+      tax_amount: 0.0000
+      base_tax_amount: 0.0000
+      row_total: 20.0000
+      base_row_total: 20.0000
+      row_total_with_discount: 0.0000
+      row_weight: 0.0000
+      product_type: configurable
+      base_tax_before_discount: null
+      tax_before_discount: null
+      original_custom_price: 10.0000
+      redirect_url: null
+      base_cost: null
+      price_incl_tax: 13.0000
+      base_price_incl_tax: 13.0000
+      row_total_incl_tax: 26.0000
+      base_row_total_incl_tax: 26.0000
+      hidden_tax_amount: null
+      base_hidden_tax_amount: null
+      gift_message_id: null
+      weee_tax_disposition: 0.0000
+      weee_tax_row_disposition: 0.0000
+      base_weee_tax_disposition: 0.0000
+      base_weee_tax_row_disposition: 0.0000
+      weee_tax_applied: 'a:0:{}'
+      weee_tax_applied_amount: 0.0000
+      weee_tax_applied_row_amount: 0.0000
+      base_weee_tax_applied_amount: 0.0000
+      base_weee_tax_applied_row_amnt: null
+    - item_id: 2
+      quote_id: 1
+      product_id: 1
+      parent_item_id: 1
+      is_virtual: 0
+      sku: 14156575-XS
+      name: LEGGING
+      sku: 14156575-XS-9394
+      free_shipping: 0
+      is_qty_decimal: 0
+      no_discount: 0
+      weight: 0.0000
+      qty: 2.0000
+      price: 0.0000
+      base_price: 0.0000
+      discount_percent: 0.0000
+      discount_amount: 0.0000
+      base_discount_amount: 0.0000
+      tax_percent: 0.0000
+      tax_amount: 0.0000
+      base_tax_amount: 0.0000
+      row_total: 0.0000
+      base_row_total: 0.0000
+      row_total_with_discount: 0.0000
+      row_weight: 0.0000
+      product_type: "simple"
+      weee_tax_disposition: 0.0000
+      weee_tax_row_disposition: 0.0000
+      base_weee_tax_disposition: 0.0000
+      base_weee_tax_row_disposition: 0.0000
+      weee_tax_applied: "a:0:{}"
+      weee_tax_applied_amount: 0.0000
+      weee_tax_applied_row_amount: 0.0000
+      base_weee_tax_applied_amount: 0.0000

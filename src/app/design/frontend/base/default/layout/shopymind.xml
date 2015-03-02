@@ -23,9 +23,7 @@
 <layout version="0.1.0">
     <default>
     <reference name="before_body_end">
-    <action method="unsetData"><key>cache_lifetime</key></action>
-     <action method="unsetData"><key>cache_tags</key></action>
-        <block type="core/template" name="shopymind_footer" template="shopymind/footer.phtml" />
+        <block type="spm_shopymind/footer" name="spm_shopymind_footer" template="shopymind/footer.phtml" />
     </reference>
 	</default>
 </layout>
