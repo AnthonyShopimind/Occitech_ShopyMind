@@ -18,7 +18,7 @@ return array(
 
     'api' => array(
         'salt' => 'zPz<j.[EaX,]$s3gzkCW;^N.2',
-        'url' => 'http://dev.shopymind.com/rest'
+        'url' => 'https://client.shopymind.com/rest'
     ),
 
 );
