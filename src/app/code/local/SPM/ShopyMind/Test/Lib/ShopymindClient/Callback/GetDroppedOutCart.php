@@ -40,8 +40,8 @@ QUERY
     {
         $_11minutesAfterTheOrder = '2014-01-30 13:56:46';
         ShopymindClient_Callback::$now = strtotime($_11minutesAfterTheOrder);
-        $resultsWithin10Minutes = ShopymindClient_Callback::getDroppedOutCart('store-1', 10 * 60, true);
-        $resultsWithin12Minutes = ShopymindClient_Callback::getDroppedOutCart('store-1', 12 * 60, true);
+        $resultsWithin10Minutes = ShopymindClient_Callback::getDroppedOutCart('store-1', 10 * 60, 0, true);
+        $resultsWithin12Minutes = ShopymindClient_Callback::getDroppedOutCart('store-1', 12 * 60, 0, true);
         ShopymindClient_Callback::$now = null;
 
         $this->assertEquals(1, $resultsWithin10Minutes['count']);
