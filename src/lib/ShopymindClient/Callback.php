@@ -411,7 +411,9 @@ class ShopymindClient_Callback {
     /**
      * Allow to get carts abandoned since a given period in seconds
      *
-     * @param int $nbSeconds
+     * @param string $id_shop Shopymind ID
+     * @param int $nbSeconds Nombre de secondes d'inactivité du panier
+     * @param int $nbSecondsMaxInterval Nombre de secondes maximum d'inactivité du panier
      * @param bool $justCount
      * @return array Either the cart details, or an array with the counter: array('count' => xx)
      */
