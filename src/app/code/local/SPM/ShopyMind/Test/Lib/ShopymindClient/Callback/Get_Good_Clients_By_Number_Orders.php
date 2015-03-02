@@ -29,6 +29,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Number
                     'shop_id_shop' => '1',
                     'nb_order_year' => '3',
                     'sum_order_year' => 0,
+                    'region' => null,
+                    'postcode' => null,
                 ),
             ),
         );

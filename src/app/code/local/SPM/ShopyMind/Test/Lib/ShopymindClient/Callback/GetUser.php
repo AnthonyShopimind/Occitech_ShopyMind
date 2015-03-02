@@ -24,7 +24,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         'sum_order'       => 0,
         'nb_order_year'   => 0,
         'sum_order_year'  => 0,
-        'groups'          => array(1)
+        'groups'          => array(1),
+        'region' => null,
+        'postcode' => null,
     );
 
     public function testItReturnsCorrectUserInformationsWhenCustomerHasNotPassedAnyOrder()
@@ -127,7 +129,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'phone1' => '0102030455',
                 'gender' => 1,
                 'locale' => 'FR',
-                'groups' => array(1)
+                'groups' => array(1),
+                'region' => '92',
+                'postcode' => '31100',
             )),
             array_merge($this->aCustomer, array(
                 'id_customer' => 'april.oliver90@example.com',
@@ -136,7 +140,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'gender' => 2,
                 'birthday' => '1962-08-29 00:00:00',
                 'locale' => 'FR',
-                'groups' => array(1)
+                'groups' => array(1),
+                'region' => '92',
+                'postcode' => 92000,
             ))
         );
         $this->assertEquals($expectedData, $result);
@@ -162,7 +168,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'phone1' => '0102030455',
                 'gender' => 1,
                 'locale' => 'FR',
-                'groups' => array(1)
+                'groups' => array(1),
+                'region' => '92',
+                'postcode' => '31100',
             )),
             array_merge($this->aCustomer, array(
                 'id_customer' => 'april.oliver90@example.com',
@@ -171,7 +179,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'gender' => 2,
                 'birthday' => '1962-08-29 00:00:00',
                 'locale' => 'FR',
-                'groups' => array(1)
+                'groups' => array(1),
+                'region' => '92',
+                'postcode' => '92000'
             ))
         );
         $this->assertEquals($expectedData, $result);

@@ -46,7 +46,9 @@ QUERY
                     'groups' => array('1'),
                     'shop_id_shop' => 1,
                     'nb_order_year' => 1,
-                    'sum_order_year' => 0
+                    'sum_order_year' => 0,
+                    'region' => null,
+                    'postcode' => null,
                 ),
                 'shipping_number' => array(),
                 'date_order' => '2015-01-01 10:00:00'

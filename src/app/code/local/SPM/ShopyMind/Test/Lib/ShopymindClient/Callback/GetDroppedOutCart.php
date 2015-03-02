@@ -95,7 +95,9 @@ QUERY
                     'groups' => array ('1'),
                     'shop_id_shop' => '1',
                     'nb_order_year' => '0',
-                    'sum_order_year' => 0
+                    'sum_order_year' => 0,
+                    'region' => null,
+                    'postcode' => null,
                 ),
             ),
         );

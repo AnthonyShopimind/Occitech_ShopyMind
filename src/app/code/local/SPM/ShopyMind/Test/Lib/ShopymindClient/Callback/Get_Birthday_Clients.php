@@ -42,6 +42,8 @@ QUERY
                     'shop_id_shop' => '1',
                     'nb_order_year' => '0',
                     'sum_order_year' => 0,
+                    'region' => 'GA',
+                    'postcode' => null,
                 ),
             ),
             array(
@@ -64,6 +66,8 @@ QUERY
                     'shop_id_shop' => '1',
                     'nb_order_year' => '0',
                     'sum_order_year' => 0,
+                    'region' => 'NY',
+                    'postcode' => null,
                 ),
             ),
         );
