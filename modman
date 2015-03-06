@@ -1,6 +1,4 @@
 src/app/code/local/SPM/ShopyMind                                    app/code/local/SPM/ShopyMind
-src/app/design/adminhtml/default/default/layout/shopymind.xml       app/design/adminhtml/default/default/layout/shopymind.xml
-src/app/design/adminhtml/default/default/template/shopymind         app/design/adminhtml/default/default/template/shopymind
 src/app/design/frontend/base/default/layout/shopymind.xml           app/design/frontend/base/default/layout/shopymind.xml
 src/app/design/frontend/base/default/template/shopymind             app/design/frontend/base/default/template/shopymind
 src/app/etc/modules/SPM_ShopyMind.xml                               app/etc/modules/SPM_ShopyMind.xml
