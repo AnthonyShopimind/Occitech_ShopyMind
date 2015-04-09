@@ -23,8 +23,10 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     public function orderUpdateObserver(Varien_Event_Observer $observer) {
 
         try {
-            $order=$observer->getOrder();
-            ShopymindClient_Callback::checkNewOrder($order);
+            $order = $observer->getOrder();
+            if ($order->hasStatus()) {
+                ShopymindClient_Callback::checkNewOrder($order);
+            }
         } catch ( Exception $e ) {
             Mage::log($e->getMessage(), Zend_Log::ERR);
         }
