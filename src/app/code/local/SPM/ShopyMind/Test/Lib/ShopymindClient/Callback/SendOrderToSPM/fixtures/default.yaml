@@ -62,6 +62,6 @@ tables:
       base_grand_total: 100.0000
       quote_id: 1
       increment_id: 1
-      base_total_paid: 100.0000
+      base_total_paid: null
       base_to_order_rate: 1.0000
 

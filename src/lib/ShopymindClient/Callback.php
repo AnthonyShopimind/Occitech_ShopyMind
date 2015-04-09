@@ -1718,7 +1718,7 @@ class ShopymindClient_Callback {
             'idCart' => $orderData['quote_id'],
             'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
             'idOrder' => $orderData['entity_id'],
-            'amount' => $orderData['base_total_paid'],
+            'amount' => $orderData['base_grand_total'],
             'taxRate' => $orderData['base_to_order_rate'],
             'currency' => $orderData['order_currency_code'],
             'dateOrder' => $orderData['created_at'],
