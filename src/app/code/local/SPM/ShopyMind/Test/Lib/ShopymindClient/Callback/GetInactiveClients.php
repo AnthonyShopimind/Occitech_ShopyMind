@@ -70,4 +70,24 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
         $this->assertEquals(array('count' => 1), $actual);
     }
 
+    /**
+     * @group test
+     */
+    public function testItCanRetrieveDataForMutlipleTimezones()
+    {
+        $actual = ShopymindClient_Callback::getInactiveClients(
+            'store-1',
+            '2014-11-24',
+            array(
+                array('country' => 'US', 'region' => 'AL'),
+                array('country' => 'US', 'region' => 'AK'),
+            ),
+            1,
+            false,
+            true
+        );
+
+        $this->assertEquals(array('count' => 2), $actual);
+    }
+
 }
