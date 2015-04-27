@@ -19,7 +19,7 @@ matrix:
 
 before_script:
   - phpenv config-add travis_tests_config.ini
-  - MAGE_CI_SETUP_ONLY=1 composer test ${MAGENTO_VERSION}
+  - COMPOSER_PROCESS_TIMEOUT=600 MAGE_CI_SETUP_ONLY=1 composer test ${MAGENTO_VERSION}
 
 script:
   - COMPOSER_PROCESS_TIMEOUT=3600 composer test ${MAGENTO_VERSION}
