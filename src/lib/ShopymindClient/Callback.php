@@ -1915,32 +1915,12 @@ class ShopymindClient_Callback {
 
     private static function restrictOrdersCollectionBillingAddressesToTimezones(Varien_Data_Collection_Db $collection, array $timezones)
     {
-        $orderAddressJoined = false;
-        $CountryRegionJoined = false;
-        foreach ($timezones as $timezone) {
-            if (isset($timezone['country'])) {
-                if (!$orderAddressJoined) {
-                    $collection
-                        ->join('sales/order_address', '`sales/order_address`.parent_id = main_table.entity_id AND `sales/order_address`.address_type = "billing"', null);
-
-                    $orderAddressJoined = true;
-                }
-
-                $collection->getSelect()
-                    ->where('`sales/order_address`.country_id = ?', $timezone['country']);
-            }
-
-            if (isset($timezone['region'])) {
-                if (!$CountryRegionJoined) {
-                    $collection
-                        ->join('directory/country_region', '`directory/country_region`.region_id = `sales/order_address`.region_id', null);
-
-                    $CountryRegionJoined = true;
-                }
-
-                $collection->getSelect()
-                    ->where('`directory/country_region`.code = ?', $timezone['region']);
-            }
+        $timezonesWhere = self::generateTimezonesWhere($timezones, 'sales/order_address', 'country_id', 'directory/country_region', 'code');
+        if (!empty($timezonesWhere)) {
+            $collection
+                ->join('sales/order_address', '`sales/order_address`.parent_id = main_table.entity_id AND `sales/order_address`.address_type = "billing"', null)
+                ->join('directory/country_region', '`directory/country_region`.region_id = `sales/order_address`.region_id', null);
+            $collection->getSelect()->where($timezonesWhere);
         }
     }
 
