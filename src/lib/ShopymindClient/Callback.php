@@ -557,8 +557,8 @@ class ShopymindClient_Callback {
         $query = 'SELECT `order_last`.`entity_id`, `order_primary`.`customer_id`, `order_primary`.`customer_email`,
             SUM((`order_primary`.`base_total_invoiced`*`order_primary`.`base_to_order_rate`)) AS Total
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0) AND `order_last`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d %H:%i:%s"))
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last2` ON (((`order_last2`.`customer_id` IS NOT NULL AND `order_last2`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last2`.`customer_id` IS NULL OR `order_last2`.`customer_id` = 0) AND `order_last2`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last2`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d %H:%i:%s"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last2` ON (((`order_last2`.`customer_id` IS NOT NULL AND `order_last2`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last2`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d"))
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
             LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
             WHERE DATE_FORMAT(DATE_SUB("' . $dateReference . '",INTERVAL ' . (int) $duration . ' DAY),"%Y-%m-%d %H:%i:%s") <= DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d %H:%i:%s")
@@ -631,8 +631,8 @@ class ShopymindClient_Callback {
         $query = 'SELECT `order_last`.`entity_id`, `order_primary`.`customer_id`, `order_primary`.`customer_email`,
             COUNT(`order_primary`.`entity_id`) AS Total
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last`.`customer_id` IS NULL OR `order_last`.`customer_id` = 0) AND `order_last`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d %H:%i:%s"))
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last2` ON (((`order_last2`.`customer_id` IS NOT NULL AND `order_last2`.`customer_id` = `order_primary`.`customer_id`) OR ((`order_last2`.`customer_id` IS NULL OR `order_last2`.`customer_id` = 0) AND `order_last2`.`customer_email` = `order_primary`.`customer_email`)) AND DATE_FORMAT(`order_last2`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d %H:%i:%s"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last2` ON (((`order_last2`.`customer_id` IS NOT NULL AND `order_last2`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last2`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d"))
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
             LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
             WHERE DATE_FORMAT(DATE_SUB("' . $dateReference . '",INTERVAL ' . (int) $duration . ' DAY),"%Y-%m-%d %H:%i:%s") <= DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d %H:%i:%s")
@@ -1893,11 +1893,11 @@ class ShopymindClient_Callback {
 
         $collection->getSelect()->joinLeft(array (
                 'recent_orders' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')
-        ), sprintf('(main_table.customer_id = recent_orders.customer_id OR main_table.customer_email = recent_orders.customer_email) AND DATE(recent_orders.created_at) > "%s" AND recent_orders.status IN ("processing", "complete")', date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))), null)->where('recent_orders.entity_id IS NULL');
+        ), sprintf('(main_table.customer_id = recent_orders.customer_id) AND DATE(recent_orders.created_at) > "%s" AND recent_orders.status IN ("processing", "complete")', date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))), null)->where('recent_orders.entity_id IS NULL');
 
         $collection->getSelect()->joinLeft(array (
                 'orders_at_date' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')
-        ), sprintf('(main_table.customer_id = orders_at_date.customer_id OR main_table.customer_email = orders_at_date.customer_email) AND DATE(orders_at_date.created_at) = "%s" AND orders_at_date.status IN ("processing", "complete")', date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))), null)->where('orders_at_date.entity_id IS NOT NULL');
+        ), sprintf('(main_table.customer_id = orders_at_date.customer_id) AND DATE(orders_at_date.created_at) = "%s" AND orders_at_date.status IN ("processing", "complete")', date('Y-m-d', strtotime("-{$nbMonthsLastOrder}months", strtotime($dateReference)))), null)->where('orders_at_date.entity_id IS NOT NULL');
 
         if ($justCount) {
             return self::counterResponse($collection);
@@ -1915,32 +1915,12 @@ class ShopymindClient_Callback {
 
     private static function restrictOrdersCollectionBillingAddressesToTimezones(Varien_Data_Collection_Db $collection, array $timezones)
     {
-        $orderAddressJoined = false;
-        $CountryRegionJoined = false;
-        foreach ($timezones as $timezone) {
-            if (isset($timezone['country'])) {
-                if (!$orderAddressJoined) {
-                    $collection
-                        ->join('sales/order_address', '`sales/order_address`.parent_id = main_table.entity_id AND `sales/order_address`.address_type = "billing"', null);
-
-                    $orderAddressJoined = true;
-                }
-
-                $collection->getSelect()
-                    ->where('`sales/order_address`.country_id = ?', $timezone['country']);
-            }
-
-            if (isset($timezone['region'])) {
-                if (!$CountryRegionJoined) {
-                    $collection
-                        ->join('directory/country_region', '`directory/country_region`.region_id = `sales/order_address`.region_id', null);
-
-                    $CountryRegionJoined = true;
-                }
-
-                $collection->getSelect()
-                    ->where('`directory/country_region`.code = ?', $timezone['region']);
-            }
+        $timezonesWhere = self::generateTimezonesWhere($timezones, 'sales/order_address', 'country_id', 'directory/country_region', 'code');
+        if (!empty($timezonesWhere)) {
+            $collection
+                ->join('sales/order_address', '`sales/order_address`.parent_id = main_table.entity_id AND `sales/order_address`.address_type = "billing"', null)
+                ->join('directory/country_region', '`directory/country_region`.region_id = `sales/order_address`.region_id', null);
+            $collection->getSelect()->where($timezonesWhere);
         }
     }
 

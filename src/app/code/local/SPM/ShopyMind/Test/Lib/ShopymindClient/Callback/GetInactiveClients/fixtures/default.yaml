@@ -59,6 +59,18 @@ eav:
       lastname: Perez
       email: gary.perez41@example.com
       dob: 1990-01-02 00:00:00
+    - entity_id: 3
+      entity_type_id: 1
+      attribute_set_id: 0
+      website_id: 1
+      store_id: 1
+      group_id: 1
+      is_active: 1
+      gender: 2
+      firstname: Aubrey
+      lastname: Alvarez
+      email: aubrey.alvarez39@example.com
+      dob: 1990-01-02 00:00:00
 
 tables:
   sales/order:
@@ -80,6 +92,12 @@ tables:
       created_at: 2014-10-24 10:00:00
       store_id: 1
       status: complete
+    - entity_id: 4
+      customer_id: 3
+      customer_email: aubrey.alvarez39@example.com
+      created_at: 2014-10-24 10:00:00
+      store_id: 1
+      status: complete
 
   sales/order_address:
     - entity_id: 1
@@ -96,4 +114,9 @@ tables:
       parent_id: 3
       country_id: US
       region_id: 3
+      address_type: billing
+    - entity_id: 4
+      parent_id: 4
+      country_id: US
+      region_id: 2
       address_type: billing
