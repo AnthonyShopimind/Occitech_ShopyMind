@@ -1294,6 +1294,7 @@ class ShopymindClient_Callback {
                         'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
                 )
                 ->getSelect();
+            $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         } elseif ($random) {
             $collection = Mage::getResourceModel('catalog/product_collection');
             $collection

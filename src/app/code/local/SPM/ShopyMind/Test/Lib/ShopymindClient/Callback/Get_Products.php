@@ -29,4 +29,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Products extends EcomD
 
         $this->assertRegExp('#catalog/product/view/id/[1-2]/#', $products[0]['product_url']);
     }
+
+    public function testCanGetRandomProductsInSpecificsProductsIds()
+    {
+        $products = ShopymindClient_Callback::getProducts(null, false, [1], true, 1);
+
+        $this->assertRegExp('#catalog/product/view/id/1/#', $products[0]['product_url']);
+    }
 }
