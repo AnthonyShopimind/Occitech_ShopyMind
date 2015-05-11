@@ -1284,6 +1284,7 @@ class ShopymindClient_Callback {
         if ($products) {
             $collection = Mage::getResourceModel('catalog/product_collection');
             $collection
+                ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
                 ->addAttributeToFilter('entity_id', array (
                     'in' => $products
                 ))
@@ -1298,6 +1299,7 @@ class ShopymindClient_Callback {
         } elseif ($random) {
             $collection = Mage::getResourceModel('catalog/product_collection');
             $collection
+                ->addAttributeToSelect(Mage::getSingleton('catalog/config')->getProductAttributes())
                 ->addAttributeToFilter('status', array(
                         'in' => Mage::getModel('catalog/product_status')->getVisibleStatusIds())
                 )
