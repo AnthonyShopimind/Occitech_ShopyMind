@@ -1283,25 +1283,32 @@ class ShopymindClient_Callback {
         $collection = array ();
         if ($products) {
             $collection = Mage::getResourceModel('catalog/product_collection');
-            Mage::getModel('catalog/layer')->prepareProductCollection($collection);
-            $collection->addAttributeToFilter('entity_id', array (
+            $collection
+                ->addAttributeToFilter('entity_id', array (
                     'in' => $products
-            ))->getSelect();
-            $collection->addStoreFilter();
-            $collection->setPage(1);
+                ))
+                ->addAttributeToFilter('status', array(
+                        'in' => Mage::getModel('catalog/product_status')->getVisibleStatusIds())
+                )
+                ->addAttributeToFilter('visibility', array(
+                        'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
+                )
+                ->getSelect();
         } elseif ($random) {
             $collection = Mage::getResourceModel('catalog/product_collection');
-            Mage::getModel('catalog/layer')->prepareProductCollection($collection);
-            $collection->getSelect()->order('rand()');
-            $collection->addStoreFilter();
+            $collection
+                ->addAttributeToFilter('status', array(
+                        'in' => Mage::getModel('catalog/product_status')->getVisibleStatusIds())
+                )
+                ->addAttributeToFilter('visibility', array(
+                        'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
+                )
+                ->getSelect()->order('rand()');
             $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         }
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
-        $storeIds = $scope->storeIds();
-        $store = Mage::getModel('core/store')
-            ->load(array_pop($storeIds));
-        $collection->addStoreFilter($store);
+        $scope->restrictProductCollection($collection);
 
         if ($collection && sizeof($collection)) {
             foreach ( $collection as $product ) {
