@@ -23,4 +23,10 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Products extends EcomD
         $this->assertEmpty($products);
     }
 
+    public function testCanGetRandomProductsIfNoStoreIsDefined()
+    {
+        $products = ShopymindClient_Callback::getProducts(null, false, false, true, 1);
+
+        $this->assertRegExp('#catalog/product/view/id/[1-2]/#', $products[0]['product_url']);
+    }
 }
