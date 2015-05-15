@@ -1950,6 +1950,7 @@ class ShopymindClient_Callback {
 
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection
+            ->addAttributeToSelect('name')
             ->addAttributeToFilter(array(
                 array(
                     'attribute' => 'name',
