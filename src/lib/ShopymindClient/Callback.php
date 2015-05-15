@@ -780,6 +780,7 @@ class ShopymindClient_Callback {
             SELECT
                 `order_primary`.`store_id`,
                 `order_primary`.`entity_id`,
+                `order_primary`.`increment_id`,
                 `order_primary`.`order_currency_code`,
                 `order_primary`.`base_grand_total`,
                 `order_primary`.`customer_id`,
@@ -832,7 +833,7 @@ class ShopymindClient_Callback {
                         'total_amount' => $row ['base_grand_total'],
                         'articles' => $orderedProducts,
                         'date_order' => $row['created_at'],
-                        'id_order' => $row ['entity_id'],
+                        'id_order' => $row ['increment_id'],
                         'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
                         'shipping_number' => $shippingNumbers,
                     );
@@ -1727,7 +1728,7 @@ class ShopymindClient_Callback {
             'idStatus' => $orderData['status'],
             'idCart' => $orderData['quote_id'],
             'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
-            'idOrder' => $orderData['entity_id'],
+            'idOrder' => $orderData['increment_id'],
             'amount' => $orderData['base_grand_total'],
             'taxRate' => $orderData['base_to_order_rate'],
             'currency' => $orderData['order_currency_code'],

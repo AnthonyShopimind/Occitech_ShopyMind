@@ -62,6 +62,7 @@ eav:
 tables:
   sales/order:
     - entity_id: 2
+      increment_id: 00002
       base_total_invoiced: 50.0000
       customer_id: 1
       customer_email: april.oliver90@example.com
