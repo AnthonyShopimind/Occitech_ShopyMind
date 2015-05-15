@@ -61,7 +61,7 @@ tables:
       order_currency_code: EUR
       base_grand_total: 100.0000
       quote_id: 1
-      increment_id: 1
+      increment_id: 0002
       base_total_paid: null
       base_to_order_rate: 1.0000
 
