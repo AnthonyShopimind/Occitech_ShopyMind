@@ -490,7 +490,7 @@ class ShopymindClient_Callback {
             /** @var Mage_Sales_Model_Quote_Item $quoteItem */
             $product = $quoteItem->getProduct();
             $children = $quoteItem->getChildren();
-            $combinationId = count($children) ? $children[0]->getProductId() : false;
+            $combinationId = count($children) ? $children[0]->getProductId() : $product->getId();
 
             $image_url = Mage::helper('catalog/image')->init($product, 'small_image')->resize(200);
             $product_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
