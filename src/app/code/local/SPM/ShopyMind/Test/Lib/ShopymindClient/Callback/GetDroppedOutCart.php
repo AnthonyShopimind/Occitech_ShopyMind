@@ -71,7 +71,7 @@ QUERY
                         'price' => '13.0000',
                         'image_url' => $this->placeholderImageUrl(),
                         'product_url' => 'catalog/product/view/id/1/s/legging/',
-                        'id_combination' => false,
+                        'id_combination' => 1,
                         'qty' => '2.0000',
                         'product_categories' => array(1, 2),
                         'product_manufacturer' => null, // See test below
