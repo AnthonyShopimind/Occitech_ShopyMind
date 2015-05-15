@@ -74,7 +74,7 @@ QUERY
             'description' => 'Produit 1',
             'qty' => 2.0,
             'price' => '13.0000',
-            'id_combination' => false,
+            'id_combination' => '1',
             'product_categories' => array(2),
             'product_manufacturer' => null,
             'product_url' => 'catalog/product/view/id/1/',
