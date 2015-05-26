@@ -126,7 +126,7 @@ class ShopymindClient_Callback {
                   INNER JOIN `' . $tablePrefix . 'sales_flat_quote` AS `quote` ON (
                     `quote`.`entity_id` = `quote_address`.`quote_id`
                   )
-                  INNER JOIN `' . $tablePrefix . 'directory_country_region` AS `directory_country_region` ON(`directory_country_region`.`region_id` = `quote_address`.`region_id`)
+                  LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `directory_country_region` ON(`directory_country_region`.`region_id` = `quote_address`.`region_id`)
                   WHERE
                     `quote_address`.`email` IN("' . (implode('", "', (array) $idOrEmails)) . '")
                     AND `quote_address`.`address_type` = "billing"
@@ -152,7 +152,7 @@ class ShopymindClient_Callback {
                   INNER JOIN `' . $tablePrefix . 'sales_flat_order` AS `order` ON (
                     `order`.`entity_id` = `order_address`.`parent_id`
                   )
-                  INNER JOIN `' . $tablePrefix . 'directory_country_region` AS `directory_country_region` ON(`directory_country_region`.`region_id` = `order_address`.`region_id`)
+                  LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `directory_country_region` ON(`directory_country_region`.`region_id` = `order_address`.`region_id`)
                   WHERE
                     `order_address`.`email` IN("' . (implode('", "', (array) $idOrEmails)) . '")
                     AND `order_address`.`address_type` = "billing"
