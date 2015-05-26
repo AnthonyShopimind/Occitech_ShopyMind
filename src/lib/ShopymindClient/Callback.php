@@ -436,8 +436,8 @@ class ShopymindClient_Callback {
           SELECT `quote_table`.*
           FROM `' . $tablePrefix . 'sales_flat_quote` AS `quote_table`
           LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_table` ON (
-            `order_table`.`customer_email` = `quote_table`.`customer_email`
-            AND `order_table`.`customer_id` = `quote_table`.`customer_id`
+            (`order_table`.`customer_email` = `quote_table`.`customer_email`
+            OR `order_table`.`customer_id` = `quote_table`.`customer_id`)
             AND `order_table`.`created_at` >= DATE_SUB("' . $now . '",  INTERVAL 7 DAY)
           )
           WHERE
