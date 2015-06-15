@@ -5,6 +5,11 @@
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Test_Data extends EcomDev_PHPUnit_Test_Case
 {
+    protected function tearDown()
+    {
+        parent::tearDown();
+        Mage::unregister('_resource_singleton/catalog/product_flat');
+    }
 
     public function testCanGetDataWithRandomProducts()
     {
