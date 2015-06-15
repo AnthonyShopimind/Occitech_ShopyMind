@@ -2021,7 +2021,7 @@ class ShopymindClient_Callback {
             return array();
         }
 
-        $collection = Mage::getModel('catalog/category')->getCollection();
+        $collection = Mage::getModel('catalog/category', array('disable_flat' => true))->getCollection();
         $collection
             ->addAttributeToFilter('name', array('like' => '%' . $search . '%'))
             ->addIsActiveFilter()
