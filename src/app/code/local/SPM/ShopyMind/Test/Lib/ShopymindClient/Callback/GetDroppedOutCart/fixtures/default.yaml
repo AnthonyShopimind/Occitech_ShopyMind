@@ -53,6 +53,8 @@ eav:
      thumbnail_label: "Legging"
      url_key: "legging"
      url_path: "legging.html"
+     website_ids:
+       - b2c
      manufacturer: 42 # Must be simulated by mock because I have not found a way to load attributes correctly - TODO Make it DRY
 
  customer:
