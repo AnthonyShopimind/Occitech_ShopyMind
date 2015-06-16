@@ -2057,7 +2057,6 @@ class ShopymindClient_Callback {
             ->addOrderField('name')
         ;
 
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
         $scope->restrictCategoryCollection($collection);
 
         $categories = array();
