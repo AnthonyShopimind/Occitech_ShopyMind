@@ -74,12 +74,12 @@ class SPM_ShopyMind_Model_Scope
     public function restrictEavAttribute(Mage_Catalog_Model_Resource_Eav_Attribute $attribute)
     {
         if ($this->scope == self::SCOPE_DEFAULT && empty($this->isoLangCode)) {
-            return;
-        }
-
-        $storeIds = $this->storeIds();
-        if (!empty($storeIds)) {
-            $attribute->setStoreId($storeIds[0]);
+            $attribute->setStoreId(0);
+        } else {
+            $storeIds = $this->storeIds();
+            if (!empty($storeIds)) {
+                $attribute->setStoreId($storeIds[0]);
+            }
         }
     }
 
@@ -176,6 +176,7 @@ class SPM_ShopyMind_Model_Scope
         $isValid = (
             $collection instanceof Mage_Catalog_Model_Resource_Eav_Mysql4_Category_Collection
             || $collection instanceof Mage_Catalog_Model_Resource_Category_Collection
+            || $collection instanceof Mage_Catalog_Model_Resource_Category_Flat_Collection
         );
         if (!$isValid) {
             throw new RuntimeException('Incorrect collection passed for filtering categories by scope');

@@ -10,3 +10,6 @@ eav:
       - 1
       - 2
      price: 14.00
+     website_ids:
+      - b2c
+      - b2b

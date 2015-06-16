@@ -1098,6 +1098,16 @@ class ShopymindClient_Callback {
         }
     }
 
+    private static function startAdminStoreEmulation()
+    {
+        foreach (Mage::app()->getStores(true) as $store) {
+            if ($store->isAdmin()) {
+                self::startStoreEmulationByStoreId($store->getId());
+                break;
+            }
+        }
+    }
+
     public static function isStoreEmulated()
     {
         return (self::$appEmulation !== false);
@@ -1277,8 +1287,15 @@ class ShopymindClient_Callback {
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
-        if ($lang)
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        if ($lang) {
             self::startStoreEmulationByIsoLang($lang,$id_shop);
+        } elseif ($id_shop) {
+            $storeIds = $scope->storeIds();
+            if (!empty($storeIds)) {
+                self::startStoreEmulationByStoreId($storeIds[0]);
+            }
+        }
         $return = array ();
 
         $collection = array ();
@@ -1311,7 +1328,6 @@ class ShopymindClient_Callback {
             $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         }
 
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
         $scope->restrictProductCollection($collection);
 
         if ($collection && sizeof($collection)) {
@@ -1326,7 +1342,7 @@ class ShopymindClient_Callback {
                 );
             }
         }
-        if ($lang)
+        if ($lang || $id_shop)
             self::stopStoreEmulation();
         return $return;
     }
@@ -2017,18 +2033,30 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        if ($lang) {
+            self::startStoreEmulationByIsoLang($lang,$id_shop);
+        } elseif ($id_shop) {
+            $storeIds = $scope->storeIds();
+            if (!empty($storeIds)) {
+                self::startStoreEmulationByStoreId($storeIds[0]);
+            }
+        } else {
+           self::startAdminStoreEmulation();
+        }
+
         if (strlen($search) < self::SEARCH_MIN_LENGTH) {
             return array();
         }
 
         $collection = Mage::getModel('catalog/category')->getCollection();
         $collection
+            ->addAttributeToSelect('name')
             ->addAttributeToFilter('name', array('like' => '%' . $search . '%'))
             ->addIsActiveFilter()
             ->addOrderField('name')
         ;
 
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
         $scope->restrictCategoryCollection($collection);
 
         $categories = array();
@@ -2038,6 +2066,8 @@ class ShopymindClient_Callback {
                 'name' => $category->getName()
             );
         }
+
+        self::stopStoreEmulation();
 
         return $categories;
     }

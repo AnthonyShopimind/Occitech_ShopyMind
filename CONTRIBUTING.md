@@ -27,6 +27,9 @@ For feature requests related to the Magento integration, you're at home! Feel fr
 To run the extension test suite run the `composer run test 1.9.1.0` command from the project root
 (where `1.9.1.0` is the Magento version to test against).
 
+Please consider running the tests in a flat catalog enabled environment by setting the `USE_FLAT_CATALOG` environment variable:
+`USE_FLAT_CATALOG=1 composer run test 1.9.1.0`
+
 ## Submitting Changes
 
 * Push your changes to a topic branch in your fork of the repository.
