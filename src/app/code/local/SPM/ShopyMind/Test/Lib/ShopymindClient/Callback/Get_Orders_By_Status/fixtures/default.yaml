@@ -44,6 +44,8 @@ eav:
      category_ids:
          - 2
      price: 13.00
+     website_ids:
+       - website_1
 
   customer:
     - entity_id: 1

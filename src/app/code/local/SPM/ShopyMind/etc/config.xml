@@ -2,7 +2,7 @@
 <config>
     <modules>
         <SPM_ShopyMind>
-            <version>1.2.9</version>
+            <version>1.2.10</version>
         </SPM_ShopyMind>
     </modules>
 
@@ -50,6 +50,14 @@
                     </spm_shopymind_model_observer>
                 </observers>
             </admin_system_config_changed_section_shopymind_configuration>
+            <phpunit_test_start_after>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>beforeTestStart</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </phpunit_test_start_after>
         </events>
     </global>
     <adminhtml>

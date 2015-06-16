@@ -8,6 +8,8 @@ eav:
      required_options: 1
      status: 1
      name: "LEGGING configurable"
+     website_ids:
+       - b2c
 
 tables:
   sales/quote:

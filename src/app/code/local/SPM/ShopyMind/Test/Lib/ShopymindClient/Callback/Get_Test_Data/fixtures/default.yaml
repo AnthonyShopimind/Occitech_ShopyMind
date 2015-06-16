@@ -47,18 +47,3 @@ eav:
       status: 1
       website_ids:
         - website_1
-
-tables:
-  catalog_product_index_price:
-    - entity_id: 1
-      website_id: 0
-      customer_group_id: 0
-    - entity_id: 2
-      website_id: 0
-      customer_group_id: 0
-
-  catalog_product_website:
-    - product_id: 1
-      website_id: 1
-    - product_id: 2
-      website_id: 1
