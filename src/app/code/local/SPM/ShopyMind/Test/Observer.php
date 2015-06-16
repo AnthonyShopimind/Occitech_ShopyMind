@@ -36,11 +36,8 @@ class SPM_ShopyMind_Test_Observer
 
     protected function _reindexFlatCatalog()
     {
-        foreach (array('catalog_product_flat', 'catalog_category_flat') as $indexer) {
-            Mage::getSingleton('index/indexer')
-                ->getProcessByCode($indexer)
-                ->reindexAll();
-        }
+        Mage::getResourceModel('catalog/product_flat_indexer')->rebuild();
+        Mage::getResourceModel('catalog/category_flat')->rebuild();
     }
 
     protected function _setStore($store)
