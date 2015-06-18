@@ -234,6 +234,7 @@ try {
     $server->sendResponse(array(
         'success' => false,
         'message' => $e->getMessage(),
+        'stacktrace' => $e->getTrace(),
     ));
 }
 
