@@ -57,13 +57,6 @@ try {
                     'vouchers' => ShopymindClient_Callback::generateVouchers($params['voucherInfos'], $params['voucherEmails'])
                 ), true);
             }
-        } elseif ($server->getTypeRequest() === 'generateKeysAccess') {
-            require_once dirname(__FILE__) . '/Callback.php';
-            if (method_exists('ShopymindClient_Callback', 'generateKeysAccess')) {
-                $params = $server->retrieveParams();
-                ShopymindClient_Callback::generateKeysAccess($params['keysAccess']);
-                $server->sendResponse(array(), true);
-            }
         } elseif ($server->getTypeRequest() === 'getCountries') {
             require_once dirname(__FILE__) . '/Callback.php';
             if (method_exists('ShopymindClient_Callback', 'getCountries')) {
@@ -234,6 +227,7 @@ try {
     $server->sendResponse(array(
         'success' => false,
         'message' => $e->getMessage(),
+        'stacktrace' => $e->getTrace(),
     ));
 }
 
