@@ -1067,6 +1067,8 @@ class ShopymindClient_Callback {
      * @return boolean void
      */
     public static function startStoreEmulationByStoreId($store_id) {
+        Mage::dispatchEvent('shopymind_start_emulation_before', array('storeId' => $store_id));
+
         if ($store_id == Mage::app()->getStore()->getId())
             return false;
         self::$appEmulation = Mage::getSingleton('core/app_emulation');
