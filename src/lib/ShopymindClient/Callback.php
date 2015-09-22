@@ -907,35 +907,6 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Enregistrement de l'ID unique de la relance
-     *
-     * @param string $keysAccess
-     * @return boolean
-     */
-    public static function generateKeysAccess($keysAccess) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        if ($keysAccess && is_array($keysAccess) && sizeof($keysAccess)) {
-            foreach ( $keysAccess as $keyAccessInfo ) {
-                $keyAccess = $keyAccessInfo ['key'];
-                $id_customer = (int) $keyAccessInfo ['id_customer'];
-                $id_cart = (int) $keyAccessInfo ['id_cart'];
-                $id_order = $keyAccessInfo ['id_order'];
-                $email = $keyAccessInfo ['email'];
-                $voucher_number = $keyAccessInfo ['voucher_number'];
-                $tablePrefix = Mage::getConfig()->getTablePrefix();
-                $write = Mage::getSingleton('core/resource')->getConnection('core_write');
-                $now = date('Y-m-d H:i:s');
-                $write->query('INSERT IGNORE INTO `' . $tablePrefix . 'spmcartoorder` (`spm_key`' . ($id_customer ? ',`id_customer`' : '') . ($voucher_number ? ',`voucher_number`' : '') . ($id_cart ? ',`id_cart`' : '') . ($email ? ',`email`' : '') . ($id_order ? ',`id_order`' : '') . ',`date_add`,`date_upd`) values ("' . $keyAccess . '"' . ($id_customer ? ',' . $id_customer : '') . ($voucher_number ? ',"' . $voucher_number . '"' : '') . ($id_cart ? ',' . $id_cart : '') . ($email ? ',"' . $email . '"' : '') . ($id_order ? ',' . $id_order : '') . ',"' . $now . '","' . $now . '")');
-            }
-        }
-        return true;
-    }
-
-    /**
      * Création code de réduction
      *
      * @param int $id_customer
