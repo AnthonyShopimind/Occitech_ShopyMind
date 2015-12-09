@@ -29,7 +29,6 @@
     "ext-curl": "*"
   },
   "require-dev": {
-    "ecomdev/mage-ci": "dev-master",
     "ecomdev/ecomdev_phpunit": "0.3.7",
     "magento-hackathon/magento-composer-installer": "2.*"
   },
