@@ -8,11 +8,11 @@ services:
   - docker
 
 env:
-  - MAGENTO_VERSION=1.6.2.0
-  - MAGENTO_VERSION=1.7.0.2
-  - MAGENTO_VERSION=1.8.1.0
-  - MAGENTO_VERSION=1.9.1.1
-  - MAGENTO_VERSION=1.9.2.2
+  - MAGENTO_VERSION=1.6.2.0-patch2
+  - MAGENTO_VERSION=1.7.0.2-patch8
+  - MAGENTO_VERSION=1.8.1.0-patch2
+  - MAGENTO_VERSION=1.9.1.1-patch4
+  - MAGENTO_VERSION=1.9.2.2-patch1
 
 matrix:
   fast_finish: true
