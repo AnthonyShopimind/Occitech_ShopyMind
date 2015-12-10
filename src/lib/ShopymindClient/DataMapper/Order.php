@@ -3,7 +3,7 @@
 class ShopymindClient_DataMapper_Order
 {
 
-    public function format(Mage_Sales_Model_Order $order, $voucherUsed, $customer, $shippingNumber)
+    public function format(Mage_Sales_Model_Order $order, $customer, $shippingNumber)
     {
         $ProductItemFormatter = new ShopymindClient_DataMapper_QuoteItem();
         $cart = $order->getQuote();
@@ -12,6 +12,12 @@ class ShopymindClient_DataMapper_Order
         $products = array();
         foreach($productItems as $productItem) {
             $products[] = $ProductItemFormatter->format($productItem);
+        }
+
+        $voucherUsed = array ();
+        $vouchersOrder = $order->getCouponCode();
+        if ($vouchersOrder) {
+            $voucherUsed [] = $vouchersOrder;
         }
 
         $dateCart = ($cart->getUpdatedAt() !== null && $cart->getUpdatedAt() !== '') ? $cart->getUpdatedAt() : $order->getCreatedAt();
