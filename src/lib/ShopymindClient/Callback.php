@@ -485,27 +485,12 @@ class ShopymindClient_Callback {
             return array();
         }
 
+        require_once Mage::getBaseDir('base') . '/lib/ShopymindClient/DataMapper/QuoteItem.php';
+        $QuoteItemDataMapper = new ShopymindClient_DataMapper_QuoteItem();
+
         $result = array();
         foreach ($resultProducts as $quoteItem) {
-            /** @var Mage_Sales_Model_Quote_Item $quoteItem */
-            $product = $quoteItem->getProduct();
-            $children = $quoteItem->getChildren();
-            $combinationId = count($children) ? $children[0]->getProductId() : $product->getId();
-
-            $image_url = Mage::helper('catalog/image')->init($product, 'small_image')->resize(200);
-            $product_url = str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
-
-            $result[] = array (
-                'id' => $product->getId(),
-                'description' => $quoteItem->getName(),
-                'qty' => $quoteItem->getQty(),
-                'price' => $quoteItem->getPriceInclTax(),
-                'image_url' => (string) $image_url,
-                'product_url' => $product_url,
-                'id_combination' => $combinationId,
-                'product_categories' => $product->getCategoryIds(),
-                'product_manufacturer' => $product->getManufacturer(),
-            );
+            $result[] = $QuoteItemDataMapper->format($quoteItem);
         }
         return $result;
     }
@@ -1555,13 +1540,8 @@ class ShopymindClient_Callback {
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
-        $orderData = $order->getData();
-        $voucherUsed = array ();
-        $vouchersOrder = $order->getCouponCode();
-        if ($vouchersOrder)
-            $voucherUsed [] = $vouchersOrder;
 
-        self::sendOrderToSPM($order, $orderData, false, $voucherUsed);
+        self::sendOrderToSPM($order);
     }
 
     /**
@@ -1572,7 +1552,7 @@ class ShopymindClient_Callback {
      * @param string $spm_key
      * @param array $voucherUsed
      */
-    public static function sendOrderToSPM($order, $orderData, $spm_key, $voucherUsed) {
+    public static function sendOrderToSPM($order) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -1583,7 +1563,7 @@ class ShopymindClient_Callback {
 
 
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
-        $params = self::formatOrderData($orderData, $spm_key, $voucherUsed);
+        $params = self::formatOrderData($order);
         ShopymindClient_Bin_Notify::newOrder($params);
         self::stopStoreEmulation();
     }
@@ -1706,28 +1686,14 @@ class ShopymindClient_Callback {
      *
      * @return array $params
      */
-    private static function formatOrderData($orderData, $spm_key, $voucherUsed) {
+    private static function formatOrderData($order)
+    {
+        require_once Mage::getBaseDir('base') . '/lib/ShopymindClient/DataMapper/Order.php';
+        $OrderDataMapper = new ShopymindClient_DataMapper_Order();
+        $customer = self::getUser(($order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail()));
+        $shippingNumber = self::getShippingNumbersForOrderId(2);
 
-        $quote = Mage::getSingleton('sales/quote')->load($orderData ['quote_id']);
-
-        $params = array (
-            'idRemindersSend' => $spm_key,
-            'shopIdShop' => $orderData['store_id'],
-            'orderIsConfirm' => ($orderData['state'] == Mage_Sales_Model_Order::STATE_PROCESSING || $orderData['state'] == Mage_Sales_Model_Order::STATE_COMPLETE) ? true : false,
-            'idStatus' => $orderData['status'],
-            'idCart' => $orderData['quote_id'],
-            'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
-            'idOrder' => $orderData['increment_id'],
-            'amount' => $orderData['base_grand_total'],
-            'taxRate' => $orderData['base_to_order_rate'],
-            'currency' => $orderData['order_currency_code'],
-            'dateOrder' => $orderData['created_at'],
-            'voucherUsed' => $voucherUsed,
-            'products' => self::productsOfCart($orderData ['quote_id']),
-            'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email'])),
-            'shipping_number' => self::getShippingNumbersForOrderId(2),
-        );
-        return $params;
+        return$OrderDataMapper->format($order, $customer, $shippingNumber);
     }
 
     /**
