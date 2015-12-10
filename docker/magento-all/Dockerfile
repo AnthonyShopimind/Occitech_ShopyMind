@@ -9,6 +9,6 @@ RUN mkdir /magento-src
 WORKDIR /magento-src
 
 RUN wget --no-check-certificate https://github.com/bragento/magento-core/archive/1.9.2.2-patch1.zip
-RUN unzip 1.9.2.2-patch1.zip && rm -rf 1.9.2.2-patch1.zip && mv magento-core-1.9.2.2-patch1 1.9.2.2
+RUN unzip -q 1.9.2.2-patch1.zip && rm -rf 1.9.2.2-patch1.zip && mv magento-core-1.9.2.2-patch1 1.9.2.2
 
 VOLUME ["/magento-src"]

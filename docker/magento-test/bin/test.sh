@@ -10,8 +10,7 @@ if [ -e /var/www/htdocs/.modman ]; then rm -rf /var/www/htdocs/.modman; fi
 mkdir /var/www/htdocs/.modman
 ln -s /src /var/www/htdocs/.modman/
 
-sleep 5
-if [ ! -e /var/www/htdocs/app/etc/local.xml ]; then n98-magerun install --root-dir="/var/www/htdocs" --dbHost="db" --noDownload --dbUser="root" --dbPass="root" --dbName="shopymind" --installSampleData=no --useDefaultConfigParams=yes --installationFolder="/var/www/htdocs" --baseUrl="http://shopymind.test/"; fi
+if [ ! -e /var/www/htdocs/app/etc/local.xml ]; then sleep 20 && n98-magerun install --root-dir="/var/www/htdocs" --dbHost="db" --noDownload --dbUser="root" --dbPass="${DB_ENV_MYSQL_ROOT_PASSWORD}" --dbName="shopymind" --installSampleData=no --useDefaultConfigParams=yes --installationFolder="/var/www/htdocs" --baseUrl="http://shopymind.test/"; fi
 
 cd htdocs
 cp -r .modman/src/vendor/ecomdev/ecomdev_phpunit .modman/
