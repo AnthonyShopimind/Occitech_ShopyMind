@@ -1693,7 +1693,7 @@ class ShopymindClient_Callback {
         $customer = self::getUser(($order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail()));
         $shippingNumber = self::getShippingNumbersForOrderId(2);
 
-        return$OrderDataMapper->format($order, $customer, $shippingNumber);
+        return $OrderDataMapper->format($order, $customer, $shippingNumber);
     }
 
     /**

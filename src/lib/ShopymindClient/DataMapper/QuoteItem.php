@@ -2,7 +2,6 @@
 
 class ShopymindClient_DataMapper_QuoteItem
 {
-
     public function format(Mage_Sales_Model_Quote_Item $quoteItem)
     {
         $product = $quoteItem->getProduct();
