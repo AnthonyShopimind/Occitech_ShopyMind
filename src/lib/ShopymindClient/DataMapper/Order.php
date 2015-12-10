@@ -2,7 +2,6 @@
 
 class ShopymindClient_DataMapper_Order
 {
-
     public function format(Mage_Sales_Model_Order $order, $customer, $shippingNumber)
     {
         $ProductItemFormatter = new ShopymindClient_DataMapper_QuoteItem();

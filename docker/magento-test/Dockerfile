@@ -13,4 +13,3 @@ COPY ./bin/test.sh /
 RUN rm -rf /var/www/htdocs
 WORKDIR /var/www
 CMD "/test.sh"
-
