@@ -22,7 +22,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_QuoteItem extends EcomDe
         $expected = array(
             'id_product' => 1,
             'id_combination' => 1,
-            'id_manufacturer' => 102,
+            'id_manufacturer' => null,
             'price' => 3.5000,
             'qty' => 8.0000,
         );
