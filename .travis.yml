@@ -8,13 +8,11 @@ services:
   - docker
 
 env:
-  DOCKER_COMPOSE_VERSION: 1.4.2
-
-before_install:
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
+  - MAGENTO_VERSION=1.6.2.0
+  - MAGENTO_VERSION=1.7.0.2
+  - MAGENTO_VERSION=1.8.1.0
+  - MAGENTO_VERSION=1.9.1.1
+  - MAGENTO_VERSION=1.9.2.2
 
 matrix:
   fast_finish: true
@@ -23,4 +21,4 @@ script:
   - composer -n install
   - docker-compose build
   - docker-compose up -d
-  - docker-compose run --rm -e ENV_MAGE_VER=1.9.2.2 test
+  - docker-compose run --rm -e ENV_MAGE_VER=${MAGENTO_VERSION} test
