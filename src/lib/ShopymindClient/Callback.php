@@ -2156,4 +2156,19 @@ class ShopymindClient_Callback {
         return ($return ? self::getUser($customer->getId()) : false);
     }
 
+    public function getProductCategory($id_category)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        require_once Mage::getModuleDir('Action', 'SPM_ShopyMind') . DIRECTORY_SEPARATOR . 'GetCategory.php';
+        $action = new SPM_ShopyMind_Action_GetCategory($id_category);
+
+        return $action->process();
+    }
+
 }
