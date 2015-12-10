@@ -33,14 +33,14 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'tax_rate' => 1.0000,
             'currency' => 'EUR',
             'date_order' => '2015-12-09 11:53:06',
-            'voucher_used' => false,
+            'voucher_used' => array(),
             'voucher_amount' => null,
             'products' => array(),
             'customer' => array(),
             'shipping_number' => null,
         );
 
-        $actual = $this->SUT->format($order, false, array(), null);
+        $actual = $this->SUT->format($order, array(), null);
         $this->assertEquals($expected, $actual);
     }
 }
