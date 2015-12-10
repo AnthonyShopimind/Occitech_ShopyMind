@@ -11,8 +11,8 @@ class ShopymindClient_DataMapper_QuoteItem
 
         return array(
             'id_product' => $product->getId(),
-            'id_manufacturer' => $combinationId,
-            'id_combination' => $product->getManufacturer(),
+            'id_combination' => $combinationId,
+            'id_manufacturer' => $product->getManufacturer(),
             'price' => $quoteItem->getPriceInclTax(),
             'qty' => $quoteItem->getQty(),
         );

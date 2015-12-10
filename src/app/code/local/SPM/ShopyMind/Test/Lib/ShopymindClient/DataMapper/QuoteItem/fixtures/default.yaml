@@ -25,6 +25,7 @@ eav:
       type_id: simple
       sku: product-1
       attribute_set_id: 1
+      manufacturer: 102
 
 tables:
   sales/quote:
