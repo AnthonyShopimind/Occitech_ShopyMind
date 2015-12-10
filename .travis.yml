@@ -21,4 +21,4 @@ script:
   - composer -n install
   - docker-compose build
   - docker-compose up -d
-  - docker-compose run --rm -e ENV_MAGE_VER=${MAGENTO_VERSION} test
+  - bin/test.sh ${MAGENTO_VERSION}

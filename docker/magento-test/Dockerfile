@@ -6,8 +6,11 @@ RUN yes | pecl install xdebug \
     && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.max_nesting_level=500" >> /usr/local/etc/php/conf.d/xdebug.ini
 
+RUN apt-get update && apt-get install -y unzip wget
+
 COPY ./bin/test.sh /
 
 RUN rm -rf /var/www/htdocs
 WORKDIR /var/www
 CMD "/test.sh"
+

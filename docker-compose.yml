@@ -2,17 +2,12 @@ db:
   image: mysql:5.5
   environment:
     MYSQL_ROOT_PASSWORD: "root"
-    MYSQL_DATABASE: "shopymind_test"
-
-all:
-  build: ./docker/magento-all
 
 test:
   build: ./docker/magento-test
   volumes:
     - .:/src
-  volumes_from:
-    - all
+    - ./magento_src:/magento_src
   ports:
     - 80
   links:
