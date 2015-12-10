@@ -1,31 +1,26 @@
 language: php
 
 php:
-  - 5.3
-  - 5.4
-  - 5.5
+  - '5.6'
 
-sudo: false
+sudo: required
+services:
+  - docker
 
 env:
-  - MAGENTO_VERSION=1.5.1.0
-  - MAGENTO_VERSION=1.5.1.0 USE_FLAT_CATALOG=1
-  - MAGENTO_VERSION=1.6.2.0
-  - MAGENTO_VERSION=1.6.2.0 USE_FLAT_CATALOG=1
-  - MAGENTO_VERSION=1.7.0.2
-  - MAGENTO_VERSION=1.7.0.2 USE_FLAT_CATALOG=1
-  - MAGENTO_VERSION=1.8.1.0
-  - MAGENTO_VERSION=1.8.1.0 USE_FLAT_CATALOG=1
-  - MAGENTO_VERSION=1.9.1.0
-  - MAGENTO_VERSION=1.9.1.0 USE_FLAT_CATALOG=1
+  DOCKER_COMPOSE_VERSION: 1.4.2
+
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 
 matrix:
   fast_finish: true
 
-before_script:
-  - phpenv config-add travis_tests_config.ini
-  - COMPOSER_PROCESS_TIMEOUT=600 MAGE_CI_SETUP_ONLY=1 composer test ${MAGENTO_VERSION}
-
 script:
-  - COMPOSER_PROCESS_TIMEOUT=3600 composer test ${MAGENTO_VERSION}
-
+  - composer -n install
+  - docker-compose build
+  - docker-compose up -d
+  - docker-compose run --rm -e ENV_MAGE_VER=1.9.2.2 test
