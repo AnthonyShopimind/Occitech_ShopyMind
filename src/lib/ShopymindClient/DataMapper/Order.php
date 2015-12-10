@@ -37,7 +37,7 @@ class ShopymindClient_DataMapper_Order
             'currency' => $order->getOrderCurrencyCode(),
             'date_order' => $order->getCreatedAt(),
             'voucher_used' => $voucherUsed,
-            'voucher_amount' => null,
+            'voucher_amount' => $order->getDiscountAmount(),
             'products' => $products,
             'customer' => $customer,
             'shipping_number' => $shippingNumber,
