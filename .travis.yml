@@ -21,4 +21,5 @@ script:
   - composer -n install
   - docker-compose build
   - docker-compose up -d
+  - sleep 20
   - bin/test.sh ${MAGENTO_VERSION}
