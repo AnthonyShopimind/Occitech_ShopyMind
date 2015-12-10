@@ -9,7 +9,6 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
     public $SUT;
 
     public function setup() {
-        @session_start();
         parent::setup();
         $this->SUT = new ShopymindClient_DataMapper_Order();
     }
@@ -34,7 +33,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'currency' => 'EUR',
             'date_order' => '2015-12-09 11:53:06',
             'voucher_used' => array(),
-            'voucher_amount' => null,
+            'voucher_amount' => 0,
             'products' => array(),
             'customer' => array(),
             'shipping_number' => null,

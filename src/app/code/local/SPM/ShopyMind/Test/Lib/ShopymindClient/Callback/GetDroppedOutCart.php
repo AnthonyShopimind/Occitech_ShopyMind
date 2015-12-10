@@ -66,15 +66,11 @@ QUERY
                 'date_cart' => '2014-01-29 12:45:46',
                 'products' => array (
                     array (
-                        'id' => 1,
-                        'description' => 'LEGGING',
-                        'price' => '13.0000',
-                        'image_url' => $this->placeholderImageUrl(),
-                        'product_url' => 'catalog/product/view/id/1/s/legging/',
+                        'id_product' => 1,
                         'id_combination' => 1,
+                        'id_manufacturer' => null, // See test below
+                        'price' => '13.0000',
                         'qty' => '2.0000',
-                        'product_categories' => array(1, 2),
-                        'product_manufacturer' => null, // See test below
                     ),
                 ),
                 'customer' => array(
@@ -134,15 +130,11 @@ QUERY
         $results = $this->getDroppedOutCartsWithTimeSimulation($_11minutesAfterTheOrder, 'store-1', 10 * 60, 10 * 60);
 
         $expectedResult = array(array(
-            'id' => 2,
-            'description' => 'LEGGING configurable',
-            'price' => '13.0000',
-            'image_url' => $this->placeholderImageUrl(),
-            'product_url' => 'catalog/product/view/id/2/',
+            'id_product' => 2,
             'id_combination' => 1,
+            'id_manufacturer' => null,
+            'price' => '13.0000',
             'qty' => '2.0000',
-            'product_categories' => array(),
-            'product_manufacturer' => null,
         ));
         $this->assertEquals($expectedResult, $results[0]['products']);
     }
