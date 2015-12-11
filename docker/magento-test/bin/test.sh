@@ -25,4 +25,4 @@ cp .modman/src/phpunit.xml.dist .
 cp .modman/src/vendor/ecomdev/ecomdev_phpunit/app/etc/local.xml.phpunit app/etc/
 cd shell; php ecomdev-phpunit.php -a magento-config --same-db 1 --db-name shopymind_test_${MAGENTO_VERSION} --base-url http://shopymind.test/;cd ..
 
-.modman/src/vendor/bin/phpunit --group setup && .modman/src/vendor/bin/phpunit
+.modman/src/vendor/bin/phpunit --group setup && .modman/src/vendor/bin/phpunit ${TEST_ARGS}
