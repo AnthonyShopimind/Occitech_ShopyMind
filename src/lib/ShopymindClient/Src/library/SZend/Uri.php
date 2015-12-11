@@ -88,13 +88,13 @@ abstract class SZend_Uri
         $schemeSpecific = isset($uri[1]) ? $uri[1] : '';
 
         if (!strlen($scheme)) {
-            require_once 'SZend/Uri/Exception.php';   
+            require_once 'Uri/Exception.php';
             throw new SZend_Uri_Exception('An empty string was supplied for the scheme');
         }
 
         // Security check: $scheme is used to load a class file, so only alphanumerics are allowed.
         if (!ctype_alnum($scheme)) {
-            require_once 'SZend/Uri/Exception.php';   
+            require_once 'Uri/Exception.php';
             throw new SZend_Uri_Exception('Illegal scheme supplied, only alphanumeric characters are permitted');
         }
 
@@ -110,7 +110,7 @@ abstract class SZend_Uri
             case 'mailto':
                 // @todo
             default:
-                require_once 'SZend/Uri/Exception.php';   
+                require_once 'Uri/Exception.php';
                 throw new SZend_Uri_Exception("Scheme \"$scheme\" is not supported");
         }
         SZend_Loader::loadClass($className);

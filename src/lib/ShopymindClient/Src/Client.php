@@ -157,9 +157,7 @@ final class ShopymindClient_Src_Client {
         global $SHOPYMIND_CLIENT_CONFIGURATION;
         $config = $SHOPYMIND_CLIENT_CONFIGURATION;
 
-        //$this->getClient()->setAdapter('SZend_Http_Client_Adapter_Curl');
         $this->getClient()->setMethod($method);
-
         $this->getClient()->setConfig(array(
                 'timeout'      => 5
             )
