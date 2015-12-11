@@ -31,7 +31,6 @@ class SPM_ShopyMind_DataMapper_Order
     {
         return ($order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING || $order->getState() == Mage_Sales_Model_Order::STATE_COMPLETE) ? true : false;
     }
-
     private function __getVoucherFor($order)
     {
         $voucherUsed = array ();

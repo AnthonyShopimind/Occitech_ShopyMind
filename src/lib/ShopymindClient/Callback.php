@@ -1100,7 +1100,7 @@ class ShopymindClient_Callback {
         }
         return $return;
     }
-    
+
     /**
      * Récupération des langues disponibles
      * @param unknown $id_shop
@@ -1117,7 +1117,7 @@ class ShopymindClient_Callback {
     		list($scope, $website_id_needed) = explode('-', $id_shop);
     	}
     	$stores = Mage::app()->getStores();
-    		
+
     	foreach ( $stores as $store ) {
     		$store_id = $store->getId();
     		$website_id = $store->getWebsite()->getId();
@@ -1164,7 +1164,7 @@ class ShopymindClient_Callback {
     	$websites = Mage::getModel('core/website')->getCollection();
     	foreach ($websites as $website){
     		$return[$website->getId()] = $website->getName();
-    	}    
+    	}
     	return $return;
     }
     /**
@@ -1552,13 +1552,12 @@ class ShopymindClient_Callback {
         }
         self::startStoreEmulationByStoreId($order->getStoreId());
 
-
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
         $params = self::formatOrderData($order);
         ShopymindClient_Bin_Notify::newOrder($params);
         self::stopStoreEmulation();
     }
-    
+
     /**
      * Envoi des ventes générées suite à une relance à ShopyMind
      *
