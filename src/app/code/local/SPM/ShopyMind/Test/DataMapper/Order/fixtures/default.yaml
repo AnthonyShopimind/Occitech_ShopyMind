@@ -40,6 +40,8 @@ tables:
       base_grand_total: 28.0300
       base_to_order_rate: 1.0000
       order_currency_code: "EUR"
+      discount_amount: 0.0000
+      quote_id: 1
 
   sales/quote:
     - entity_id: 1
