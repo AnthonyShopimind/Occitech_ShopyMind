@@ -92,4 +92,23 @@ class SPM_ShopyMind_Test_Model_Scope extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals('hello', $value);
     }
 
+    /**
+     * @loadFixture order
+     */
+    public function testFromOrderWillRetrieveOrderLang()
+    {
+        $order = Mage::getModel('sales/order')->load(1);
+        $scope = SPM_ShopyMind_Model_Scope::fromOrder($order);
+        $this->assertEquals($scope->getLang(), 'en_GB');
+    }
+
+    /**
+     * @loadFixture order
+     */
+    public function testFromOrderWillRetrieveOrderStore()
+    {
+        $order = Mage::getModel('sales/order')->load(1);
+        $scope = SPM_ShopyMind_Model_Scope::fromOrder($order);
+        $this->assertEquals($scope->getId(), 1);
+    }
 }

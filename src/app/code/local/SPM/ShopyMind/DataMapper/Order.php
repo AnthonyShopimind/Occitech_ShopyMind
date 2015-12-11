@@ -22,15 +22,17 @@ class SPM_ShopyMind_DataMapper_Order
         $dateCart = ($cart->getUpdatedAt() !== null && $cart->getUpdatedAt() !== '') ? $cart->getUpdatedAt() : $order->getCreatedAt();
         $state = ($order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING || $order->getState() == Mage_Sales_Model_Order::STATE_COMPLETE) ? true : false;
 
+        $scope = SPM_ShopyMind_Model_Scope::fromOrder($order);
+
         return array(
-            'shop_id_shop' => $cart->getStoreId(),
+            'shop_id_shop' => $scope->getId(),
+            'lang' => $scope->getLang(),
             'order_is_confirm' => $state,
             'order_reference' => $order->getIncrementId(),
             'id_cart' => $cart->getId(),
             'id_status' => $order->getStatus(),
             'date_cart' => $dateCart,
             'id_order' => $order->getId(),
-            'lang' => '',
             'amount' => $order->getBaseGrandTotal(),
             'tax_rate' => $order->getBaseToOrderRate(),
             'currency' => $order->getOrderCurrencyCode(),

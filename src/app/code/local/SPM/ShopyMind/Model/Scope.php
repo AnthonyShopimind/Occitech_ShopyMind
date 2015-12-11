@@ -47,6 +47,15 @@ class SPM_ShopyMind_Model_Scope
         return new self($id, $scope, false);
     }
 
+    public static function fromOrder(Mage_Sales_Model_Order $order)
+    {
+        $id = $order->getStoreId();
+        $scope = self::SCOPE_STORE;
+        $isoLangCode = Mage::getStoreConfig('general/locale/code', $id);
+
+        return new self($id, $scope, $isoLangCode);
+    }
+
     public static function fromRequest() {
         if(isset($_POST['shopIdShop']) && !empty($_POST['shopIdShop'])) {
             return self::fromShopymindId($_POST['shopIdShop']);
@@ -105,6 +114,16 @@ class SPM_ShopyMind_Model_Scope
         return array_map(function($store) {
             return $store->getId();
         }, $this->stores());
+    }
+
+    public function getLang()
+    {
+        return $this->isoLangCode;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function getConfig($path)
