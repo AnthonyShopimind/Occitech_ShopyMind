@@ -8,13 +8,9 @@ class SPM_ShopyMind_Test_Action_SyncCustomers extends PHPUnit_Framework_TestCase
 {
     public function testRetrieveCustomerIdsWithNoRestrictions()
     {
-        $params = array(
-            'idShop' => '',
-            'start' => null,
-            'limit' => null,
-            'lastUpdate' => null,
-        );
-        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($params);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($scope, null, null, null);
+
         $actual = $SyncCustomers->retrieveCustomerIds();
         $expected = array(1, 2, 3);
 
@@ -23,13 +19,9 @@ class SPM_ShopyMind_Test_Action_SyncCustomers extends PHPUnit_Framework_TestCase
 
     public function testRetrieveCustomerIdsWithShopRestriction()
     {
-        $params = array(
-            'idShop' => 'website-1',
-            'start' => null,
-            'limit' => null,
-            'lastUpdate' => null,
-        );
-        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($params);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('website-1');
+        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($scope, null, null, null);
+
         $actual = $SyncCustomers->retrieveCustomerIds();
         $expected = array(1);
 
@@ -38,13 +30,9 @@ class SPM_ShopyMind_Test_Action_SyncCustomers extends PHPUnit_Framework_TestCase
 
     public function testRetrieveCustomerIdsWithLimit()
     {
-        $params = array(
-            'idShop' => '',
-            'start' => 1,
-            'limit' => 2,
-            'lastUpdate' => null,
-        );
-        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($params);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($scope, 1, 2, null);
+
         $actual = $SyncCustomers->retrieveCustomerIds();
         $expected = array(2, 3);
 
@@ -53,13 +41,9 @@ class SPM_ShopyMind_Test_Action_SyncCustomers extends PHPUnit_Framework_TestCase
 
     public function testRetrieveCustomerIdsWithLastUpdate()
     {
-        $params = array(
-            'idShop' => '',
-            'start' => null,
-            'limit' => null,
-            'lastUpdate' => '2015-01-20 00:00:00',
-        );
-        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($params);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($scope, null, null, '2015-01-20 00:00:00');
+
         $actual = $SyncCustomers->retrieveCustomerIds();
         $expected = array(3);
 
@@ -68,14 +52,9 @@ class SPM_ShopyMind_Test_Action_SyncCustomers extends PHPUnit_Framework_TestCase
 
     public function testRetrieveCustomerIdsWithSpecificCustomerId()
     {
-        $params = array(
-            'idShop' => '',
-            'start' => null,
-            'limit' => null,
-            'lastUpdate' => null,
-            'customerId' => 2,
-        );
-        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($params);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($scope, null, null, null, 2);
+
         $actual = $SyncCustomers->retrieveCustomerIds();
         $expected = array(2);
 
@@ -84,15 +63,9 @@ class SPM_ShopyMind_Test_Action_SyncCustomers extends PHPUnit_Framework_TestCase
 
     public function testProcesssWithJustCountOption()
     {
-        $params = array(
-            'idShop' => '',
-            'start' => null,
-            'limit' => null,
-            'lastUpdate' => null,
-            'customerId' => false,
-            'justCount' => true,
-        );
-        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($params);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($scope, null, null, null, false, true);
+
         $actual = $SyncCustomers->process();
         $expected = 3;
 
@@ -101,14 +74,10 @@ class SPM_ShopyMind_Test_Action_SyncCustomers extends PHPUnit_Framework_TestCase
 
     public function testProcessReturnCustomerFormattedByGetUserMethod()
     {
-        $params = array(
-            'idShop' => '',
-            'start' => null,
-            'limit' => null,
-            'lastUpdate' => null,
-            'customerId' => 2,
-        );
-        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($params);
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($scope, null, null, null, 2);
+
         $actual = $SyncCustomers->process();
         $expected = array(ShopymindClient_Callback::getUser(2));
 

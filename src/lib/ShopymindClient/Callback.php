@@ -2165,16 +2165,8 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
-        $args = array(
-            'idShop' => $id_shop,
-            'start' => $start,
-            'limit' => $limit,
-            'lastUpdate' => $lastUpdate,
-            'customerId' => $idCustomer,
-            'justCount' => $justCount,
-        );
-
-        $SyncCustomersAction = new SPM_ShopyMind_Action_SyncCustomers($args);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $SyncCustomersAction = new SPM_ShopyMind_Action_SyncCustomers($scope, $start, $limit, $lastUpdate, $idCustomer = false, $justCount = false);
         return $SyncCustomersAction->process();
     }
 
