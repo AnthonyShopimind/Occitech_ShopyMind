@@ -1,10 +1,10 @@
 <?php
 
-class ShopymindClient_DataMapper_Order
+class SPM_ShopyMind_DataMapper_Order
 {
     public function format(Mage_Sales_Model_Order $order, $customer, $shippingNumber)
     {
-        $ProductItemFormatter = new ShopymindClient_DataMapper_QuoteItem();
+        $ProductItemFormatter = new SPM_ShopyMind_DataMapper_QuoteItem();
         $cart = $order->getQuote();
         $productItems = $cart->getAllVisibleItems();
 
