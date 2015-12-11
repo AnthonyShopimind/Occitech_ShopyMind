@@ -486,12 +486,7 @@ class ShopymindClient_Callback {
         }
 
         $QuoteItemDataMapper = new SPM_ShopyMind_DataMapper_QuoteItem();
-
-        $result = array();
-        foreach ($resultProducts as $quoteItem) {
-            $result[] = $QuoteItemDataMapper->format($quoteItem);
-        }
-        return $result;
+        return array_map($QuoteItemDataMapper->format, $resultProducts);
     }
 
     /**
@@ -1547,9 +1542,6 @@ class ShopymindClient_Callback {
      * Envoi des ventes générées suite à une relance à ShopyMind
      *
      * @param Mage_Sales_Model_Order $order
-     * @param array $orderData
-     * @param string $spm_key
-     * @param array $voucherUsed
      */
     public static function sendOrderToSPM($order) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
