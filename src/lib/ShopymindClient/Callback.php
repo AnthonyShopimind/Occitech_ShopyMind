@@ -486,7 +486,7 @@ class ShopymindClient_Callback {
         }
 
         $QuoteItemDataMapper = new SPM_ShopyMind_DataMapper_QuoteItem();
-        return array_map($QuoteItemDataMapper->format, $resultProducts);
+        return array_map(array($QuoteItemDataMapper, 'format'), $resultProducts);
     }
 
     /**

@@ -51,15 +51,10 @@ class SPM_ShopyMind_DataMapper_Order
 
     private function __productsFor($order)
     {
-        $ProductItemFormatter = new SPM_ShopyMind_DataMapper_QuoteItem();
-        $cart = $order->getQuote();
-        $productItems = $cart->getAllVisibleItems();
-
-        $products = array();
-        foreach($productItems as $productItem) {
-            $products[] = $ProductItemFormatter->format($productItem);
-        }
-
-        return array_map($ProductItemFormatter->format, $products);
+        $ItemFormatter = new SPM_ShopyMind_DataMapper_QuoteItem();
+        return array_map(
+            array($ItemFormatter, 'format'),
+            $order->getQuote()->getAllVisibleItems()
+        );
     }
 }
