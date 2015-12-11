@@ -10,7 +10,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
 
     public function setup() {
         parent::setup();
-        $this->SUT = new ShopymindClient_DataMapper_Order();
+        $this->SUT = new SPM_ShopyMind_DataMapper_Order();
     }
 
     public function testFormatOrderData()

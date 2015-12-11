@@ -10,7 +10,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_QuoteItem extends EcomDe
 
     public function setup() {
         parent::setup();
-        $this->SUT = new ShopymindClient_DataMapper_QuoteItem();
+        $this->SUT = new SPM_ShopyMind_DataMapper_QuoteItem();
     }
 
     public function testFormatProductItem()

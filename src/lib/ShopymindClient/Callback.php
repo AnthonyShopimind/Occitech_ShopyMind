@@ -485,8 +485,7 @@ class ShopymindClient_Callback {
             return array();
         }
 
-        require_once Mage::getBaseDir('base') . '/lib/ShopymindClient/DataMapper/QuoteItem.php';
-        $QuoteItemDataMapper = new ShopymindClient_DataMapper_QuoteItem();
+        $QuoteItemDataMapper = new SPM_ShopyMind_DataMapper_QuoteItem();
 
         $result = array();
         foreach ($resultProducts as $quoteItem) {
@@ -1688,8 +1687,7 @@ class ShopymindClient_Callback {
      */
     private static function formatOrderData($order)
     {
-        require_once Mage::getBaseDir('base') . '/lib/ShopymindClient/DataMapper/Order.php';
-        $OrderDataMapper = new ShopymindClient_DataMapper_Order();
+        $OrderDataMapper = new SPM_ShopyMind_DataMapper_Order();
         $customer = self::getUser(($order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail()));
         $shippingNumber = self::getShippingNumbersForOrderId(2);
 
