@@ -190,6 +190,21 @@ try {
                     'customer' => ShopymindClient_Callback::createCustomer((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['lang']) ? $params['lang'] : false),$params['customerInfos'])
                 ), true);
             }
+        } elseif ($server->getTypeRequest() === 'syncCustomers') {
+            require_once dirname(__FILE__) . '/Callback.php';
+            if (method_exists('ShopymindClient_Callback', 'syncCustomers')) {
+                $params = $server->retrieveParams();
+                $syncParams = array('shopIdShop', 'start', 'limit', 'lastUpdate', 'idCustomer', 'justCount');
+
+                $params = array_map(function($syncParam) use($params) {
+                    return isset($params[$syncParam]) ? $params[$syncParam] : false;
+                }, $syncParams);
+
+                $server->sendResponse(array(
+                    'lastUpdate' => date('Y-m-d H:i:s'),
+                    'customers' => ShopymindClient_Callback::syncCustomers($syncParams['shopIdShop'], $syncParams['start'], $syncParams['limit'], $syncParams['lastUpdate'], $syncParams['idCustomer'], $syncParams['justCount']),
+                ), true);
+            }
         }elseif ($server->getTypeRequest() === 'relaunch') {
             $relaunch = $server->retrieveRelaunch();
             $params = $server->retrieveParams();

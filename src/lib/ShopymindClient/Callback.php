@@ -2156,4 +2156,26 @@ class ShopymindClient_Callback {
         return ($return ? self::getUser($customer->getId()) : false);
     }
 
+    public static function syncCustomers($id_shop, $start, $limit, $lastUpdate, $idCustomer = false, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $args = array(
+            'idShop' => $id_shop,
+            'start' => $start,
+            'limit' => $limit,
+            'lastUpdate' => $lastUpdate,
+            'customerId' => $idCustomer,
+            'justCount' => $justCount,
+        );
+
+        $SyncCustomersAction = new SPM_ShopyMind_Action_SyncCustomers($args);
+        return $SyncCustomersAction->process();
+    }
+
 }
