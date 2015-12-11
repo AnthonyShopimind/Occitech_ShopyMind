@@ -47,7 +47,6 @@ scope:
 
 config:
   stores/b2b/general/locale/code: fr_FR
-  stores/b2c/general/locale/code: en_GB
 
 eav:
  customer:

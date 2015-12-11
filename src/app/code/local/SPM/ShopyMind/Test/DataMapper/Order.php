@@ -27,7 +27,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'id_status' => 'pending',
             'date_cart' => '2015-12-09 13:53:06',
             'id_order' => 1,
-            'lang' => '',
+            'lang' => 'fr',
             'amount' => 28.0300,
             'tax_rate' => 1.0000,
             'currency' => 'EUR',

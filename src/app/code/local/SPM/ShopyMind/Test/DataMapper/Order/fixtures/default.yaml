@@ -19,6 +19,9 @@ scope:
       name: First Store
       is_active: 1
 
+config:
+  stores/default/general/locale/code: fr_FR
+
 eav:
   catalog_product:
     - entity_id: 1

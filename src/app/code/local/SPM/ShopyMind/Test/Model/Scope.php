@@ -99,7 +99,7 @@ class SPM_ShopyMind_Test_Model_Scope extends EcomDev_PHPUnit_Test_Case
     {
         $order = Mage::getModel('sales/order')->load(1);
         $scope = SPM_ShopyMind_Model_Scope::fromOrder($order);
-        $this->assertEquals($scope->getLang(), 'en_GB');
+        $this->assertEquals($scope->getLang(), 'en');
     }
 
     /**

@@ -51,7 +51,7 @@ class SPM_ShopyMind_Model_Scope
     {
         $id = $order->getStoreId();
         $scope = self::SCOPE_STORE;
-        $isoLangCode = Mage::getStoreConfig('general/locale/code', $id);
+        $isoLangCode = substr(Mage::getStoreConfig('general/locale/code', $id), 0, -3);
 
         return new self($id, $scope, $isoLangCode);
     }
