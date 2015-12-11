@@ -32,7 +32,7 @@ tables:
       store_id: 1
       status: pending
       state: processing
-      increment_id: 100
+      increment_id: 10001
       created_at: "2015-12-09 11:53:06"
       base_grand_total: 28.0300
       base_to_order_rate: 1.0000

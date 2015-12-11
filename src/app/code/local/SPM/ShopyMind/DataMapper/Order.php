@@ -25,11 +25,11 @@ class SPM_ShopyMind_DataMapper_Order
         return array(
             'shop_id_shop' => $cart->getStoreId(),
             'order_is_confirm' => $state,
-            'order_reference' => '',
+            'order_reference' => $order->getIncrementId(),
             'id_cart' => $cart->getId(),
             'id_status' => $order->getStatus(),
             'date_cart' => $dateCart,
-            'id_order' => $order->getIncrementId(),
+            'id_order' => $order->getId(),
             'lang' => '',
             'amount' => $order->getBaseGrandTotal(),
             'tax_rate' => $order->getBaseToOrderRate(),

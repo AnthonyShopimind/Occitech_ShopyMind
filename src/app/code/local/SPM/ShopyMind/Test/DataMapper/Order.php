@@ -22,11 +22,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
         $expected = array(
             'shop_id_shop' => 1,
             'order_is_confirm' => true,
-            'order_reference' => '',
+            'order_reference' => 10001,
             'id_cart' => 1,
             'id_status' => 'pending',
             'date_cart' => '2015-12-09 13:53:06',
-            'id_order' => 100,
+            'id_order' => 1,
             'lang' => '',
             'amount' => 28.0300,
             'tax_rate' => 1.0000,
