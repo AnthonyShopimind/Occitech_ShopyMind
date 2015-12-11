@@ -2112,4 +2112,15 @@ class ShopymindClient_Callback {
         return ($return ? self::getUser($customer->getId()) : false);
     }
 
+    public static function getOrder($idOrder)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+        return self::formatOrderData(Mage::getModel('sales/order')->load($idOrder));
+    }
+
 }
