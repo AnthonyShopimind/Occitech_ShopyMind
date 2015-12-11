@@ -12,32 +12,8 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract {
 
     public function formatCustomerQuote($quote)
     {
-        return array(
-            'id_customer' => $quote->getCustomerId(),
-            'id_cart' => $quote->getId(),
-            'date_add' => $quote->getCreatedAt(),
-            'date_upd' => $quote->getUpdatedAt(),
-            'amount' => $quote->getGrandTotal(),
-            'tax_rate',
-            'currency' => $quote->getQuoteCurrencyCode(),
-            'voucher_used' => ShopymindClient_Callback::getCartVouchers(),
-            'voucher_amount',
-            'products',
-        );
-    }
+        $QuoteFormatter = new SPM_ShopyMind_DataMapper_Quote();
 
-    public function formatQuoteItem($quoteItem)
-    {
-        $product = $quoteItem->getProduct();
-        $children = $quoteItem->getChildren();
-        $combinationId = count($children) ? $children[0]->getProductId() : $product->getId();
-
-        return array(
-            'id_product' => $product->getId(),
-            'qty' => $quoteItem->getQty(),
-            'price' => $quoteItem->getPriceInclTax(),
-            'id_combination' => $combinationId,
-            'id_manufacturer' => $product->getManufacturer(),
-        );
+        return $QuoteFormatter->format($quote);
     }
 }

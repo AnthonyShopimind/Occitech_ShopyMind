@@ -141,6 +141,9 @@ class SPM_ShopyMind_Block_Footer extends Mage_Core_Block_Template
                 'region' => (is_object($primaryAddress) ? $primaryAddress->getRegionCode() : ''),
                 'country' => (is_object($primaryAddress) ? $primaryAddress->getCountryId() : ''),
             );
+
+            $quote = Mage::getSingleton('checkout/session')->getQuote();
+            $currentUserInfos['cart'] = Mage::helper('shopymind')->formatCustomerQuote($quote);
         } else
             $currentUserInfos ['user'] = null;
 
