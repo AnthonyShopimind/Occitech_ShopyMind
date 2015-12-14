@@ -167,6 +167,7 @@ class SPM_ShopyMind_Model_Scope
         $collection->addAttributeToFilter(array(
             array('attribute' => 'path', 'like' => "%/$rootCategoryId/%"),
             array('attribute' => 'path', 'like' => "%/$rootCategoryId%"),
+            array('attribute' => 'path', 'like' => "%$rootCategoryId/%"),
         ));
     }
 
