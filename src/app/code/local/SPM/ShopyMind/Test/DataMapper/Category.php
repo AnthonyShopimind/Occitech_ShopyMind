@@ -13,6 +13,15 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
         $this->SUT = new SPM_ShopyMind_DataMapper_Category();
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        if (session_id()) {
+            session_destroy();
+        }
+    }
+
     /**
      * @loadFixture default
      */
