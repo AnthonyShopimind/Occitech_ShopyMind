@@ -32,11 +32,14 @@ class SPM_ShopyMind_Action_GetCategory implements SPM_ShopyMind_Interface_Action
             return array();
         }
 
+        $locale = $this->scope->getConfig('general/locale/code');
+        $category->setData('locale', (string) $locale);
         if ($formatData) {
             $data = $this->Formatter->format($category);
         } else {
             $data = $category;
         }
+
         ShopymindClient_Callback::stopStoreEmulation();
 
         return $data;

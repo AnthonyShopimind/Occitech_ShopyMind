@@ -35,9 +35,6 @@ class SPM_ShopyMind_DataMapper_Category
             case 'shop_id_shop':
                 $formattedData->setData($currentKey, $category->getStoreId());
                 break;
-            case 'lang':
-                $formattedData->setData($currentKey, Mage::getStoreConfig('general/locale/code'));
-                break;
             default:
                 return $formattedData;
             break;

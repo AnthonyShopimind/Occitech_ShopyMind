@@ -3,11 +3,12 @@
 /**
  * Class SPM_ShopyMind_Test_Action_GetCategory
  * @group category
- * @loadSharedFixture
  */
 class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
 {
-
+    /**
+     * @loadFixture default
+     */
     public function testProcessWithNotFoundCategoryReturnsEmptyArray()
     {
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
@@ -16,9 +17,13 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
         $this->assertEmpty($Action->process());
     }
 
+    /**
+     * @loadFixture default
+     * @group tdd
+     */
     public function testProcessWithExistingCategoryId()
     {
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-1');
         $Action = new SPM_ShopyMind_Action_GetCategory($scope, 6);
 
         $expected = array(
@@ -34,6 +39,7 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
             'updated_at' => '2013-10-26 13:00:00',
             'path' => '1/5/6',
             'position' => '1',
+            'locale' => 'fr_FR',
             'level' => 1,
             'children_count' => 0,
             'include_in_menu' => 1
@@ -45,27 +51,27 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
 
     /**
      * @loadFixture default
-     * @group fail
      */
-    public function testProcessWithScope()
+    public function testProcessWithDefinedScope()
     {
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('website-2');
         $Action = new SPM_ShopyMind_Action_GetCategory($scope, 3);
 
         $expected = array(
-            'entity_id' => 2,
-            'parent_id' => 1,
-            'name' => 'Website Category',
-            'description' => 'this is a website category',
-            'url_key' => 'website-category',
+            'entity_id' => 3,
+            'parent_id' => 2,
+            'name' => 'Test Category 1',
+            'description' => 'this is a test category',
+            'url_key' => 'test-category-1',
             'created_at' => '2013-10-26 12:00:00',
             'is_active' => 1,
             'entity_type_id' => 3,
             'attribute_set_id' => 3,
             'updated_at' => '2013-10-26 13:00:00',
-            'path' => '1/2',
+            'path' => '1/2/3',
             'position' => '1',
             'level' => 2,
+            'locale' => 'en_US',
             'children_count' => 0,
             'include_in_menu' => 1
         );
