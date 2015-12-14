@@ -19,7 +19,6 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
 
     /**
      * @loadFixture default
-     * @group tdd
      */
     public function testProcessWithExistingCategoryId()
     {
