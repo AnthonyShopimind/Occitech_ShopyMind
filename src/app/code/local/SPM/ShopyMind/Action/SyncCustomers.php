@@ -23,7 +23,7 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
             return $customerIds;
         }
 
-        return array_map(array(ShopymindClient_Callback, 'getUser'), $customerIds);
+        return array_map(array(SPM_ShopyMind_DataMapper_Customer, 'format'), $customerIds);
     }
 
     public function retrieveCustomerIds()
