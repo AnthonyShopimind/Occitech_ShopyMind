@@ -2,6 +2,7 @@
 
 /**
  * @group category
+ * @group dataMappers
  */
 class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
 {

@@ -3,6 +3,7 @@
 /**
  * Class SPM_ShopyMind_Test_Action_GetCategory
  * @group category
+ * @group actions
  * @loadSharedFixture
  */
 class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
