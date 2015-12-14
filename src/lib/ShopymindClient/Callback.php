@@ -2165,12 +2165,11 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
-        $Formatter = new SPM_ShopyMind_DataMapper_Category();
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId(null);
+        $scope = SPM_ShopyMind_Model_Scope::fromRequest();
         $action = new SPM_ShopyMind_Action_GetCategory($scope, $id_category);
         $category = $action->process();
 
-        return $Formatter->format($category);
+        return $category->getData();
     }
 
 }

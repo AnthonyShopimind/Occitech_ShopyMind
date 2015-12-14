@@ -39,8 +39,38 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
             'include_in_menu' => 1
         );
 
-        $category = $Action->process();
+        $category = $Action->process(false);
         $this->assertEquals($expected, $category->getData());
     }
 
+    /**
+     * @loadFixture default
+     */
+    public function testProcessWithScope()
+    {
+        $this->markTestIncomplete('Scope restriction issue');
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('website-2');
+        $Action = new SPM_ShopyMind_Action_GetCategory($scope, 3);
+
+        $expected = array(
+            'entity_id' => 2,
+            'parent_id' => 1,
+            'name' => 'Website Category',
+            'description' => 'this is a website category',
+            'url_key' => 'website-category',
+            'created_at' => '2013-10-26 12:00:00',
+            'is_active' => 1,
+            'entity_type_id' => 3,
+            'attribute_set_id' => 3,
+            'updated_at' => '2013-10-26 13:00:00',
+            'path' => '1/2',
+            'position' => '1',
+            'level' => 2,
+            'children_count' => 0,
+            'include_in_menu' => 1
+        );
+
+        $category = $Action->process(false);
+        $this->assertEquals($expected, $category->getData());
+    }
 }
