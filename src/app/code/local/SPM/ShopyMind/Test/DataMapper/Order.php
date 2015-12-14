@@ -36,7 +36,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'voucher_amount' => 0,
             'products' => array(),
             'customer' => array(),
-            'shipping_number' => null,
+            'shipping_number' => array(),
         );
 
         $actual = $this->SUT->format($order, array(), null);
@@ -69,7 +69,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'voucher_amount' => -10,
             'products' => array(),
             'customer' => array(),
-            'shipping_number' => null,
+            'shipping_number' => array(),
         );
 
         $actual = $this->SUT->format($order, array(), null);
