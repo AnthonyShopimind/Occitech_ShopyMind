@@ -45,10 +45,10 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
 
     /**
      * @loadFixture default
+     * @group fail
      */
     public function testProcessWithScope()
     {
-        $this->markTestIncomplete('Scope restriction issue');
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('website-2');
         $Action = new SPM_ShopyMind_Action_GetCategory($scope, 3);
 
