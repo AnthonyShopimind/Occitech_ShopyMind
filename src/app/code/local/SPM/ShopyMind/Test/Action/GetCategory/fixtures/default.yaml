@@ -33,6 +33,11 @@ scope:
       name: English B2B
       is_active: 1
 
+config:
+  default/general/local/code: fr_FR
+  stores/b2c/general/locale/code: fr_FR
+  stores/b2b/general/locale/code: en_US
+
 eav:
   catalog_category:
     - entity_id: 1

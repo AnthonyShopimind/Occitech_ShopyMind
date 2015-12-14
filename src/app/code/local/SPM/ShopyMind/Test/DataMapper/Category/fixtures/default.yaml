@@ -34,9 +34,8 @@ scope:
       is_active: 1
 
 config:
-  default/general/local/code: fr_FR
+  default/0/general/local/code: fr_FR
   stores/b2c/general/locale/code: fr_FR
-  stores/b2c/web/seo/use_rewrites: 1
   stores/b2b/general/locale/code: en_US
 
 eav:
