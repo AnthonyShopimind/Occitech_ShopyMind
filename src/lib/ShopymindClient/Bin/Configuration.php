@@ -127,7 +127,6 @@ class ShopymindClient_Bin_Configuration {
         	   ->setShopIdShop($shop_id_shop);
         return $config;
     }
-
     /**
      * Va tanter de trouver l'url du client
      *
