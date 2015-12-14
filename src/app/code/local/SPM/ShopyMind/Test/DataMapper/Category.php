@@ -25,7 +25,7 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
             'lang' => 'fr_FR',
             'name' => 'Hello world',
             'description' => 'this is REALLY a test category',
-            'link' => 'http://shopymind.test/hello-world',
+            'link' => 'http://shopymind.test/catalog/category/view/s/hello-world/id/6/',
             'date_creation' => '2013-10-26 12:00:00',
             'active' => '1',
         );
