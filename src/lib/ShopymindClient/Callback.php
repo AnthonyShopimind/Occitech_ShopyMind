@@ -830,7 +830,7 @@ class ShopymindClient_Callback {
      * @param $orderId
      * @return array
      */
-    private static function getShippingNumbersForOrderId($orderId)
+    public static function getShippingNumbersForOrderId($orderId)
     {
         $tracks = Mage::getModel('sales/order')->load($orderId)->getTracksCollection();
         $shippingNumbers = array();
@@ -1669,20 +1669,12 @@ class ShopymindClient_Callback {
 
     /**
      * Formate les données d'une commande dans le format attendu par le serveur de ShopyMind
-     *
-     * @param array $orderData
-     * @param string $spm_key
-     * @param array $voucherUsed
-     *
-     * @return array $params
      */
-    private static function formatOrderData($order)
+    private static function formatOrderData(Mage_Sales_Model_Order $order)
     {
         $OrderDataMapper = new SPM_ShopyMind_DataMapper_Order();
-        $customer = self::getUser(($order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail()));
-        $shippingNumber = self::getShippingNumbersForOrderId(2);
 
-        return $OrderDataMapper->format($order, $customer, $shippingNumber);
+        return $OrderDataMapper->format($order);
     }
 
     /**

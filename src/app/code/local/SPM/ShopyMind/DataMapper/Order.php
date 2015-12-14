@@ -2,9 +2,11 @@
 
 class SPM_ShopyMind_DataMapper_Order
 {
-    public function format(Mage_Sales_Model_Order $order, $customer, $shippingNumber)
+    public function format(Mage_Sales_Model_Order $order)
     {
         $scope = SPM_ShopyMind_Model_Scope::fromOrder($order);
+        $customer = $this->customerFor($order);
+        $shippingNumber = $this->shippingNumberFor($order);
 
         return array(
             'shop_id_shop' => $scope->getId(),
@@ -56,5 +58,20 @@ class SPM_ShopyMind_DataMapper_Order
             array($ItemFormatter, 'format'),
             $order->getQuote()->getAllVisibleItems()
         );
+    }
+
+    private function customerFor($order)
+    {
+        $CustomerDataMapper = new SPM_ShopyMind_DataMapper_Customer();
+        $customerIdentifier = $order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail();
+
+        return $CustomerDataMapper->format($customerIdentifier);
+    }
+
+    private function shippingNumberFor($order)
+    {
+        $ShippingNumberDataMapper = new SPM_ShopyMind_DataMapper_ShippingNumber();
+
+        return $ShippingNumberDataMapper->format($order->getId());
     }
 }
