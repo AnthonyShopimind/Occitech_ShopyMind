@@ -9,4 +9,11 @@
  * @version     $Id Data.php 2014-12-17$
  */
 class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract {
+
+    public function formatCustomerQuote(Mage_Sales_Model_Quote $quote)
+    {
+        $QuoteFormatter = new SPM_ShopyMind_DataMapper_Quote();
+
+        return $QuoteFormatter->format($quote);
+    }
 }

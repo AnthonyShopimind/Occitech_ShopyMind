@@ -70,14 +70,11 @@ QUERY
     public function testItShouldReturnsProductWithCorrectFormat()
     {
         $expectedProduct = array(
-            'id' => '1',
-            'description' => 'Produit 1',
-            'qty' => 2.0,
-            'price' => '13.0000',
+            'id_product' => '1',
             'id_combination' => '1',
-            'product_categories' => array(2),
-            'product_manufacturer' => null,
-            'product_url' => 'catalog/product/view/id/1/',
+            'id_manufacturer' => null,
+            'price' => '13.0000',
+            'qty' => 2.0,
         );
         $result =  ShopymindClient_Callback::getOrdersByStatus(
             false,

@@ -74,63 +74,107 @@ class ShopymindClient_Bin_Notify {
     }
 
     /**
-     * Permet de notifier le serveur d'un nouveau client OPT IN
+     * Permet de synchroniser un client
      *
-     * @param array $params = array(
-     *      'last_name' => '',
-     *      'first_name' => '',
-     *      'email_address' => '',
-     *      'birthday' => 'Y-m-d',
-     *      'locale' => 'lang_COUNTRY',
-     *      'gender' => '1 = mâle, 2 => femme',
-     *      'ip' => ''
-     * )
-     * @return string|bool
-     */
-    public static function addOptInClient(array $params) {
-        $requestServer = new ShopymindClient_Bin_RequestServer;
-        $requestServer->setRestService('addoptinclient');
-
-        foreach ($params as $key => $value){
-            $requestServer->addParam($key, $value);
-        }
-
-        if ($requestServer->send() === true) {
-            $response = $requestServer->getResponse();
-            if (isset($response['id'])) {
-                return $response['id'];
-            }
-        }
-
-        return false;
-    }
-    
-    /**
-     * Permet de notifier le serveur d'une nouvelle inscription
-     *
-     * @param array $params = array(
-     *      'idRemindersSend' => '',
-     *      'idCart' => '',
-     *      'idOrder' => '',
-     *      'products' => array,
-     *      'amount' => '',
-     *      'currency' => '',
-     *      'voucherUsed' => array,
-     *      'dateOrder' => ''
-     * )
+     * @param array $params
      * @return boolean
      */
-    public static function newCustomer(array $params) {
+    public static function saveCustomer($id_customer) {
         $requestServer = new ShopymindClient_Bin_RequestServer;
-        $requestServer->setRestService('newcustomer');
-    
-        foreach ($params as $key => $value){
-            $requestServer->addParam($key, $value);
-        }
-    
+        $requestServer->setRestService('savecustomer');
+		$requestServer->addParam('customer', array($id_customer));
+        if($requestServer->send() === true)
+        	return $requestServer->getResponse();
+        return false;
+    }
+
+    /**
+     * Permet de synchroniser un produit
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public static function saveProduct($id_product) {
+        $requestServer = new ShopymindClient_Bin_RequestServer;
+        $requestServer->setRestService('saveproduct');
+        $requestServer->addParam('product', array($id_product));
         if($requestServer->send() === true)
             return $requestServer->getResponse();
         return false;
     }
 
+    /**
+     * Permet de synchroniser une categorie de produit
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public static function saveProductCategory($id_category) {
+        $requestServer = new ShopymindClient_Bin_RequestServer;
+        $requestServer->setRestService('saveproductcategory');
+        $requestServer->addParam('productcategory', array($id_category));
+        if($requestServer->send() === true)
+            return $requestServer->getResponse();
+        return false;
+    }
+
+    /**
+     * Permet de supprimer un client
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public static function deleteCustomer(array $params) {
+        $requestServer = new ShopymindClient_Bin_RequestServer;
+        $requestServer->setRestService('deletecustomer');
+        $requestServer->addParam('customer', array($params));
+        if($requestServer->send() === true)
+            return $requestServer->getResponse();
+        return false;
+    }
+
+    /**
+     * Permet de supprimer un groupe de client
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public static function deleteCustomerGroup(array $params) {
+        $requestServer = new ShopymindClient_Bin_RequestServer;
+        $requestServer->setRestService('deletecustomergroup');
+        $requestServer->addParam('group', array($params));
+        if($requestServer->send() === true)
+            return $requestServer->getResponse();
+        return false;
+    }
+
+    /**
+     * Permet de supprimer un produit
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public static function deleteProduct(array $params) {
+        $requestServer = new ShopymindClient_Bin_RequestServer;
+        $requestServer->setRestService('deleteproduct');
+        $requestServer->addParam('product', array($params));
+        if($requestServer->send() === true)
+            return $requestServer->getResponse();
+        return false;
+    }
+
+    /**
+     * Permet de supprimer une category de produit
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public static function deleteProductCategory(array $params) {
+        $requestServer = new ShopymindClient_Bin_RequestServer;
+        $requestServer->setRestService('deleteproductcategory');
+        $requestServer->addParam('productcategory', array($params));
+        if($requestServer->send() === true)
+            return $requestServer->getResponse();
+        return false;
+    }
 }

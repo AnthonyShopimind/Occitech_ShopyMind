@@ -45,6 +45,8 @@ class ShopymindClient_Src_Reminders_GoodClientsByAmount extends ShopymindClient_
     protected $_dateReference;
 
     protected $_timezones;
+    
+    protected $_relaunchOlder = false;
 
     public static function factory(array $params) {
         if (!isset($params['timezones'])) {
@@ -155,7 +157,7 @@ class ShopymindClient_Src_Reminders_GoodClientsByAmount extends ShopymindClient_
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getGoodClientsByAmount')) {
-            return ShopymindClient_Callback::getGoodClientsByAmount($this->getShopIdShop(),$this->getDateReference(), $this->getTimezones(), $this->getAmount(), $this->getAmountMax(), $this->getNbDays(), $this->getNbDaysLastOrder(), $this->getJustCount());
+            return ShopymindClient_Callback::getGoodClientsByAmount($this->getShopIdShop(), $this->getDateReference(), $this->getTimezones(), $this->getAmount(), $this->getAmountMax(), $this->getNbDays(), $this->getNbDaysLastOrder(), $this->getRelaunchOlder(), $this->getJustCount());
         }
 
         return null;
@@ -201,4 +203,23 @@ class ShopymindClient_Src_Reminders_GoodClientsByAmount extends ShopymindClient_
         return $this;
     }
 
+    /**
+     * Permet de savoir si l'on doit relancer les clients plus anciens
+     *
+     * @return bool
+     */
+    public function getRelaunchOlder() {
+    	return (int)$this->_relaunchOlder;
+    }
+    
+    /**
+     * Permet de modifier la variable _relaunchOlder
+     *
+     * @param bool $relaunchOlder
+     * @return ShopymindClient_Reminders_InactiveClients
+     */
+    public function setRelaunchOlder($relaunchOlder) {
+    	$this->_relaunchOlder = (int) $relaunchOlder;
+    	return $this;
+    }
 }

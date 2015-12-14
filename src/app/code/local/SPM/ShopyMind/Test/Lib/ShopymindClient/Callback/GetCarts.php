@@ -44,15 +44,11 @@ QUERY
             'date_upd' => '2014-01-30 13:45:46',
             'products' => array (
                 array (
-                    'id' => 1,
-                    'description' => 'LEGGING',
-                    'price' => '13.0000',
-                    'image_url' => $this->placeholderImageUrl(),
-                    'product_url' => 'catalog/product/view/id/1/s/legging/',
+                    'id_product' => 1,
                     'id_combination' => 1,
+                    'id_manufacturer' => null, // See test below
+                    'price' => '13.0000',
                     'qty' => '2.0000',
-                    'product_categories' => array(1, 2),
-                    'product_manufacturer' => null, // See test below
                 ),
             ),
             'customer' => array(

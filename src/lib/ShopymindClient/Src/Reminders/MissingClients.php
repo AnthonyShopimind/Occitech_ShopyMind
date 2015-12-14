@@ -71,12 +71,12 @@ class ShopymindClient_Src_Reminders_MissingClients extends ShopymindClient_Src_R
     }
 
 	/**
-     * Permet de savoir si l'on doit relancer les clients plus anciens que _nbDays
+     * Permet de savoir si l'on doit relancer les clients plus anciens
      *
      * @return bool
      */
     public function getRelaunchOlder() {
-        return (bool)$this->_relaunchOlder;
+        return (int)$this->_relaunchOlder;
     }
 
     /**
@@ -86,7 +86,7 @@ class ShopymindClient_Src_Reminders_MissingClients extends ShopymindClient_Src_R
      * @return ShopymindClient_Src_Reminders_MissingClients
      */
     public function setRelaunchOlder($relaunchOlder) {
-        $this->_relaunchOlder = (bool) $relaunchOlder;
+        $this->_relaunchOlder = (int) $relaunchOlder;
         return $this;
     }
 
@@ -98,7 +98,7 @@ class ShopymindClient_Src_Reminders_MissingClients extends ShopymindClient_Src_R
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getMissingClients')) {
-            return ShopymindClient_Callback::getMissingClients($this->getShopIdShop(),$this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getRelaunchOlder(), $this->getJustCount());
+            return ShopymindClient_Callback::getMissingClients($this->getShopIdShop(), $this->getDateReference(), $this->getTimezones(), $this->getNbDays(), $this->getRelaunchOlder(), $this->getJustCount());
         }
 
         return null;

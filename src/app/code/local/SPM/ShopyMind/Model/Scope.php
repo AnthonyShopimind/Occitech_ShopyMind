@@ -21,6 +21,11 @@ class SPM_ShopyMind_Model_Scope
         $this->isoLangCode = $isoLangCode;
     }
 
+    public static function buildUnrestricted()
+    {
+        return self::fromShopymindId('');
+    }
+
     public static function fromShopymindId($shopymindId, $isoLangCode = false)
     {
         if (empty($shopymindId)) {
@@ -45,6 +50,15 @@ class SPM_ShopyMind_Model_Scope
             $scope = self::SCOPE_DEFAULT;
         }
         return new self($id, $scope, false);
+    }
+
+    public static function fromOrder(Mage_Sales_Model_Order $order)
+    {
+        $id = $order->getStoreId();
+        $scope = self::SCOPE_STORE;
+        $isoLangCode = substr(Mage::getStoreConfig('general/locale/code', $id), 0, -3);
+
+        return new self($id, $scope, $isoLangCode);
     }
 
     public static function fromRequest() {
@@ -105,6 +119,16 @@ class SPM_ShopyMind_Model_Scope
         return array_map(function($store) {
             return $store->getId();
         }, $this->stores());
+    }
+
+    public function getLang()
+    {
+        return $this->isoLangCode;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function getConfig($path)
