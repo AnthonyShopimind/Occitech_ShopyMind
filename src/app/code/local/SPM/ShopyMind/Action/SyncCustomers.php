@@ -3,9 +3,8 @@
 class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Action
 {
     private $params;
-    private $scope;
 
-    public function __construct(SPM_ShopyMind_Model_Scope $scope, $start, $limit, $lastUpdate, $customerId = false, $justCount = false)
+    public function __construct(SPM_ShopyMind_Model_Scope $scope, $start, $limit, $lastUpdate, $customerId, $justCount)
     {
         $this->scope = $scope;
         $this->params['start'] = $start;
@@ -13,6 +12,7 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
         $this->params['lastUpdate'] = $lastUpdate;
         $this->params['customerId'] = $customerId;
         $this->params['justCount'] = $justCount;
+        $this->params['scope'] = $scope;
     }
 
     public function process()
@@ -37,7 +37,7 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
 
         $customerCollection = Mage::getModel('customer/customer')->getCollection()
             ->addFieldToFilter('updated_at', array('gt' => $this->params['lastUpdate']));
-        $this->scope->restrictCollection($customerCollection);
+        $this->params['scope']->restrictCollection($customerCollection);
 
         if ($this->params['limit']) {
             $customerCollection->getSelect()->limit($this->params['limit'], $this->params['start']);
@@ -47,11 +47,8 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
             return $customerCollection->count();
         }
 
-        $result = array();
-        foreach($customerCollection as $customer) {
-            $result[] = $customer->getId();
-        }
-
-        return $result;
+        return array_map(function($customer) {
+            return $customer->getId();
+        }, iterator_to_array($customerCollection->getIterator()));
     }
 }

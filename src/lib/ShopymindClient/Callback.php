@@ -2166,7 +2166,7 @@ class ShopymindClient_Callback {
         }
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
-        $SyncCustomersAction = new SPM_ShopyMind_Action_SyncCustomers($scope, $start, $limit, $lastUpdate, $idCustomer = false, $justCount = false);
+        $SyncCustomersAction = new SPM_ShopyMind_Action_SyncCustomers($scope, $start, $limit, $lastUpdate, $idCustomer, $justCount);
         return $SyncCustomersAction->process();
     }
 
