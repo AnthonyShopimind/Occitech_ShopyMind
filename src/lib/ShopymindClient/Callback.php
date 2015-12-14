@@ -1100,7 +1100,7 @@ class ShopymindClient_Callback {
         }
         return $return;
     }
-
+    
     /**
      * Récupération des langues disponibles
      * @param unknown $id_shop
@@ -1117,7 +1117,7 @@ class ShopymindClient_Callback {
     		list($scope, $website_id_needed) = explode('-', $id_shop);
     	}
     	$stores = Mage::app()->getStores();
-
+    		
     	foreach ( $stores as $store ) {
     		$store_id = $store->getId();
     		$website_id = $store->getWebsite()->getId();
@@ -1164,7 +1164,7 @@ class ShopymindClient_Callback {
     	$websites = Mage::getModel('core/website')->getCollection();
     	foreach ($websites as $website){
     		$return[$website->getId()] = $website->getName();
-    	}
+    	}    
     	return $return;
     }
     /**
@@ -1534,16 +1534,24 @@ class ShopymindClient_Callback {
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
+        $orderData = $order->getData();
+        $voucherUsed = array ();
+        $vouchersOrder = $order->getCouponCode();
+        if ($vouchersOrder)
+            $voucherUsed [] = $vouchersOrder;
 
-        self::sendOrderToSPM($order);
+        self::sendOrderToSPM($order, $orderData, false, $voucherUsed);
     }
 
     /**
      * Envoi des ventes générées suite à une relance à ShopyMind
      *
      * @param Mage_Sales_Model_Order $order
+     * @param array $orderData
+     * @param string $spm_key
+     * @param array $voucherUsed
      */
-    public static function sendOrderToSPM($order) {
+    public static function sendOrderToSPM($order, $orderData, $spm_key, $voucherUsed) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -1552,12 +1560,13 @@ class ShopymindClient_Callback {
         }
         self::startStoreEmulationByStoreId($order->getStoreId());
 
+
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
-        $params = self::formatOrderData($order);
+        $params = self::formatOrderData($orderData, $spm_key, $voucherUsed);
         ShopymindClient_Bin_Notify::newOrder($params);
         self::stopStoreEmulation();
     }
-
+    
     /**
      * Envoi des ventes générées suite à une relance à ShopyMind
      *
@@ -1676,13 +1685,28 @@ class ShopymindClient_Callback {
      *
      * @return array $params
      */
-    private static function formatOrderData($order)
-    {
-        $OrderDataMapper = new SPM_ShopyMind_DataMapper_Order();
-        $customer = self::getUser(($order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail()));
-        $shippingNumber = self::getShippingNumbersForOrderId(2);
+    private static function formatOrderData($orderData, $spm_key, $voucherUsed) {
 
-        return $OrderDataMapper->format($order, $customer, $shippingNumber);
+        $quote = Mage::getSingleton('sales/quote')->load($orderData ['quote_id']);
+
+        $params = array (
+            'idRemindersSend' => $spm_key,
+            'shopIdShop' => $orderData['store_id'],
+            'orderIsConfirm' => ($orderData['state'] == Mage_Sales_Model_Order::STATE_PROCESSING || $orderData['state'] == Mage_Sales_Model_Order::STATE_COMPLETE) ? true : false,
+            'idStatus' => $orderData['status'],
+            'idCart' => $orderData['quote_id'],
+            'dateCart' => ($quote->getUpdatedAt() !== null && $quote->getUpdatedAt() !== '' ? $quote->getUpdatedAt() : $orderData ['created_at']),
+            'idOrder' => $orderData['increment_id'],
+            'amount' => $orderData['base_grand_total'],
+            'taxRate' => $orderData['base_to_order_rate'],
+            'currency' => $orderData['order_currency_code'],
+            'dateOrder' => $orderData['created_at'],
+            'voucherUsed' => $voucherUsed,
+            'products' => self::productsOfCart($orderData ['quote_id']),
+            'customer' => self::getUser(($orderData ['customer_id'] ? $orderData ['customer_id'] : $orderData ['customer_email'])),
+            'shipping_number' => self::getShippingNumbersForOrderId(2),
+        );
+        return $params;
     }
 
     /**
@@ -2120,6 +2144,20 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
         return self::formatOrderData(Mage::getModel('sales/order')->load($idOrder));
+    }
+
+    public static function syncCustomers($id_shop, $start, $limit, $lastUpdate, $idCustomer = false, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $SyncCustomersAction = new SPM_ShopyMind_Action_SyncCustomers($scope, $start, $limit, $lastUpdate, $idCustomer, $justCount);
+        return $SyncCustomersAction->process();
     }
 
 }
