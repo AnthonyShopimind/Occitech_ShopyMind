@@ -3,6 +3,7 @@
 /**
  * Class SPM_ShopyMind_Test_Action_GetCategory
  * @group category
+ * @loadSharedFixture
  */
 class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
 {
@@ -15,9 +16,6 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
         }
     }
 
-    /**
-     * @loadFixture default
-     */
     public function testProcessWithNotFoundCategoryReturnsEmptyArray()
     {
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
@@ -26,9 +24,6 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
         $this->assertEmpty($Action->process());
     }
 
-    /**
-     * @loadFixture default
-     */
     public function testProcessWithExistingCategoryId()
     {
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-1');
@@ -57,9 +52,6 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals($expected, $category->getData());
     }
 
-    /**
-     * @loadFixture default
-     */
     public function testProcessWithDefinedScope()
     {
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('website-2');
@@ -88,9 +80,6 @@ class SPM_ShopyMind_Test_Action_GetCategory extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals($expected, $category->getData());
     }
 
-    /**
-     * @loadFixture default
-     */
     public function testProcessWithUndefinedScope()
     {
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
