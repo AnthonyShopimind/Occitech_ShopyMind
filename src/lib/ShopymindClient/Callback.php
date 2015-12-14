@@ -1676,7 +1676,7 @@ class ShopymindClient_Callback {
      *
      * @return array $params
      */
-    private static function formatOrderData($order)
+    public static function formatOrderData($order)
     {
         $OrderDataMapper = new SPM_ShopyMind_DataMapper_Order();
         $customer = self::getUser(($order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail()));
