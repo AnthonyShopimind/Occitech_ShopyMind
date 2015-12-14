@@ -3,7 +3,7 @@
 class SPM_ShopyMind_DataMapper_Category
 {
     private $mapping = array(
-        'shop_id_shop' =>'store_id',
+        'shop_id_shop' => 'store_id',
         'id_category' => 'entity_id',
         'id_parent_category' => 'parent_id',
         'lang' => 'locale',
