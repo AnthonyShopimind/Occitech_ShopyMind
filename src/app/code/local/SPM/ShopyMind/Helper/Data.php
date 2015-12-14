@@ -10,7 +10,7 @@
  */
 class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract {
 
-    public function formatCustomerQuote($quote)
+    public function formatCustomerQuote(Mage_Sales_Model_Quote $quote)
     {
         $QuoteFormatter = new SPM_ShopyMind_DataMapper_Quote();
 
