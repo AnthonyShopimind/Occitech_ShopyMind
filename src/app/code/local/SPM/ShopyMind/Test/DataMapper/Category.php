@@ -41,8 +41,8 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-2');
         $Action = new SPM_ShopyMind_Action_GetCategory($scope, 3);
-        $category = $Action->process(false);
+        $category = $Action->process(true);
 
-        $this->assertEquals($expected, $this->SUT->format($category));
+        $this->assertEquals($expected, $category);
     }
 }
