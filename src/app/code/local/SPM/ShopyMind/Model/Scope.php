@@ -21,6 +21,11 @@ class SPM_ShopyMind_Model_Scope
         $this->isoLangCode = $isoLangCode;
     }
 
+    public static function buildUnrestricted()
+    {
+        return self::fromShopymindId('');
+    }
+
     public static function fromShopymindId($shopymindId, $isoLangCode = false)
     {
         if (empty($shopymindId)) {

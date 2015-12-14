@@ -18,13 +18,6 @@ class ShopymindClient_Src_Reminders_DroppedOutCart extends ShopymindClient_Src_R
      * @var int
      */
     protected $_intervalAction;
-    
-    /**
-     * Nombre de secondes maximum d'innactivité de panier
-     *
-     * @var int
-     */
-    protected $_maxIntervalAction;
 
     /**
      * Permet de construire une relance courante
@@ -70,7 +63,7 @@ class ShopymindClient_Src_Reminders_DroppedOutCart extends ShopymindClient_Src_R
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
         if (method_exists('ShopymindClient_Callback', 'getDroppedOutCart')) {
-            return ShopymindClient_Callback::getDroppedOutCart($this->getShopIdShop(),$this->getIntervalAction(),$this->getMaxIntervalAction(), $this->getJustCount());
+            return ShopymindClient_Callback::getDroppedOutCart($this->getShopIdShop(), $this->getIntervalAction(), $this->getJustCount());
         }
 
         return null;
@@ -95,24 +88,5 @@ class ShopymindClient_Src_Reminders_DroppedOutCart extends ShopymindClient_Src_R
         $this->_intervalAction = $intervalAction;
         return $this;
     }
-    
-    /**
-     * Permet d'obtenir le nombre de seconde maximum d'inactivité de panier
-     *
-     * @return int
-     */
-    public function getMaxIntervalAction() {
-        return $this->_maxIntervalAction;
-    }
-    
-    /**
-     * Permet de modifier de seconde maximum d'inactivité de panier
-     *
-     * @param int $intervalAction
-     * @return ShopymindClient_Src_Reminders_DroppedOutCart
-     */
-    public function setMaxIntervalAction($maxIntervalAction) {
-        $this->_maxIntervalAction = $maxIntervalAction;
-        return $this;
-    }
+
 }

@@ -1676,7 +1676,7 @@ class ShopymindClient_Callback {
      *
      * @return array $params
      */
-    public static function formatOrderData($order)
+    private static function formatOrderData($order)
     {
         $OrderDataMapper = new SPM_ShopyMind_DataMapper_Order();
         $customer = self::getUser(($order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail()));
@@ -2120,6 +2120,20 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
         return self::formatOrderData(Mage::getModel('sales/order')->load($idOrder));
+    }
+
+    public static function syncCustomers($id_shop, $start, $limit, $lastUpdate, $idCustomer = false, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $SyncCustomersAction = new SPM_ShopyMind_Action_SyncCustomers($scope, $start, $limit, $lastUpdate, $idCustomer, $justCount);
+        return $SyncCustomersAction->process();
     }
 
 }

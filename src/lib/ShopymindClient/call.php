@@ -54,7 +54,13 @@ try {
             if (method_exists('ShopymindClient_Callback', 'generateVouchers')) {
                 $params = $server->retrieveParams();
                 $server->sendResponse(array(
-                    'vouchers' => ShopymindClient_Callback::generateVouchers($params['voucherInfos'], $params['voucherEmails'])
+                    'vouchers' => ShopymindClient_Callback::generateVouchers(
+                        $params['voucherInfos'],
+                        $params['voucherEmails'],
+                        (isset($params['shopIdShop']) ? $params['shopIdShop'] : false),
+                        (isset($params['dynamicPrefix']) ? $params['dynamicPrefix'] : false),
+                        (isset($params['duplicateCode']) ? $params['duplicateCode'] : false)
+                )
                 ), true);
             }
         } elseif ($server->getTypeRequest() === 'getCountries') {
@@ -138,16 +144,52 @@ try {
                     'emails' => ShopymindClient_Callback::getExistingEmails((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false))
                 ), true);
             }
-        }elseif ($server->getTypeRequest() === 'getContacts') {
+        }
+        /**
+         *  SYNC REQUESTS   ------------
+         */
+        elseif ($server->getTypeRequest() === 'syncCustomers') {
             require_once dirname(__FILE__) . '/Callback.php';
-            if (method_exists('ShopymindClient_Callback', 'getContacts')) {
+            if (method_exists('ShopymindClient_Callback', 'syncCustomers')) {
                 $params = $server->retrieveParams();
                 $server->sendResponse(array(
                     'lastUpdate' => date('Y-m-d H:i:s'),
-                    'emails' => ShopymindClient_Callback::getContacts((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
+                    'customers' => ShopymindClient_Callback::syncCustomers((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
                 ), true);
             }
-        } elseif ($server->getTypeRequest() === 'getUser') {
+        } elseif ($server->getTypeRequest() === 'syncProducts') {
+            require_once dirname(__FILE__) . '/Callback.php';
+            if (method_exists('ShopymindClient_Callback', 'syncProducts')) {
+                $params = $server->retrieveParams();
+                $server->sendResponse(array(
+                    'lastUpdate' => date('Y-m-d H:i:s'),
+                    'products' => ShopymindClient_Callback::syncProducts((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
+                ), true);
+            }
+        } elseif ($server->getTypeRequest() === 'syncProductsCategories') {
+            require_once dirname(__FILE__) . '/Callback.php';
+            if (method_exists('ShopymindClient_Callback', 'syncProductsCategories')) {
+                $params = $server->retrieveParams();
+                $server->sendResponse(array(
+                    'lastUpdate' => date('Y-m-d H:i:s'),
+                    'productsCategories' => ShopymindClient_Callback::syncProductsCategories((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
+                ), true);
+            }
+        } elseif ($server->getTypeRequest() === 'syncOrders') {
+            require_once dirname(__FILE__) . '/Callback.php';
+            if (method_exists('ShopymindClient_Callback', 'syncOrders')) {
+                $params = $server->retrieveParams();
+                $server->sendResponse(array(
+                    'lastUpdate' => date('Y-m-d H:i:s'),
+                    'orders' => ShopymindClient_Callback::syncOrders((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
+                ), true);
+            }
+        }
+        /**
+         *  END SYNC REQUESTS   ----------
+         */
+
+        elseif ($server->getTypeRequest() === 'getUser') {
             require_once dirname(__FILE__) . '/Callback.php';
             if (method_exists('ShopymindClient_Callback', 'getUser')) {
                 $params = $server->retrieveParams();
@@ -156,7 +198,7 @@ try {
                         'user' => ShopymindClient_Callback::getUser($params['idUser'])
                     ), true);
             }
-        }elseif ($server->getTypeRequest() === 'getCarts') {
+        } elseif ($server->getTypeRequest() === 'getCarts') {
             require_once dirname(__FILE__) . '/Callback.php';
             if (method_exists('ShopymindClient_Callback', 'getCarts')) {
                 $params = $server->retrieveParams();
@@ -165,7 +207,7 @@ try {
                         'carts' => ShopymindClient_Callback::getCarts((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),$params['idCart'])
                     ), true);
             }
-        }elseif ($server->getTypeRequest() === 'getOrder') {
+        } elseif ($server->getTypeRequest() === 'getOrder') {
             require_once dirname(__FILE__) . '/Callback.php';
             if (method_exists('ShopymindClient_Callback', 'getOrder')) {
                 $params = $server->retrieveParams();
@@ -174,7 +216,7 @@ try {
                         'order' => ShopymindClient_Callback::getOrder($params['idOrder'])
                     ), true);
             }
-        }elseif ($server->getTypeRequest() === 'getShops') {
+        } elseif ($server->getTypeRequest() === 'getShops') {
             require_once dirname(__FILE__) . '/Callback.php';
             if (method_exists('ShopymindClient_Callback', 'getShops')) {
                 $params = $server->retrieveParams();
@@ -182,20 +224,12 @@ try {
                     'shops' => ShopymindClient_Callback::getShops()
                 ), true);
             }
-        }elseif ($server->getTypeRequest() === 'createCustomer') {
-            require_once dirname(__FILE__) . '/Callback.php';
-            if (method_exists('ShopymindClient_Callback', 'createCustomer')) {
-                $params = $server->retrieveParams();
-                $server->sendResponse(array(
-                    'customer' => ShopymindClient_Callback::createCustomer((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['lang']) ? $params['lang'] : false),$params['customerInfos'])
-                ), true);
-            }
-        }elseif ($server->getTypeRequest() === 'relaunch') {
+        } elseif ($server->getTypeRequest() === 'relaunch') {
             $relaunch = $server->retrieveRelaunch();
             $params = $server->retrieveParams();
 
             if ($relaunch !== null) {
-                if (file_exists('Src/Reminders/' . ucfirst($relaunch) . '.php')) {
+                if (file_exists('src/Reminders/' . ucfirst($relaunch) . '.php')) {
                     require_once dirname(__FILE__) . '/Src/Reminders/' . ucfirst($relaunch) . '.php';
                     $classRelaunch = 'ShopymindClient_Src_Reminders_' . ucfirst($relaunch);
                     $relaunch = call_user_func(array(
