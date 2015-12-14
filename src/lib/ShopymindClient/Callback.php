@@ -2165,10 +2165,12 @@ class ShopymindClient_Callback {
             ), func_get_args());
         }
 
-        require_once Mage::getModuleDir('Action', 'SPM_ShopyMind') . DIRECTORY_SEPARATOR . 'GetCategory.php';
-        $action = new SPM_ShopyMind_Action_GetCategory($id_category);
+        $Formatter = new SPM_ShopyMind_DataMapper_Category();
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId(null);
+        $action = new SPM_ShopyMind_Action_GetCategory($scope, $id_category);
+        $category = $action->process();
 
-        return $action->process();
+        return $Formatter->format($category);
     }
 
 }
