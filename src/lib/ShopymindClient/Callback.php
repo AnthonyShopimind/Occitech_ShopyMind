@@ -849,99 +849,30 @@ class ShopymindClient_Callback {
      * @param array $emails
      * @return array
      */
-    public static function generateVouchers($voucherInfos, $emails) {
+    public static function generateVouchers($voucherInfos, $emails)
+    {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
             ), func_get_args());
-        $vouchers = array ();
-        if ($voucherInfos && is_array($voucherInfos) && $emails && is_array($emails) && sizeof($emails)) {
-            foreach ( $emails as $email ) {
-                $voucher = self::generateVoucher($email, $voucherInfos ['type'], ($voucherInfos ['type'] == 'shipping' ? false : $voucherInfos ['amount']), ($voucherInfos ['type'] == 'amount' ? $voucherInfos ['amountCurrency'] : false), $voucherInfos ['minimumOrder'], $voucherInfos ['nbDayValidate'], '');
-                if (! $voucher)
-                    continue;
-                $vouchers [$email] = $voucher;
-            }
-        }
-        return $vouchers;
-    }
 
-    /**
-     * Création code de réduction
-     *
-     * @param int $id_customer
-     * @param int $type
-     * @param string $amount
-     * @param string $amountCurrency
-     * @param string $minimumOrder
-     * @param int $nbDayValidate
-     * @param string $description
-     * @return string boolean
-     */
-    public static function generateVoucher($id_customer, $type, $amount = false, $amountCurrency = false, $minimumOrder = false, $nbDayValidate, $description) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        $coupon_code = 'SPM-' . self::shortId();
-        $date = date('Y-m-d H:i:s');
-        $coupon = Mage::getModel('salesrule/rule');
-        $coupon->setName($coupon_code)->setFromDate($date)->setToDate((date('Y-m-d 23:59:59', mktime(date("H"), date("i"), date("s"), date("m"), date("d") + $nbDayValidate, date("Y")))))->setUsesPerCustomer('1')->setIsActive('1')->setStopRulesProcessing('0')->setIsAdvanced('1')->setProductIds(NULL)->setSortOrder('0');
-        if ($type == 'percent') {
-            $coupon->setSimpleAction('by_percent')->setDiscountAmount($amount)->setDiscountQty(NULL)->setSimpleFreeShipping('0');
-        }
-        if ($type == 'amount') {
-            $coupon->setSimpleAction('cart_fixed')->setDiscountAmount($amount)->setDiscountQty(NULL)->setSimpleFreeShipping('0');
-        } elseif ($type == 'shipping') {
-            $coupon->setSimpleFreeShipping(1);
-        }
-        $coupon->setDiscountStep('0')->setApplyToShipping('0')->setTimesUsed('0')->setIsRss('0')->setCouponType('2')->setUsesPerCoupon(1)->setCustomerGroupIds(self::getAllCustomerGroupsIds())->setWebsiteIds(self::getAllWebsitesIds())->setCouponCode($coupon_code);
-        if ($minimumOrder) {
-            $condition = Mage::getModel('salesrule/rule_condition_address')->setType('salesrule/rule_condition_address')->setAttribute('base_subtotal')->setOperator('>=')->setValue((int) $minimumOrder);
-            $coupon->getConditions()->addCondition($condition);
-        }
-        if ($coupon->save())
-            return $coupon_code;
-        return false;
-    }
-    /**
-     *
-     * Get all websites ids
-     */
-    public static function getAllWebsitesIds(){
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        $websites = Mage::getModel('core/website')->getCollection();
-        $websiteIds = array();
-        foreach ($websites as $website){
-            $websiteIds[] = $website->getId();
-        }
-        return $websiteIds;
-    }
-    /**
-     * Récupération des IDs de groupes de client
-     *
-     * @return array
-     */
-    public static function getAllCustomerGroupsIds() {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        $return = array ();
-        $results = Mage::getResourceModel('customer/group_collection')->toOptionArray();
-        if ($results) {
-            foreach ( $results as $row ) {
-                $return [] = $row ['value'];
+        $vouchers = array();
+        if ($voucherInfos && is_array($voucherInfos) && $emails && is_array($emails) && sizeof($emails)) {
+            foreach ($emails as $email) {
+                $amount = ($voucherInfos['type'] == 'shipping' ? false : $voucherInfos['amount']);
+                $amountCurrency = ($voucherInfos['type'] == 'amount' ? $voucherInfos ['amountCurrency'] : false);
+                $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher($email, $voucherInfos['type'], $amount, $amountCurrency, $voucherInfos['minimumOrder'], $voucherInfos ['nbDayValidate'], '');
+
+                $voucher = $GenerateVoucher->process();
+                if (!$voucher) {
+                    continue;
+                }
+                $vouchers[$email] = $voucher;
             }
         }
-        return $return;
+
+        return $vouchers;
     }
 
     /**
