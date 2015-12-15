@@ -1149,35 +1149,6 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Récupération de la locale d'un client
-     *
-     * @param int|string $id_customer
-     * @param int $store_id
-     * @param string $country_code
-     * @return string
-     */
-    public static function getUserLocale($id_customer, $store_id, $country_code = false) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        $locale_shop = Mage::getStoreConfig('general/locale/code', $store_id);
-        if (! $country_code) {
-            $customer = Mage::getModel('customer/customer')->load($id_customer);
-            $defaultBilling = $customer->getDefaultBillingAddress();
-            if ($defaultBilling)
-                return substr($locale_shop, 0, 3) . $defaultBilling->getCountry();
-        } else
-            return substr($locale_shop, 0, 3) . $country_code;
-
-        $locale_shop = explode('_', $locale_shop);
-        $locale_shop = strtolower($locale_shop [0]) . '_00';
-
-        return $locale_shop;
-    }
-
-    /**
      * Récupération du complément de requete de timezone
      *
      * @param array $timezones
@@ -1207,102 +1178,6 @@ class ShopymindClient_Callback {
         if (sizeof($where))
             return '(' . implode(' OR ', $where) . ')';
         return false;
-    }
-
-    /**
-     * Récupération date de dernière commande d'un client
-     *
-     * @param int|string $id_customer
-     * @return string int
-     */
-    public static function getDateLastOrder($id_customer) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        $tablePrefix = Mage::getConfig()->getTablePrefix();
-        $read = Mage::getSingleton('core/resource')->getConnection('core_read');
-        if (is_numeric($id_customer)) {
-            $result = $read->fetchRow('SELECT MAX(`created_at`) AS `created_at`
-			FROM `' . $tablePrefix . 'sales_flat_order`
-			WHERE `customer_id` = ' . (int) $id_customer . ' AND `base_total_invoiced` IS NOT NULL');
-        } else {
-            $result = $read->fetchRow('SELECT MAX(`created_at`) AS `created_at`
-			FROM `' . $tablePrefix . 'sales_flat_order`
-			WHERE `customer_email` = "' . $id_customer . '" AND `base_total_invoiced` IS NOT NULL');
-        }
-        return isset($result ['created_at']) ? $result ['created_at'] : 0;
-    }
-
-    /**
-     * Number of orders passed by a customer, optionally on a given period
-     *
-     * @param int|string $customerIdOrEmail
-     * @param string $sinceAgo Period to consider (in SQL DATE_SUB compatible format), optional (example: "1 YEAR")
-     * @return int
-     */
-    public static function countCustomerOrder($customerIdOrEmail, $sinceAgo = null) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
-            return call_user_func_array(array (
-                'ShopymindClient_CallbackOverride',
-                __FUNCTION__
-            ), func_get_args());
-        }
-
-        $tablePrefix = Mage::getConfig()->getTablePrefix();
-        $read = Mage::getSingleton('core/resource')->getConnection('core_read');
-
-        $conditions = self::ordersConditionsForCustomer($customerIdOrEmail, $sinceAgo);
-        $query = sprintf(
-            'SELECT COUNT(`entity_id`) AS `nbOrder` FROM `' . $tablePrefix . 'sales_flat_order` WHERE %s',
-            implode(' AND ', $conditions)
-        );
-        $result = $read->fetchRow($query);
-
-        return isset($result['nbOrder']) ? $result['nbOrder'] : 0;
-    }
-
-    /**
-     * Total amount ordered by a client, optionally filtered on a given period
-     *
-     * @param int|string $customerIdOrEmail
-     * @param string $sinceAgo Period to consider (in SQL DATE_SUB compatible format), optional (example: "1 YEAR")
-     * @return int float
-     */
-    public static function sumCustomerOrder($customerIdOrEmail, $sinceAgo = null) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        }
-
-        $tablePrefix = Mage::getConfig()->getTablePrefix();
-        $read = Mage::getSingleton('core/resource')->getConnection('core_read');
-
-        $conditions = self::ordersConditionsForCustomer($customerIdOrEmail, $sinceAgo);
-        $query = sprintf(
-            'SELECT SUM(`base_total_invoiced`*base_to_order_rate) AS `sumOrder` FROM `' . $tablePrefix . 'sales_flat_order` WHERE %s',
-            implode(' AND ', $conditions)
-        );
-        $result = $read->fetchRow($query);
-
-        return isset($result['sumOrder']) ? $result['sumOrder'] : 0;
-    }
-
-    private static function ordersConditionsForCustomer($customerIdOrEmail, $sinceAgo)
-    {
-        $conditions = array('`base_total_invoiced` IS NOT NULL');
-        if (!is_null($sinceAgo)) {
-            $conditions[] = '`created_at` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL ' . $sinceAgo . ')';
-        }
-        if (is_numeric($customerIdOrEmail)) {
-            $conditions[] = '`customer_id` = ' . (int)$customerIdOrEmail;
-        } else {
-            $conditions[] = '`customer_email` = "' . $customerIdOrEmail . '"';
-        }
-        return $conditions;
     }
 
     /**

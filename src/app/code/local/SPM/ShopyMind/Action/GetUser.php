@@ -13,7 +13,8 @@ class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
     public function process()
     {
         $users = $this->fetchUsers();
-        $return = array_map(array('SPM_ShopyMind_DataMapper_Customer', 'format'), $users);
+        $Formatter = new SPM_ShopyMind_DataMapper_Customer();
+        $return = array_map(array($Formatter, 'format'), $users);
 
         return (sizeof($return) === 1 ? $return [0] : $return);
     }
