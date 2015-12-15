@@ -1,0 +1,86 @@
+scope:
+  website:
+    - website_id: 1
+      code: b2c
+      name: B2C
+      default_group_id: 1
+    - website_id: 2
+      code: b2b
+      name: B2B
+      default_group_id: 2
+  group:
+    - group_id: 1
+      website_id: 1
+      name: B2C
+      default_store_id: 1
+      root_category_id: 2
+    - group_id: 2
+      website_id: 2
+      name: B2B
+      default_store_id: 2
+      root_category_id: 2
+  store:
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: b2c
+      name: France B2C
+      is_active: 1
+    - store_id: 2
+      website_id: 2
+      group_id: 2
+      code: b2b
+      name: France B2B
+      is_active: 1
+
+eav:
+  catalog_product:
+    - entity_id: 1
+      type_id: simple
+      sku: product-1
+      attribute_set_id: 1
+  customer:
+     - entity_id: 1
+       entity_type_id: 1
+       attribute_set_id: 0
+       website_id: 1
+       store_id: 1
+       group_id: 1
+       is_active: 1
+       gender: 2
+       firstname: April
+       lastname: Oliver
+       email: april.oliver90@example.com
+       created_at: "2009-10-21 14:10:59"
+       updated_at: "2010-01-15 10:00:00"
+
+tables:
+  sales/order:
+    - entity_id: 1
+      store_id: 2
+      created_at: "2015-12-09 11:53:06"
+      updated_at: "2015-12-09 11:53:06"
+      status: pending
+      state: processing
+      increment_id: 10001
+      base_grand_total: 28.0300
+      base_to_order_rate: 1.0000
+      order_currency_code: "EUR"
+      discount_amount: 0.0000
+      quote_id: 1
+      customer_id: 1
+    - entity_id: 2
+      store_id: 1
+      created_at: "2012-11-09 11:53:06"
+      updated_at: "2012-11-09 11:53:06"
+      customer_id: 1
+    - entity_id: 3
+      store_id: 1
+      created_at: "2013-12-09 11:53:06"
+      updated_at: "2013-12-09 11:53:06"
+
+  sales/quote:
+    - entity_id: 1
+      store_id: 2
+      created_at: "2011-01-09 11:53:06"
+      updated_at: "2011-01-09 13:53:06"
