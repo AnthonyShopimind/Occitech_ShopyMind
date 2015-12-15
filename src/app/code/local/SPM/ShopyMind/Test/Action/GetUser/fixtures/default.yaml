@@ -33,9 +33,6 @@ scope:
       name: France B2B
       is_active: 1
 
-config:
-  stores/b2c/general/locale/code: fr_FR
-
 eav:
   customer:
     - entity_id: 1

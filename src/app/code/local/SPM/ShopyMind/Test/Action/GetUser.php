@@ -3,7 +3,6 @@
 /**
  * @loadSharedFixture
  * @group actions
- * @group mine
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PHPUnit_Test_Case
 {
@@ -20,7 +19,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         'phone2'          => '',
         'gender'          => 2,
         'birthday'        => 0,
-        'locale'          => 'fr_00',
+        'locale'          => '_00',
         'date_last_order' => 0,
         'nb_order'        => 0,
         'sum_order'       => 0,
@@ -139,6 +138,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'first_name' => 'Jane',
                 'email_address' => 'jane.doe34@example.com',
                 'phone1' => '0102030455',
+                'locale' => 'FR',
                 'gender' => 1,
                 'groups' => array(1),
                 'region' => '92',
@@ -150,6 +150,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'phone1' => '0102030405',
                 'gender' => 2,
                 'birthday' => '1962-08-29 00:00:00',
+                'locale' => 'FR',
                 'groups' => array(1),
                 'region' => '92',
                 'postcode' => 92000,
@@ -178,6 +179,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'first_name' => 'Jane',
                 'email_address' => 'jane.doe34@example.com',
                 'phone1' => '0102030455',
+                'locale' => 'FR',
                 'gender' => 1,
                 'groups' => array(1),
                 'region' => '92',
@@ -189,6 +191,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'phone1' => '0102030405',
                 'gender' => 2,
                 'birthday' => '1962-08-29 00:00:00',
+                'locale' => 'FR',
                 'groups' => array(1),
                 'region' => '92',
                 'postcode' => '92000'
