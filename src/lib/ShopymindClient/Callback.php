@@ -2128,7 +2128,7 @@ class ShopymindClient_Callback {
         return $SyncCustomersAction->process();
     }
 
-    public function syncProductCategories($id_shop, $start, $limit, $lastUpdate, $idCategory = false, $justCount = false)
+    public function syncProductsCategories($id_shop, $start, $limit, $lastUpdate, $idCategory = false, $justCount = false)
     {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array (
