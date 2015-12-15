@@ -11,7 +11,7 @@ class SPM_ShopyMind_DataMapper_QuoteItem
         return array(
             'id_product' => $product->getId(),
             'id_combination' => $combinationId,
-            'id_manufacturer' => $product->getManufacturer(),
+            'id_manufacturer' => Mage::helper('shopymind')->manufacturerIdOf($product),
             'price' => $quoteItem->getPriceInclTax(),
             'qty' => $quoteItem->getQty(),
         );

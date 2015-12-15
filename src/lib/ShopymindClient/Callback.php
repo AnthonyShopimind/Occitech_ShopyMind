@@ -19,7 +19,6 @@ class ShopymindClient_Callback {
     protected static $appEmulation = false;
     protected static $initialEnvironmentInfo = false;
     const SEARCH_MIN_LENGTH = 3;
-    const MANUFACTURER_ATTRIBUTE_CODE = 'manufacturer';
 
     /**
      * @var null|int Current timestamp (to allow simulating time changes from tests)
@@ -1284,8 +1283,8 @@ class ShopymindClient_Callback {
 
         if ($collection && sizeof($collection)) {
             foreach ( $collection as $product ) {
-                $image_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
-                $product_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
+                $image_url = Mage::helper('shopymind')->productImageUrlOf($product);
+                $product_url = Mage::helper('shopymind')->productUrlOf($product);
                 $return [] = array (
                         'description' => $product->getName(),
                         'price' => $product->getPrice(),
@@ -1729,7 +1728,7 @@ class ShopymindClient_Callback {
         if (strlen($search) < self::SEARCH_MIN_LENGTH) {
             return array();
         }
-        $attribute = Mage::getModel('eav/config')->getAttribute('catalog_product', self::MANUFACTURER_ATTRIBUTE_CODE);
+        $attribute = Mage::getModel('eav/config')->getAttribute('catalog_product', SPM_ShopyMind_Helper_Data::MANUFACTURER_ATTRIBUTE_CODE);
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
         $scope->restrictEavAttribute($attribute);
@@ -1962,19 +1961,13 @@ class ShopymindClient_Callback {
             $nameAttributeId = Mage::getModel('eav/entity_attribute')->loadByCode(Mage_Catalog_Model_Product::ENTITY, 'name')->getId();
         }
 
-        $combinations = array();
-        if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
-            $combinations = array_map(
-                function ($childProduct) {
-                    return array(
-                        'id'   => $childProduct->getId(),
-                        'name' => $childProduct->getName()
-                    );
-                },
-                Mage::getModel('catalog/product_type_configurable')->getUsedProducts(array($nameAttributeId), $product)
+        $formatter = function ($childProduct) {
+            return array(
+                'id' => $childProduct->getId(),
+                'name' => $childProduct->getName()
             );
-        }
-        return $combinations;
+        };
+        return Mage::helper('shopymind')->formatCombinationsOfProduct($product, $formatter, array($nameAttributeId));
     }
 
     public static function findCategories($id_shop, $lang = false, $search) {
