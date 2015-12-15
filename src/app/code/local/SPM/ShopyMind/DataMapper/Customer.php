@@ -19,7 +19,7 @@ class SPM_ShopyMind_DataMapper_Customer
             'phone2' => '',
             'gender' => (isset($user['gender_id']) && ($user['gender_id'] == 1 || $user['gender_id'] == 2) ? $user['gender_id'] : 0),
             'birthday' => (isset($user['birthday']) ? $user['birthday'] : 0),
-            'locale' => $this->getUserLocale($customer),
+            'locale' => $this->getUserLocale($user['entity_id'], $user['store_id'], $user['country_code']),
             'region' => $user['region_code'],
             'postcode' => $user['postcode'],
             'date_last_order' => $this->getDateLastOrder($user['entity_id']),
@@ -33,16 +33,17 @@ class SPM_ShopyMind_DataMapper_Customer
         );
     }
 
-    private function getUserLocale($customer)
+    private function getUserLocale($id_customer, $store_id, $country_code = false)
     {
-        $locale_shop = Mage::getStoreConfig('general/locale/code', $customer->getStoreId());
-        if (!$customer->getCountryCode()) {
+        $locale_shop = Mage::getStoreConfig('general/locale/code', $store_id);
+        if (!$country_code) {
+            $customer = Mage::getModel('customer/customer')->load($id_customer);
             $defaultBilling = $customer->getDefaultBillingAddress();
-            if ($defaultBilling) {
+            if ($defaultBilling){
                 return substr($locale_shop, 0, 3) . $defaultBilling->getCountry();
             }
-        } else {
-            return substr($locale_shop, 0, 3) . $customer->getCountryCode();
+        } else{
+            return substr($locale_shop, 0, 3) . $country_code;
         }
 
         $locale_shop = explode('_', $locale_shop);
