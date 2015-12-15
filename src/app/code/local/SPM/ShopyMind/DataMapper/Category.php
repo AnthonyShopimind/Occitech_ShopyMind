@@ -23,6 +23,7 @@ class SPM_ShopyMind_DataMapper_Category
         $this->transformations = array(
             'link' => array($this->category, 'getUrl'),
             'shop_id_shop' => array($this->category, 'getStoreId'),
+            'lang' => array($this, 'formatLocale')
         );
     }
 
@@ -39,10 +40,21 @@ class SPM_ShopyMind_DataMapper_Category
         return $formattedData->getData();
     }
 
+    protected function formatLocale(Varien_Object $formattedData)
+    {
+
+        $lang = $formattedData->getData('lang');
+        if (empty($lang)) {
+            return $lang;
+        }
+
+        return substr($lang, 0, -3);
+    }
+
     private function transformComplexMappedData(Varien_Object $formattedData)
     {
         foreach ($this->transformations as $key => $callable) {
-            $formattedData->setData($key, call_user_func($callable));
+            $formattedData->setData($key, call_user_func($callable, $formattedData));
         }
 
         return $formattedData;
