@@ -34,7 +34,7 @@ class SPM_ShopyMind_Action_GetCategory implements SPM_ShopyMind_Interface_Action
         $this->Formatter = new SPM_ShopyMind_DataMapper_Category($category);
         $locale = $this->scope->getConfig('general/locale/code');
         $category->setData('locale', (string) $locale);
-        $data = $formatData ? $this->Formatter->format($category) : $category;
+        $data = $formatData ? $this->Formatter->format() : $category;
         $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
 
         return $data;
