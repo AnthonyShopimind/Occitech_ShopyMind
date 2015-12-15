@@ -14,30 +14,35 @@ class SPM_ShopyMind_DataMapper_Category
         'active' => 'is_active',
     );
 
-    public function format(Mage_Catalog_Model_Category $category) {
+    private $category;
+    private $transformations;
+
+    public function __construct(Mage_Catalog_Model_Category $category)
+    {
+        $this->category = $category;
+        $this->transformations = array(
+            'link' => array($this->category, 'getUrl'),
+            'shop_id_shop' => array($this->category, 'getStoreId'),
+        );
+    }
+
+
+    public function format() {
         $formattedData = new Varien_Object();
-        $categoryData = $category->getData();
+        $categoryData = $this->category->getData();
 
         foreach($this->mapping as $shopymindKey => $magentoKey) {
             $formattedData->setData($shopymindKey, $categoryData[$magentoKey]);
-            $formattedData = $this->transform($shopymindKey, $category, $formattedData);
         }
+        $formattedData = $this->transformComplexMappedData($formattedData);
 
         return $formattedData->getData();
     }
 
-    private function transform($currentKey, Mage_Catalog_Model_Category $category, Varien_Object $formattedData)
+    private function transformComplexMappedData(Varien_Object $formattedData)
     {
-        switch ($currentKey) {
-            case 'link':
-                $formattedData->setData($currentKey, $category->getUrl());
-                break;
-            case 'shop_id_shop':
-                $formattedData->setData($currentKey, $category->getStoreId());
-                break;
-            default:
-                return $formattedData;
-            break;
+        foreach ($this->transformations as $key => $callable) {
+            $formattedData->setData($key, call_user_func($callable));
         }
 
         return $formattedData;
