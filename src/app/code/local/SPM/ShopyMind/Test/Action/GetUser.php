@@ -2,6 +2,7 @@
 
 /**
  * @loadSharedFixture
+ * @group actions
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PHPUnit_Test_Case
 {
@@ -31,7 +32,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
 
     public function testItReturnsCorrectUserInformationsWhenCustomerHasNotPassedAnyOrder()
     {
-        $result = ShopymindClient_Callback::getUser(1);
+        $GetUser = new SPM_ShopyMind_Action_GetUser(1);
+        $result = $GetUser->process();
         $this->assertEquals($this->aCustomer, $result);
     }
 
@@ -40,7 +42,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsOptinWhenCustomerHasSubscribedToTheNewsletter()
     {
-        $result = ShopymindClient_Callback::getUser(1);
+        $GetUser = new SPM_ShopyMind_Action_GetUser(1);
+        $result = $GetUser->process();
         $this->assertTrue($result['optin']);
     }
 
@@ -49,7 +52,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsCorrectOrderStatsWhenCustomerPassedSeveralOrders()
     {
-        $result = ShopymindClient_Callback::getUser(1);
+        $GetUser = new SPM_ShopyMind_Action_GetUser(1);
+        $result = $GetUser->process();
         $expectedOrderStats = array(
             'nb_order' => 2,
             'sum_order' => (146.35 + 14.00),
@@ -64,10 +68,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItAcceptsSeveralCustomerEmails()
     {
-        $result = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com'
         ));
+        $result = $GetUser->process();
         $this->assertCount(2, $result);
     }
 
@@ -76,11 +81,12 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsOnlyEmailAddressesFound()
     {
-        $result = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com',
             'unknown-email@example.com',
         ));
+        $result = $GetUser->process();
         $this->assertCount(2, $result);
     }
 
@@ -90,10 +96,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItDoesNotReturnOrderStatsWhenSearchingByCustomerEmails()
     {
-        $results = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com'
         ));
+        $results = $GetUser->process();
 
         $noOrderStats = array(
             'nb_order' => 0,
@@ -114,10 +121,12 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsCorrectCustomerDataWhenSearchingInOrdersBillingAddresses()
     {
-        $result = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com'
         ));
+        $result = $GetUser->process();
+
         $expectedData = array(
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
@@ -153,10 +162,12 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsCorrectCustomerDataWhenSearchingInQuotes()
     {
-        $result = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com'
         ), true);
+        $result = $GetUser->process();
+
         $expectedData = array(
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',

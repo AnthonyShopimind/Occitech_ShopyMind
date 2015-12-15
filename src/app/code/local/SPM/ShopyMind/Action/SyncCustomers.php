@@ -17,27 +17,29 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
 
     public function process()
     {
-        $customerIds = $this->retrieveCustomerIds();
+        $customerEmails = $this->retrieveCustomerEmails();
 
         if ($this->params['justCount']) {
-            return $customerIds;
+            return $customerEmails;
         }
 
-        return array_map(array(SPM_ShopyMind_DataMapper_Customer, 'format'), $customerIds);
+        $GetUsers = new SPM_ShopyMind_Action_GetUser($customerEmails);
+        return $GetUsers->process();
     }
 
-    public function retrieveCustomerIds()
+    public function retrieveCustomerEmails()
     {
-        if ($this->params['customerId']) {
-            if (!is_array($this->params['customerId'])) {
-                return array($this->params['customerId']);
-            }
-            return $this->params['customerId'];
-        }
-
         $customerCollection = Mage::getModel('customer/customer')->getCollection()
             ->addFieldToFilter('updated_at', array('gt' => $this->params['lastUpdate']));
         $this->params['scope']->restrictCollection($customerCollection);
+
+        if (!is_array($this->params['customerId']) && !empty($this->params['customerId'])) {
+            return $this->params['customerId'];
+        }
+
+        if ($this->params['customerId']) {
+            $customerCollection->addFieldToFilter('entity_id', array('in' => $this->params['customerId']));
+        }
 
         if ($this->params['limit']) {
             $customerCollection->getSelect()->limit($this->params['limit'], $this->params['start']);
@@ -48,7 +50,7 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
         }
 
         return array_map(function($customer) {
-            return $customer->getId();
+            return $customer->getEmail();
         }, iterator_to_array($customerCollection->getIterator()));
     }
 }
