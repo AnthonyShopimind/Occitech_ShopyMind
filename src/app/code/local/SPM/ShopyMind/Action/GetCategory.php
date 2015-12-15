@@ -19,8 +19,9 @@ class SPM_ShopyMind_Action_GetCategory implements SPM_ShopyMind_Interface_Action
     public function process($formatData = true)
     {
         $storeIds = $this->scope->storeIds();
-
-        ShopymindClient_Callback::startStoreEmulationByStoreId($storeIds[0]);
+        /** @var  $appEmulation Mage_Core_Model_App_Emulation */
+        $appEmulation = Mage::getSingleton('core/app_emulation');
+        $emulatedEnvironment = $appEmulation->startEnvironmentEmulation($storeIds[0]);
         $collection = $this->Category->getCollection();
         $this->scope->restrictCategoryCollection($collection);
         $collection->addAttributeToFilter('entity_id', array('eq' => $this->categoryId))
@@ -40,8 +41,8 @@ class SPM_ShopyMind_Action_GetCategory implements SPM_ShopyMind_Interface_Action
             $data = $category;
         }
 
-        ShopymindClient_Callback::stopStoreEmulation();
-
+        $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
         return $data;
     }
+
 }
