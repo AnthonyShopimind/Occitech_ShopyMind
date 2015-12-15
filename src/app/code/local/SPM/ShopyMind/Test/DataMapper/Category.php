@@ -34,8 +34,10 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
 
         $category = Mage::getModel('catalog/category')->load(3);
         $category->setData('locale', 'fr_FR');
-        $Formatter = new SPM_ShopyMind_DataMapper_Category($category);
-        $actual = $Formatter->format();
+
+        $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
+        $Formatter = new SPM_ShopyMind_DataMapper_Category($scope);
+        $actual = $Formatter->format($category);
 
         $this->assertEquals($expected, $actual);
     }

@@ -15,20 +15,21 @@ class SPM_ShopyMind_DataMapper_Category
     );
 
     private $category;
+    private $scope;
     private $transformations;
 
-    public function __construct(Mage_Catalog_Model_Category $category)
+    public function __construct(SPM_ShopyMind_Model_Scope $scope)
     {
+        $this->scope = $scope;;
+    }
+
+    public function format(Mage_Catalog_Model_Category $category) {
         $this->category = $category;
         $this->transformations = array(
             'link' => array($this->category, 'getUrl'),
-            'shop_id_shop' => array($this->category, 'getStoreId'),
-            'lang' => array($this, 'formatLocale')
+            'shop_id_shop' => array($this, 'getStoreId'),
+            'lang' => array($this, 'getFormattedLocale')
         );
-    }
-
-
-    public function format() {
         $formattedData = new Varien_Object();
         $categoryData = $this->category->getData();
 
@@ -40,15 +41,19 @@ class SPM_ShopyMind_DataMapper_Category
         return $formattedData->getData();
     }
 
-    protected function formatLocale(Varien_Object $formattedData)
+    protected function getFormattedLocale(Varien_Object $formattedData)
     {
-
-        $lang = $formattedData->getData('lang');
+        $lang = $this->scope->getConfig('general/locale/code');
         if (empty($lang)) {
             return $lang;
         }
 
         return substr($lang, 0, -3);
+    }
+
+    protected function getStoreId(Varien_Object $formattedData)
+    {
+        return Mage::app()->getStore()->getId();
     }
 
     private function transformComplexMappedData(Varien_Object $formattedData)
@@ -59,5 +64,4 @@ class SPM_ShopyMind_DataMapper_Category
 
         return $formattedData;
     }
-
 }
