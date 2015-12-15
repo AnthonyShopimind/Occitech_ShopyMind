@@ -18,12 +18,13 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
     public function process()
     {
         $customerIds = $this->retrieveCustomerIds();
-
         if ($this->params['justCount']) {
             return $customerIds;
         }
 
-        return array_map(array(SPM_ShopyMind_DataMapper_Customer, 'format'), $customerIds);
+        $Formatter = new SPM_ShopyMind_DataMapper_Customer();
+
+        return array_map(array($Formatter, 'format'), $customerIds);
     }
 
     public function retrieveCustomerIds()

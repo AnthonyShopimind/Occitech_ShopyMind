@@ -48,7 +48,7 @@ class SPM_ShopyMind_Test_Action_SyncOrders extends PHPUnit_Framework_TestCase
 
     public function testProcessWithJustCountOption()
     {
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
         $SyncOrders = new SPM_ShopyMind_Action_SyncOrders($scope, null, null, null, false, true);
 
         $actual = $SyncOrders->process();
