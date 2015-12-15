@@ -24,7 +24,7 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
             'shop_id_shop' => 1,
             'id_category' => 3,
             'id_parent_category' => 2,
-            'lang' => 'fr',
+            'lang' => 'en',
             'name' => 'Test Category 1',
             'description' => 'this is a test category',
             'link' => 'http://shopymind.test/catalog/category/view/s/test-category-1/id/3/',
@@ -33,7 +33,6 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
         );
 
         $category = Mage::getModel('catalog/category')->load(3);
-        $category->setData('locale', 'fr_FR');
 
         $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
         $Formatter = new SPM_ShopyMind_DataMapper_Category($scope);
