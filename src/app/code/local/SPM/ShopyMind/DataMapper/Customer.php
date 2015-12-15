@@ -5,8 +5,9 @@ class SPM_ShopyMind_DataMapper_Customer
     public function format($user)
     {
         $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($user['email']);
+        $customer = Mage::getModel('customer/customer')->load($user['entity_id']);
 
-        return array (
+        return array(
             'id_customer' => $user['entity_id'],
             'shop_id_shop' => $user['store_id'],
             'optin' => $subscriber->isSubscribed(),
@@ -18,7 +19,7 @@ class SPM_ShopyMind_DataMapper_Customer
             'phone2' => '',
             'gender' => (isset($user['gender_id']) && ($user['gender_id'] == 1 || $user['gender_id'] == 2) ? $user['gender_id'] : 0),
             'birthday' => (isset($user['birthday']) ? $user['birthday'] : 0),
-            'locale' => $this->getUserLocale($user['entity_id'], $user['store_id'], $user['country_code']),
+            'locale' => $this->getUserLocale($customer),
             'region' => $user['region_code'],
             'postcode' => $user['postcode'],
             'date_last_order' => $this->getDateLastOrder($user['entity_id']),
@@ -26,19 +27,23 @@ class SPM_ShopyMind_DataMapper_Customer
             'sum_order' => $this->sumCustomerOrder($user['entity_id']),
             'nb_order_year' => $this->countCustomerOrder($user['entity_id'], '1 YEAR'),
             'sum_order_year' => $this->sumCustomerOrder($user['entity_id'], '1 YEAR'),
-            'groups' => array ($user['group_id']),
+            'groups' => array($user['group_id']),
+            'active' => true,
+            'addresses' => $this->customerAddresses($customer),
         );
     }
 
-    private function getUserLocale($id_customer, $store_id, $country_code = false) {
-        $locale_shop = Mage::getStoreConfig('general/locale/code', $store_id);
-        if (! $country_code) {
-            $customer = Mage::getModel('customer/customer')->load($id_customer);
+    private function getUserLocale($customer)
+    {
+        $locale_shop = Mage::getStoreConfig('general/locale/code', $customer->getStoreId());
+        if (!$customer->getCountryCode()) {
             $defaultBilling = $customer->getDefaultBillingAddress();
-            if ($defaultBilling)
+            if ($defaultBilling) {
                 return substr($locale_shop, 0, 3) . $defaultBilling->getCountry();
-        } else
-            return substr($locale_shop, 0, 3) . $country_code;
+            }
+        } else {
+            return substr($locale_shop, 0, 3) . $customer->getCountryCode();
+        }
 
         $locale_shop = explode('_', $locale_shop);
         $locale_shop = strtolower($locale_shop [0]) . '_00';
@@ -46,18 +51,14 @@ class SPM_ShopyMind_DataMapper_Customer
         return $locale_shop;
     }
 
-    private function getDateLastOrder($id_customer) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                'ShopymindClient_CallbackOverride',
-                __FUNCTION__
-            ), func_get_args());
+    private function getDateLastOrder($id_customer)
+    {
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $read = Mage::getSingleton('core/resource')->getConnection('core_read');
         if (is_numeric($id_customer)) {
             $result = $read->fetchRow('SELECT MAX(`created_at`) AS `created_at`
 			FROM `' . $tablePrefix . 'sales_flat_order`
-			WHERE `customer_id` = ' . (int) $id_customer . ' AND `base_total_invoiced` IS NOT NULL');
+			WHERE `customer_id` = ' . (int)$id_customer . ' AND `base_total_invoiced` IS NOT NULL');
         } else {
             $result = $read->fetchRow('SELECT MAX(`created_at`) AS `created_at`
 			FROM `' . $tablePrefix . 'sales_flat_order`
@@ -66,14 +67,8 @@ class SPM_ShopyMind_DataMapper_Customer
         return isset($result ['created_at']) ? $result ['created_at'] : 0;
     }
 
-    private function countCustomerOrder($customerIdOrEmail, $sinceAgo = null) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
-            return call_user_func_array(array (
-                'ShopymindClient_CallbackOverride',
-                __FUNCTION__
-            ), func_get_args());
-        }
-
+    private function countCustomerOrder($customerIdOrEmail, $sinceAgo = null)
+    {
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $read = Mage::getSingleton('core/resource')->getConnection('core_read');
 
@@ -87,14 +82,8 @@ class SPM_ShopyMind_DataMapper_Customer
         return isset($result['nbOrder']) ? $result['nbOrder'] : 0;
     }
 
-    private function sumCustomerOrder($customerIdOrEmail, $sinceAgo = null) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
-            return call_user_func_array(array (
-                'ShopymindClient_CallbackOverride',
-                __FUNCTION__
-            ), func_get_args());
-        }
-
+    private function sumCustomerOrder($customerIdOrEmail, $sinceAgo = null)
+    {
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $read = Mage::getSingleton('core/resource')->getConnection('core_read');
 
@@ -120,5 +109,26 @@ class SPM_ShopyMind_DataMapper_Customer
             $conditions[] = '`customer_email` = "' . $customerIdOrEmail . '"';
         }
         return $conditions;
+    }
+
+    private function customerAddresses($customer)
+    {
+        $addresses = array();
+        foreach ($customer->getAddresses() as $address) {
+            $addresses[] = array(
+                'id_address' => $address->getId(),
+                'phone1' => $address->getTelephone(),
+                'phone2' => '',
+                'company' => $address->getCompany(),
+                'address1' => $address->getStreet1(),
+                'address2' => $address->getStreet2(),
+                'postcode' => $address->getPostcode(),
+                'city' => $address->getCity(),
+                'other' => '',
+                'active' => '',
+            );
+        }
+
+        return $addresses;
     }
 }

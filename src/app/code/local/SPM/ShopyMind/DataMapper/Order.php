@@ -62,10 +62,10 @@ class SPM_ShopyMind_DataMapper_Order
 
     private function customerFor($order)
     {
-        $CustomerDataMapper = new SPM_ShopyMind_DataMapper_Customer();
         $customerIdentifier = $order->getCustomerId() ? $order->getCustomerId() : $order->getCustomerEmail();
+        $GetUser = new SPM_ShopyMind_Action_GetUser($customerIdentifier);
 
-        return $CustomerDataMapper->format($customerIdentifier);
+        return $GetUser->process();
     }
 
     private function shippingNumberFor($order)
