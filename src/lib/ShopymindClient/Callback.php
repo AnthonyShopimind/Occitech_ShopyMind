@@ -843,24 +843,6 @@ class ShopymindClient_Callback {
     }
 
     /**
-     * Obtention d'un shortId
-     *
-     * @param number $length
-     * @return string
-     */
-    public static function shortId($length = 6) {
-        $az = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $azr = rand(0, 51);
-        $azs = substr($az, $azr, 10);
-        $stamp = hash('sha256', time());
-        $mt = hash('sha256', mt_rand(5, 20));
-        $alpha = hash('sha256', $azs);
-        $hash = str_shuffle($stamp . $mt . $alpha);
-        $code = ucfirst(substr($hash, $azr, $length));
-        return $code;
-    }
-
-    /**
      * Génération des codes de réduction
      *
      * @param array $voucherInfos
