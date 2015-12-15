@@ -12,15 +12,21 @@ class SPM_ShopyMind_DataMapper_Product
         $this->helper = Mage::helper('shopymind');
     }
 
-    public function format(Mage_Catalog_Model_Product $product)
+    public function format(Mage_Catalog_Model_Product $product, SPM_ShopyMind_Model_Scope $scope = null)
     {
         if (!$product->getId()) {
             return array();
         }
 
+        if (is_null($scope)) {
+            $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
+        }
+
         $shopymindData = array(
+            'shop_id_shop' => $scope->getId(),
             'id_product' => $product->getId(),
             'reference' => $product->getSku(),
+            'lang' => $scope->getLang(),
             'name' => $product->getName(),
             'description_short' => $product->getShortDescription(),
             'description' => $product->getDescription(),
@@ -29,6 +35,7 @@ class SPM_ShopyMind_DataMapper_Product
             'combinations' => $this->formattedCombinationsOf($product),
             'id_categories' => $product->getCategoryIds(),
             'id_manufacturer' => $this->helper->manufacturerIdOf($product),
+            'currency' => $scope->currencyCode(),
             'price' => $product->getPrice(),
             'price_discount' => $product->getFinalPrice(),
             'quantity_remaining' => $product->getStockItem()->getQty(),

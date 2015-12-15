@@ -42,10 +42,10 @@ QUERY
         $actual = $this->SUT->format($simpleProduct);
 
         $expectedData = array(
-//            'shop_id_shop' => Id de la boutique si multiboutique
+            'shop_id_shop' => Mage_Core_Model_App::ADMIN_STORE_ID,
             'id_product' => 1,
             'reference' => 'sku42-pr',
-//            'lang' => Code ISO de la langue du produit
+            'lang' => null,
             'name' => 'First simple product',
             'description_short' => 'This is a short description',
             'description' => 'This is a long description',
@@ -54,7 +54,7 @@ QUERY
             'combinations' => array(),
             'id_categories' => array(1, 2),
             'id_manufacturer' => null,
-//            'currency' => 'EUR', (getCurrentCurrencyCode)
+            'currency' => 'USD',
             'price' => 13.00,
             'price_discount' => 13.00,
             'quantity_remaining' => 100,

@@ -131,6 +131,11 @@ class SPM_ShopyMind_Model_Scope
         return $this->id;
     }
 
+    public function currencyCode()
+    {
+        return Mage::app()->getStore($this->getId())->getCurrentCurrencyCode();
+    }
+
     public function getConfig($path)
     {
         list($scope, $id) = $this->magentoConfigScopeValues();
