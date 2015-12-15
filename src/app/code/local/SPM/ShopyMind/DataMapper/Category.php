@@ -41,7 +41,7 @@ class SPM_ShopyMind_DataMapper_Category
         return $formattedData->getData();
     }
 
-    protected function getFormattedLocale(Varien_Object $formattedData)
+    protected function getFormattedLocale()
     {
         $lang = $this->scope->getConfig('general/locale/code');
         if (empty($lang)) {
@@ -51,7 +51,7 @@ class SPM_ShopyMind_DataMapper_Category
         return substr($lang, 0, -3);
     }
 
-    protected function getStoreId(Varien_Object $formattedData)
+    protected function getStoreId()
     {
         return Mage::app()->getStore()->getId();
     }
@@ -59,7 +59,7 @@ class SPM_ShopyMind_DataMapper_Category
     private function transformComplexMappedData(Varien_Object $formattedData)
     {
         foreach ($this->transformations as $key => $callable) {
-            $formattedData->setData($key, call_user_func($callable, $formattedData));
+            $formattedData->setData($key, call_user_func($callable));
         }
 
         return $formattedData;

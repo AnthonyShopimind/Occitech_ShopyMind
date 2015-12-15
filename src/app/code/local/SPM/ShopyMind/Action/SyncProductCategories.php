@@ -22,14 +22,16 @@ class SPM_ShopyMind_Action_SyncProductCategories implements SPM_ShopyMind_Interf
         $appEmulation = Mage::getSingleton('core/app_emulation');
         $emulatedEnvironment = $appEmulation->startEnvironmentEmulation($storeIds[0]);
         $categories = $this->retrieveCategories();
-        $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
 
         if ($this->params['justCount']) {
             return $categories;
         }
 
         $Formatter = new SPM_ShopyMind_DataMapper_Category($this->params['scope']);
-        return array_map(array($Formatter, 'format'), iterator_to_array($categories->getIterator()));
+        $categories = array_map(array($Formatter, 'format'), iterator_to_array($categories->getIterator()));
+        $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
+
+        return $categories;
     }
 
     public function retrieveCategories()

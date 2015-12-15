@@ -83,12 +83,9 @@ class SPM_ShopyMind_Test_Action_SyncProductCategories extends PHPUnit_Framework_
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @group tdd
-     */
     public function testRetrieveCategoriesShouldReturnFormattedData()
     {
-        $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-1');
         $SyncCategories = new SPM_ShopyMind_Action_SyncProductCategories($scope, null, null, null, 6, false);
 
         $actual = $SyncCategories->process();
@@ -97,7 +94,7 @@ class SPM_ShopyMind_Test_Action_SyncProductCategories extends PHPUnit_Framework_
             'shop_id_shop' => 1,
             'id_category' => 6,
             'id_parent_category' => 5,
-            'lang' => 'en',
+            'lang' => 'fr',
             'name' => 'Hello world',
             'description' => 'this is REALLY a test category',
             'link' => 'http://shopymind.test/catalog/category/view/s/hello-world/id/6/',

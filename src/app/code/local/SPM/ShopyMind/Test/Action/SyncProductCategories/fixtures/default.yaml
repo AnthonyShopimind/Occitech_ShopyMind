@@ -34,9 +34,8 @@ scope:
       is_active: 1
 
 config:
-  default/general/local/code: fr_FR
-  stores/b2c/general/locale/code: fr_FR
   stores/b2b/general/locale/code: en_US
+  stores/b2c/general/locale/code: fr_FR
 
 eav:
   catalog_category:
