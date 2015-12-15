@@ -36,16 +36,14 @@ QUERY
         $this->assertEquals(array(), $actual);
     }
 
-    public function testFormattingSimpleProductReturnsGlobalDataWhenNoScopeDefined()
+    public function testFormattingSimpleProductReturnsCorrectDataWithoutScopeRelatedInformation()
     {
         $simpleProduct = Mage::getModel('catalog/product')->load(1);
         $actual = $this->SUT->format($simpleProduct);
 
         $expectedData = array(
-            'shop_id_shop' => Mage_Core_Model_App::ADMIN_STORE_ID,
             'id_product' => 1,
             'reference' => 'sku42-pr',
-            'lang' => null,
             'name' => 'First simple product',
             'description_short' => 'This is a short description',
             'description' => 'This is a long description',
@@ -54,7 +52,6 @@ QUERY
             'combinations' => array(),
             'id_categories' => array(1, 2),
             'id_manufacturer' => null,
-            'currency' => 'USD',
             'price' => 13.00,
             'price_discount' => 13.00,
             'quantity_remaining' => 100,
@@ -62,11 +59,6 @@ QUERY
             'active' => true,
         );
         $this->assertEquals($expectedData, $actual);
-    }
-
-    public function testFormattingSimpleProductReturnsViewDataWhenScopeDefined()
-    {
-        $this->markTestIncomplete('TODO');
     }
 
     public function testFormattingProductReturnsCorrectManufacturerIdWhenAvailable()

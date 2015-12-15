@@ -34,7 +34,7 @@ scope:
       is_active: 1
 
 config:
-  stores/default/general/locale/code: fr_FR
+  stores/b2b/general/locale/code: fr_FR
 
 eav:
   catalog_category:
@@ -104,3 +104,4 @@ eav:
      /websites:
       b2b:
         name: Premier super produit
+        status: 0
