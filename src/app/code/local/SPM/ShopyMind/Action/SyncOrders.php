@@ -22,7 +22,7 @@ class SPM_ShopyMind_Action_SyncOrders implements SPM_ShopyMind_Interface_Action
             return $orders;
         }
 
-        return array_map(array(SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order, 'format'), iterator_to_array($orders->getIterator()));
+        return array_map(array('SPM_ShopyMind_DataMapper_Order', 'format'), iterator_to_array($orders->getIterator()));
     }
 
     public function retrieveOrders()
