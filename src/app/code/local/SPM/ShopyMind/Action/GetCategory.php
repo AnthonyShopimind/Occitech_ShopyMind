@@ -10,7 +10,6 @@ class SPM_ShopyMind_Action_GetCategory implements SPM_ShopyMind_Interface_Action
     public function __construct(SPM_ShopyMind_Model_Scope $scope, $categoryId)
     {
         $this->Category = Mage::getModel('catalog/category');
-        $this->Formatter = new SPM_ShopyMind_DataMapper_Category();
 
         $this->categoryId = $categoryId;
         $this->scope = $scope;
@@ -32,7 +31,7 @@ class SPM_ShopyMind_Action_GetCategory implements SPM_ShopyMind_Interface_Action
         if (is_null($this->categoryId) || !$category->getId()) {
             return array();
         }
-
+        $this->Formatter = new SPM_ShopyMind_DataMapper_Category($category);
         $locale = $this->scope->getConfig('general/locale/code');
         $category->setData('locale', (string) $locale);
         if ($formatData) {
@@ -42,6 +41,7 @@ class SPM_ShopyMind_Action_GetCategory implements SPM_ShopyMind_Interface_Action
         }
 
         $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
+
         return $data;
     }
 
