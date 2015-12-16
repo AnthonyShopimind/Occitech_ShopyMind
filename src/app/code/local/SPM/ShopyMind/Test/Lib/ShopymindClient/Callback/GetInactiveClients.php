@@ -36,6 +36,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
                     'sum_order_year' => 0,
                     'region' => null,
                     'postcode' => null,
+                    'active' => true,
+                    'addresses' => array(),
                 ),
             ),
         );

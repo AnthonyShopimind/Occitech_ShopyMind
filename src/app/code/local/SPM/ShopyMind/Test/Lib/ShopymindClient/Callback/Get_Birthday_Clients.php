@@ -44,6 +44,21 @@ QUERY
                     'sum_order_year' => 0,
                     'region' => 'GA',
                     'postcode' => null,
+                    'active' => true,
+                    'addresses' => array(
+                        array(
+                            'id_address' => 3,
+                            'phone1' => null,
+                            'phone2' => null,
+                            'company' => null,
+                            'address1' => null,
+                            'address2' => null,
+                            'postcode' => null,
+                            'city' => null,
+                            'other' => '',
+                            'active' => '',
+                        )
+                    ),
                 ),
             ),
             array(
@@ -68,6 +83,21 @@ QUERY
                     'sum_order_year' => 0,
                     'region' => 'NY',
                     'postcode' => null,
+                    'active' => true,
+                    'addresses' => array(
+                        array(
+                            'id_address' => 2,
+                            'phone1' => null,
+                            'phone2' => null,
+                            'company' => null,
+                            'address1' => null,
+                            'address2' => null,
+                            'postcode' => null,
+                            'city' => null,
+                            'other' => '',
+                            'active' => '',
+                        )
+                    ),
                 ),
             ),
         );

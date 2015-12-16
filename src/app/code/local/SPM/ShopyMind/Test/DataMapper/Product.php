@@ -2,7 +2,6 @@
 
 /**
  * @group dataMappers
- * @group tdd
  * @loadSharedFixture
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Product extends EcomDev_PHPUnit_Test_Case

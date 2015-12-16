@@ -49,6 +49,8 @@ QUERY
                     'sum_order_year' => 0,
                     'region' => null,
                     'postcode' => null,
+                    'active' => true,
+                    'addresses' => array(),
                 ),
                 'shipping_number' => array(),
                 'date_order' => '2015-01-01 10:00:00'
