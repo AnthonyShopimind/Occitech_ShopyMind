@@ -40,7 +40,7 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
             ->method('shortId')
             ->willReturn('test-1');
 
-        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, null);
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, null, null);
         $ruleName = $GenerateVoucher->process();
         $this->couponToCleanup = $ruleName;
         $ruleId = Mage::getModel('salesrule/coupon')->load($ruleName, 'code')->getRuleId();
@@ -58,7 +58,7 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
             ->method('shortId')
             ->willReturn('test-2');
 
-        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, null, 'MY_PREFIX');
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, null, null, 'MY_PREFIX');
         $ruleName = $GenerateVoucher->process();
         $this->couponToCleanup = $ruleName;
         $ruleId = Mage::getModel('salesrule/coupon')->load($ruleName, 'code')->getRuleId();
@@ -79,7 +79,7 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
             ->method('shortId')
             ->willReturn('test-3');
 
-        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, null, null, 12);
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, null, null, null, 12);
         $ruleName = $GenerateVoucher->process();
         $this->couponToCleanup = $ruleName;
         $ruleId = Mage::getModel('salesrule/coupon')->load($ruleName, 'code')->getRuleId();
