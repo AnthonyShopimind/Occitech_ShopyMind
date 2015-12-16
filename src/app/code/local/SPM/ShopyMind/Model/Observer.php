@@ -147,7 +147,8 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function deleteProduct(Varien_Event_Observer $observer)
     {
-        ShopymindClient_Bin_Notify::deleteProduct($observer->getEvent()->getProduct()->getId());
+        $params = array('id_product'=> $observer->getEvent()->getProduct()->getId());
+        ShopymindClient_Bin_Notify::deleteProduct($params);
     }
 
     /**
@@ -163,7 +164,8 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function deleteProductCategory(Varien_Event_Observer $observer)
     {
-        ShopymindClient_Bin_Notify::deleteProductCategory($observer->getEvent()->getCategory()->getId());
+        $params = array('id_category'=> $observer->getEvent()->getCategory()->getId());
+        ShopymindClient_Bin_Notify::deleteProductCategory($params);
     }
 
     /**
@@ -181,7 +183,8 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function deleteCustomer(Varien_Event_Observer $observer)
     {
-        ShopymindClient_Bin_Notify::deleteCustomer($observer->getEvent()->getCustomer()->getId());
+        $params = array('id_customer'=> $observer->getEvent()->getCustomer()->getId());
+        ShopymindClient_Bin_Notify::deleteCustomer($params);
     }
 
     private function hasShopyMindClientConfiguration()
