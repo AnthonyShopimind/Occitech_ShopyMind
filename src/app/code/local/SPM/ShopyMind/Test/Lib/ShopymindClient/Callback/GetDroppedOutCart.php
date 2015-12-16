@@ -94,6 +94,8 @@ QUERY
                     'sum_order_year' => 0,
                     'region' => null,
                     'postcode' => null,
+                    'active' => true,
+                    'addresses' => array(),
                 ),
             ),
         );

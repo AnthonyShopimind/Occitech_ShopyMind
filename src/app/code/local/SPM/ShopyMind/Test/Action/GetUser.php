@@ -2,6 +2,7 @@
 
 /**
  * @loadSharedFixture
+ * @group actions
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PHPUnit_Test_Case
 {
@@ -27,11 +28,14 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         'groups'          => array(1),
         'region' => null,
         'postcode' => null,
+        'active' => true,
+        'addresses' => array(),
     );
 
     public function testItReturnsCorrectUserInformationsWhenCustomerHasNotPassedAnyOrder()
     {
-        $result = ShopymindClient_Callback::getUser(1);
+        $GetUser = new SPM_ShopyMind_Action_GetUser(1);
+        $result = $GetUser->process();
         $this->assertEquals($this->aCustomer, $result);
     }
 
@@ -40,7 +44,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsOptinWhenCustomerHasSubscribedToTheNewsletter()
     {
-        $result = ShopymindClient_Callback::getUser(1);
+        $GetUser = new SPM_ShopyMind_Action_GetUser(1);
+        $result = $GetUser->process();
         $this->assertTrue($result['optin']);
     }
 
@@ -49,7 +54,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsCorrectOrderStatsWhenCustomerPassedSeveralOrders()
     {
-        $result = ShopymindClient_Callback::getUser(1);
+        $GetUser = new SPM_ShopyMind_Action_GetUser(1);
+        $result = $GetUser->process();
         $expectedOrderStats = array(
             'nb_order' => 2,
             'sum_order' => (146.35 + 14.00),
@@ -64,10 +70,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItAcceptsSeveralCustomerEmails()
     {
-        $result = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com'
         ));
+        $result = $GetUser->process();
         $this->assertCount(2, $result);
     }
 
@@ -76,11 +83,12 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsOnlyEmailAddressesFound()
     {
-        $result = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com',
             'unknown-email@example.com',
         ));
+        $result = $GetUser->process();
         $this->assertCount(2, $result);
     }
 
@@ -90,10 +98,11 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItDoesNotReturnOrderStatsWhenSearchingByCustomerEmails()
     {
-        $results = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com'
         ));
+        $results = $GetUser->process();
 
         $noOrderStats = array(
             'nb_order' => 0,
@@ -114,10 +123,12 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsCorrectCustomerDataWhenSearchingInOrdersBillingAddresses()
     {
-        $result = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com'
         ));
+        $result = $GetUser->process();
+
         $expectedData = array(
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
@@ -127,8 +138,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'first_name' => 'Jane',
                 'email_address' => 'jane.doe34@example.com',
                 'phone1' => '0102030455',
-                'gender' => 1,
                 'locale' => 'FR',
+                'gender' => 1,
                 'groups' => array(1),
                 'region' => '92',
                 'postcode' => '31100',
@@ -153,10 +164,12 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsCorrectCustomerDataWhenSearchingInQuotes()
     {
-        $result = ShopymindClient_Callback::getUser(array(
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
             'jane.doe34@example.com',
             'april.oliver90@example.com'
         ), true);
+        $result = $GetUser->process();
+
         $expectedData = array(
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
@@ -166,8 +179,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'first_name' => 'Jane',
                 'email_address' => 'jane.doe34@example.com',
                 'phone1' => '0102030455',
-                'gender' => 1,
                 'locale' => 'FR',
+                'gender' => 1,
                 'groups' => array(1),
                 'region' => '92',
                 'postcode' => '31100',
@@ -185,5 +198,53 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             ))
         );
         $this->assertEquals($expectedData, $result);
+    }
+
+    /**
+     * @loadFixture addresses
+     */
+    public function testItReturnCustomerAddresses()
+    {
+        $addresses = array(
+            array(
+                'id_address' => 1,
+                'phone1' => '0102030405',
+                'phone2' => '',
+                'company' => 'Shopymind',
+                'address1' => '92 rue Saint Jacques',
+                'address2' => '',
+                'postcode' => '13006',
+                'city' => 'Marseille',
+                'other' => '',
+                'active' => '',
+            ),
+            array(
+                'id_address' => 2,
+                'phone1' => '0504030201',
+                'phone2' => '',
+                'company' => 'Occitech',
+                'address1' => '12 route d\'Espagne',
+                'address2' => '1er etage',
+                'postcode' => '31100',
+                'city' => 'Toulouse',
+                'other' => '',
+                'active' => '',
+            ),
+            array(
+                'id_address' => 3,
+                'phone1' => '',
+                'phone2' => '',
+                'company' => '',
+                'address1' => '',
+                'address2' => '',
+                'postcode' => '',
+                'city' => '',
+                'other' => '',
+                'active' => '',
+            ),
+        );
+        $GetUser = new SPM_ShopyMind_Action_GetUser(1);
+        $result = $GetUser->process();
+        $this->assertEquals($addresses, $result['addresses']);
     }
 }
