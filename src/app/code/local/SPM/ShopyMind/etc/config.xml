@@ -58,6 +58,70 @@
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
             </phpunit_test_start_after>
+            <catalog_product_save_after>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>saveProduct</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </catalog_product_save_after>
+            <catalog_product_delete_after_done>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>deleteProduct</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </catalog_product_delete_after_done>
+            <catalog_category_save_after>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>saveProductCategory</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </catalog_category_save_after>
+            <catalog_category_delete_after>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>deleteProductCategory</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </catalog_category_delete_after>
+            <customer_save_after>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>saveCustomer</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </customer_save_after>
+            <customer_address_save_after>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>saveCustomer</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </customer_address_save_after>
+            <customer_address_delete_after>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>saveCustomer</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </customer_address_delete_after>
+            <customer_delete_after>
+                <observers>
+                    <SPM_ShopyMind_Model_Observer>
+                        <class>SPM_ShopyMind_Test_Observer</class>
+                        <method>deleteCustomer</method>
+                    </SPM_ShopyMind_Model_Observer>
+                </observers>
+            </customer_delete_after>
         </events>
     </global>
     <adminhtml>

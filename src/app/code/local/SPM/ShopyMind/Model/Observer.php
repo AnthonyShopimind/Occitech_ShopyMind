@@ -134,6 +134,56 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         }
     }
 
+    /**
+     * @event catalog_product_save_after
+     */
+    public function saveProduct(Varien_Event_Observer $observer)
+    {
+        ShopymindClient_Bin_Notify::saveProduct($observer->getEvent()->getProduct()->getId());
+    }
+
+    /**
+     * @event catalog_product_delete_after_done
+     */
+    public function deleteProduct(Varien_Event_Observer $observer)
+    {
+        ShopymindClient_Bin_Notify::deleteProduct($observer->getEvent()->getProduct()->getId());
+    }
+
+    /**
+     * @event catalog_category_save_after
+     */
+    public function saveProductCategory(Varien_Event_Observer $observer)
+    {
+        ShopymindClient_Bin_Notify::saveProductCategory($observer->getEvent()->getCategory()->getId());
+    }
+
+    /**
+     * @event catalog_category_delete_after
+     */
+    public function deleteProductCategory(Varien_Event_Observer $observer)
+    {
+        ShopymindClient_Bin_Notify::deleteProductCategory($observer->getEvent()->getCategory()->getId());
+    }
+
+    /**
+     * @event customer_save_after
+     * @event customer_address_save_after
+     * @event customer_address_delete_after
+     */
+    public function saveCustomer(Varien_Event_Observer $observer)
+    {
+        ShopymindClient_Bin_Notify::saveCustomer($observer->getEvent()->getCustomer()->getId());
+    }
+
+    /**
+     * @event customer_delete_after
+     */
+    public function deleteCustomer(Varien_Event_Observer $observer)
+    {
+        ShopymindClient_Bin_Notify::deleteCustomer($observer->getEvent()->getCustomer()->getId())
+    }
+
     private function hasShopyMindClientConfiguration()
     {
         return file_exists(Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Configuration.php');
