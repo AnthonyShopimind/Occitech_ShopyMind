@@ -35,6 +35,10 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
     {
         $productCollection = $this->retrieveProducts();
 
+        if ($this->params['justCount']) {
+            return $productCollection->count();
+        }
+
         $formatter = function ($formattedProduct) {
             return array_merge($formattedProduct, $this->getScopedRelatedInformations($this->params['scope']));
         };
@@ -77,6 +81,6 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
         $productCollection->getSelect()->limit($limit, $offset);
 
         $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
-        return $this->params['justCount'] ? $productCollection->count() : $productCollection;
+        return $productCollection;
     }
 }
