@@ -1965,7 +1965,7 @@ class ShopymindClient_Callback {
         return $SyncCustomersAction->process();
     }
 
-    public static function syncProducts($id_shop, $start, $limit, $lastUpdate, $idOrder = false, $justCount = false)
+    public static function syncProducts($id_shop, $start, $limit, $lastUpdate, $idProduct= false, $justCount = false)
     {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array (
@@ -1975,7 +1975,7 @@ class ShopymindClient_Callback {
         }
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
-        $SyncProductsAction = new SPM_ShopyMind_Action_SyncProducts($scope, $start, $limit, $lastUpdate, $idOrder, $justCount);
+        $SyncProductsAction = new SPM_ShopyMind_Action_SyncProducts($scope, $start, $limit, $lastUpdate, $idProduct, $justCount);
         return $SyncProductsAction->process();
     }
 
