@@ -849,7 +849,7 @@ class ShopymindClient_Callback {
      * @param array $emails
      * @return array
      */
-    public static function generateVouchers($voucherInfos, $emails)
+    public static function generateVouchers($voucherInfos, $emails, $idShop, $dynamicPrefix, $duplicateCode)
     {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array(
@@ -859,12 +859,11 @@ class ShopymindClient_Callback {
 
         $vouchers = array();
         if ($voucherInfos && is_array($voucherInfos) && $emails && is_array($emails) && sizeof($emails)) {
-            foreach ($emails as $email) {
-                $amount = ($voucherInfos['type'] == 'shipping' ? false : $voucherInfos['amount']);
-                $amountCurrency = ($voucherInfos['type'] == 'amount' ? $voucherInfos ['amountCurrency'] : false);
-                $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher($email, $voucherInfos['type'], $amount, $amountCurrency, $voucherInfos['minimumOrder'], $voucherInfos ['nbDayValidate'], '');
+            $amount = ($voucherInfos['type'] == 'shipping' ? false : $voucherInfos['amount']);
+            $amountCurrency = ($voucherInfos['type'] == 'amount' ? $voucherInfos ['amountCurrency'] : false);
 
-                $voucher = $GenerateVoucher->process();
+            foreach ($emails as $email) {
+                $voucher = self::generateVoucher($email, $voucherInfos['type'], $amount, $amountCurrency, $voucherInfos['minimumOrder'], $voucherInfos ['nbDayValidate'], $voucherInfos ['description'], $idShop, $dynamicPrefix, $duplicateCode);
                 if (!$voucher) {
                     continue;
                 }
@@ -873,6 +872,32 @@ class ShopymindClient_Callback {
         }
 
         return $vouchers;
+    }
+
+    /**
+     * Création code de réduction
+     *
+     * @param int $id_customer
+     * @param int $type
+     * @param string $amount
+     * @param string $amountCurrency
+     * @param string $minimumOrder
+     * @param int $nbDayValidate
+     * @param string $description
+     * @param string $id_shop
+     * @param string $dynamicProfix
+     * @param int $duplicateCode
+     * @return string
+     */
+    public static function generateVoucher($id_customer, $type, $amount = false, $amountCurrency = false, $minimumOrder = false, $nbDayValidate, $description, $id_shop, $dynamicPrefix, $duplicateCode) {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher($id_customer, $type, $amount, $amountCurrency, $minimumOrder, $nbDayValidate, $description, $id_shop, $dynamicPrefix, $duplicateCode);
+        return $GenerateVoucher->process();
     }
 
     /**
