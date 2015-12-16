@@ -28,7 +28,8 @@ class SPM_ShopyMind_DataMapper_Category
         $this->transformations = array(
             'link' => array($this->category, 'getUrl'),
             'shop_id_shop' => array($this, 'getStoreId'),
-            'lang' => array($this, 'getFormattedLocale')
+            'lang' => array($this, 'getFormattedLocale'),
+            'date_creation' => array($this, 'formatDateTime')
         );
         $formattedData = new Varien_Object();
         $categoryData = $this->category->getData();
@@ -56,10 +57,15 @@ class SPM_ShopyMind_DataMapper_Category
         return Mage::app()->getStore()->getId();
     }
 
+    protected function formatDateTime(Varien_Object $formattedData)
+    {
+        return date('Y-m-d H:i:s', strtotime($formattedData->getData('date_creation')));
+    }
+
     private function transformComplexMappedData(Varien_Object $formattedData)
     {
         foreach ($this->transformations as $key => $callable) {
-            $formattedData->setData($key, call_user_func($callable));
+            $formattedData->setData($key, call_user_func($callable, $formattedData));
         }
 
         return $formattedData;

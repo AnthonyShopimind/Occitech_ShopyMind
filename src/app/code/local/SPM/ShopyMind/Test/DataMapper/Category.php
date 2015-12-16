@@ -28,7 +28,7 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
             'name' => 'Test Category 1',
             'description' => 'this is a test category',
             'link' => 'http://shopymind.test/catalog/category/view/s/test-category-1/id/3/',
-            'date_creation' => '2013-10-26T05:00:00-07:00',
+            'date_creation' => '2013-10-26 12:00:00',
             'active' => '1',
         );
 
