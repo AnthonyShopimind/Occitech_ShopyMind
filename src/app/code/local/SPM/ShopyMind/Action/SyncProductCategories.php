@@ -24,7 +24,7 @@ class SPM_ShopyMind_Action_SyncProductCategories implements SPM_ShopyMind_Interf
         $categories = $this->retrieveCategories();
 
         if ($this->params['justCount']) {
-            return $categories;
+            return $categories->count();
         }
 
         $Formatter = new SPM_ShopyMind_DataMapper_Category($this->params['scope']);
@@ -48,10 +48,6 @@ class SPM_ShopyMind_Action_SyncProductCategories implements SPM_ShopyMind_Interf
 
         if ($this->params['limit']) {
             $categoryCollection->getSelect()->limit($this->params['limit'], $this->params['start']);
-        }
-
-        if ($this->params['justCount']) {
-            return $categoryCollection->count();
         }
 
         return $categoryCollection;

@@ -21,7 +21,7 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
     public function testFieldsAreCorrectlyMapped()
     {
         $expected = array(
-            'shop_id_shop' => 1,
+            'shop_id_shop' => 0,
             'id_category' => 3,
             'id_parent_category' => 2,
             'lang' => 'en',

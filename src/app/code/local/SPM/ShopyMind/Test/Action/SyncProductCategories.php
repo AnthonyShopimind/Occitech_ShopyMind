@@ -77,7 +77,7 @@ class SPM_ShopyMind_Test_Action_SyncProductCategories extends PHPUnit_Framework_
         $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
         $SyncCategories = new SPM_ShopyMind_Action_SyncProductCategories($scope, null, null, null, false, true);
 
-        $actual = $SyncCategories->retrieveCategories();
+        $actual = $SyncCategories->process();
         $expected = 6;
 
         $this->assertEquals($expected, $actual);

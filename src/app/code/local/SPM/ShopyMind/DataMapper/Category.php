@@ -27,7 +27,7 @@ class SPM_ShopyMind_DataMapper_Category
         $this->category = $category;
         $this->transformations = array(
             'link' => array($this->category, 'getUrl'),
-            'shop_id_shop' => array($this, 'getStoreId'),
+            'shop_id_shop' => array($this->scope, 'getId'),
             'lang' => array($this, 'getFormattedLocale'),
             'date_creation' => array($this, 'formatDateTime')
         );
