@@ -1924,18 +1924,13 @@ class ShopymindClient_Callback {
 
     private static function combinationsOfProduct(Mage_Catalog_Model_Product $product)
     {
-        static $nameAttributeId = null;
-        if (is_null($nameAttributeId)) {
-            $nameAttributeId = Mage::getModel('eav/entity_attribute')->loadByCode(Mage_Catalog_Model_Product::ENTITY, 'name')->getId();
-        }
-
         $formatter = function ($childProduct) {
             return array(
                 'id' => $childProduct->getId(),
                 'name' => $childProduct->getName()
             );
         };
-        return Mage::helper('shopymind')->formatCombinationsOfProduct($product, $formatter, array($nameAttributeId));
+        return Mage::helper('shopymind')->formatCombinationsOfProduct($product, $formatter, array('name'));
     }
 
     public static function findCategories($id_shop, $lang = false, $search) {

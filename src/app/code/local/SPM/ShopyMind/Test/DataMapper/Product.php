@@ -75,4 +75,32 @@ QUERY
     {
         $this->markTestIncomplete('TODO');
     }
+
+    /**
+     * @ loadFixture
+     * TODO Make me pass faster
+     */
+    public function testFormattingConfigurableProductReturnsCombinationsData()
+    {
+        $this->markTestIncomplete('TODO Make it faster and stable, I stumbled upon setting it up properly in a reasonable time');
+        $configurableProduct = Mage::getModel('catalog/product')->load(2);
+        $actual = $this->SUT->format($configurableProduct);
+
+        $expectedCombinations = array (
+            array(
+                'reference' => 'sku43-configurable-pr',
+                'product_link' => 'http://shopymind.test/catalog/product/view/id/1/s/first-simple-product/',
+                'image_link' => 'http://shopymind.test/media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
+                'combination_name' => 'First simple product',
+                'id_combination' => 1,
+                'values' => '',
+                'price' => 13.00,
+                'price_discount' => 13.00,
+                'quantity_remaining' => 100,
+            )
+        );
+
+        $this->assertEquals($expectedCombinations, $actual['combinations']);
+    }
+
 }

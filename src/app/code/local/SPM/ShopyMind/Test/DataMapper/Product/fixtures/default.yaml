@@ -91,6 +91,7 @@ eav:
      url_path: "first-simple-product.html"
      small_image: "/m/s/msj000t_1_not_existing.jpg"
      created_at: "2013-03-05 05:48:12"
+     color: white
      stock:
       qty: 100.00
       is_in_stock: 1
@@ -105,3 +106,21 @@ eav:
       b2b:
         name: Premier super produit
         status: 0
+
+tables:
+  eav_attribute_option:
+    - option_id: 3
+      attribute_id: 92
+      sort_order: 0
+    - option_id: 4
+      attribute_id: 92
+      sort_order: 0
+  eav_attribute_option_value:
+    - value_id: 3
+      option_id: 3
+      store_id: 0
+      value: black
+    - value_id: 4
+      option_id: 4
+      store_id: 0
+      value: white

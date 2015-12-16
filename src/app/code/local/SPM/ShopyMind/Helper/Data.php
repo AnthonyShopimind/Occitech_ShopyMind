@@ -40,13 +40,21 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
         return date('Y-m-d H:i:s', strtotime($date));
     }
 
-    public function formatCombinationsOfProduct(Mage_Catalog_Model_Product $product, $formatter, $attributeIds = null)
+    public function formatCombinationsOfProduct(Mage_Catalog_Model_Product $product, $formatter, $attributeNames = null)
     {
         $combinations = array();
         if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
+            $ids = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
+            $childProducts = Mage::getModel('catalog/product')
+                ->getCollection()
+                ->addAttributeToFilter('entity_id', $ids);
+            if (!empty($attributeNames)) {
+                $childProducts->addAttributeToSelect($attributeNames);
+            }
+
             $combinations = array_map(
                 $formatter,
-                Mage::getModel('catalog/product_type_configurable')->getUsedProducts($attributeIds, $product)
+                iterator_to_array($childProducts->getIterator())
             );
         }
         return $combinations;
