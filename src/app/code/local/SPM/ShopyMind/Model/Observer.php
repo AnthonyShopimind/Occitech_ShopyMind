@@ -181,7 +181,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function deleteCustomer(Varien_Event_Observer $observer)
     {
-        ShopymindClient_Bin_Notify::deleteCustomer($observer->getEvent()->getCustomer()->getId())
+        ShopymindClient_Bin_Notify::deleteCustomer($observer->getEvent()->getCustomer()->getId());
     }
 
     private function hasShopyMindClientConfiguration()
