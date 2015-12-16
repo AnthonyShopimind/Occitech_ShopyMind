@@ -49,7 +49,6 @@ class SPM_ShopyMind_DataMapper_Product
                 array(
                     'combination_name' => $childProduct->getName(),
                     'id_combination' => $childProduct->getId(),
-                    'values' => '', // valeurs de la déclinaison
                     'quantity_remaining' => $stockItemModel->loadByProduct($childProduct)->getQty(),
                 )
             );
