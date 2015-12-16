@@ -3,3 +3,4 @@
 /vendor/
 /composer.lock
 /magento_*
+phpunit.xml

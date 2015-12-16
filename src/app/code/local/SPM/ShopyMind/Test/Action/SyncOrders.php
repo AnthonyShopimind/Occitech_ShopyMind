@@ -22,14 +22,6 @@ class SPM_ShopyMind_Test_Action_SyncOrders extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testRetrieveOrdersWithLimit()
-    {
-        $actual = $this->actualOrdersIdsFromSyncOrders('', 1, 2, null, false, false);
-        $expected = array(3, 1);
-
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testRetrieveOrdersWithLastUpdate()
     {
         $actual = $this->actualOrdersIdsFromSyncOrders('', null, null, '2015-12-09 00:00:00', false, false);
@@ -56,7 +48,7 @@ class SPM_ShopyMind_Test_Action_SyncOrders extends PHPUnit_Framework_TestCase
 
     public function testProcessWithJustCountOption()
     {
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('');
+        $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
         $SyncOrders = new SPM_ShopyMind_Action_SyncOrders($scope, null, null, null, false, true);
 
         $actual = $SyncOrders->process();
