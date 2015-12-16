@@ -61,17 +61,18 @@ class SPM_ShopyMind_Model_Scope
         return new self($id, $scope, $isoLangCode);
     }
 
-    public static function fromRequest() {
-        if(isset($_POST['shopIdShop']) && !empty($_POST['shopIdShop'])) {
+    public static function fromRequest()
+    {
+        if (!empty($_POST['shopIdShop'])) {
             return self::fromShopymindId($_POST['shopIdShop']);
-        }else {
-            $currentStore = Mage::app()->getStore();
-            if ($currentStore->isAdmin()) {
-                $request = Mage::app()->getRequest();
-                return self::fromMagentoCodes($request->getParam('website'), $request->getParam('store'));
-            }
-            return self::fromMagentoCodes($currentStore->getWebsite()->getCode(), $currentStore->getCode());
         }
+
+        $currentStore = Mage::app()->getStore();
+        if ($currentStore->isAdmin()) {
+            $request = Mage::app()->getRequest();
+            return self::fromMagentoCodes($request->getParam('website'), $request->getParam('store'));
+        }
+        return self::fromMagentoCodes($currentStore->getWebsite()->getCode(), $currentStore->getCode());
     }
 
     public function shopyMindId()
