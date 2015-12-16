@@ -3,11 +3,13 @@
 class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
 {
     private $params;
+    private $helper;
 
     public function __construct($idOrEmails, $fromQuotes = false)
     {
         $this->params['identifier'] = $idOrEmails;
         $this->params['fromQuote'] = $fromQuotes;
+        $this->helper = Mage::helper('shopymind');
     }
 
     public function process()
@@ -16,7 +18,7 @@ class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
         $Formatter = new SPM_ShopyMind_DataMapper_Customer();
         $return = array_map(array($Formatter, 'format'), $users);
 
-        return (sizeof($return) === 1 ? $return [0] : $return);
+        return (sizeof($return) === 1 ? $return[0] : $return);
     }
 
     public function fetchUsers()
@@ -45,37 +47,37 @@ class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
                 LEFT JOIN `' . $tablePrefix . 'customer_entity_datetime` AS `customer_birth_table`
                 ON (
                     `customer_birth_table`.`entity_id` = `customer_primary_table`.`entity_id`
-                    AND `customer_birth_table`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer', 'dob') . '
+                    AND `customer_birth_table`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer', 'dob') . '
                 )
                 LEFT JOIN `' . $tablePrefix . 'customer_entity_varchar` AS `customer_firstname_table`
                 ON
                     (`customer_firstname_table`.`entity_id` = `customer_primary_table`.`entity_id`)
-                    AND (`customer_firstname_table`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer', 'firstname') . ')
+                    AND (`customer_firstname_table`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer', 'firstname') . ')
                 LEFT JOIN `' . $tablePrefix . 'customer_entity_varchar` AS `customer_lastname_table`
                 ON
                     (`customer_lastname_table`.`entity_id` = `customer_primary_table`.`entity_id`)
-                    AND (`customer_lastname_table`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer', 'lastname') . ')
+                    AND (`customer_lastname_table`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer', 'lastname') . ')
                 LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_default_billing_jt`
                 ON
                     (`customer_default_billing_jt`.`entity_id` = `customer_primary_table`.`entity_id`)
-                    AND (`customer_default_billing_jt`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer', 'default_shipping') . ')
+                    AND (`customer_default_billing_jt`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer', 'default_shipping') . ')
                 LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_country`
                 ON
                     (`customer_default_billing_jt`.`value` = `customer_default_billing_country`.`entity_id`)
-                    AND (`customer_default_billing_country`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer_address', 'country_id') . ')
+                    AND (`customer_default_billing_country`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer_address', 'country_id') . ')
                 LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_postcode`
                 ON
                     (`customer_default_billing_jt`.`value` = `customer_default_billing_postcode`.`entity_id`)
-                    AND (`customer_default_billing_postcode`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer_address', 'postcode') . ')
+                    AND (`customer_default_billing_postcode`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer_address', 'postcode') . ')
                 LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_phone`
                 ON
                     (`customer_default_billing_jt`.`value` = `customer_default_phone`.`entity_id`)
-                    AND (`customer_default_phone`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer_address', 'telephone') . ')
+                    AND (`customer_default_phone`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer_address', 'telephone') . ')
                 LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt`
                 ON
                     (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`)
                     AND (
-                        `customer_default_billing_state_jt`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer_address', 'region_id') . '
+                        `customer_default_billing_state_jt`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer_address', 'region_id') . '
                         OR `customer_default_billing_state_jt`.`attribute_id` IS NULL
                     )
                 LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state`
@@ -83,7 +85,7 @@ class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
                 LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_gender`
                 ON
                     (`customer_gender`.`entity_id` = `customer_primary_table`.`entity_id`)
-                    AND (`customer_gender`.`attribute_id` = ' . ShopymindClient_Callback::getMagentoAttributeCode('customer', 'gender') . ')
+                    AND (`customer_gender`.`attribute_id` = ' . $this->helper->getMagentoAttributeCode('customer', 'gender') . ')
 
                 WHERE  `customer_primary_table`.`entity_id` IN(' . (implode(', ', (array)$this->params['identifier'])) . ')
                 GROUP BY `customer_primary_table`.`entity_id`';

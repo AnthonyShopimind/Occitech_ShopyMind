@@ -36,14 +36,16 @@ class SPM_ShopyMind_DataMapper_Customer
     private function getUserLocale($id_customer, $store_id, $country_code = false)
     {
         $locale_shop = Mage::getStoreConfig('general/locale/code', $store_id);
+        $locale_substr = substr($locale_shop, 0, 3);
+
         if (!$country_code) {
             $customer = Mage::getModel('customer/customer')->load($id_customer);
             $defaultBilling = $customer->getDefaultBillingAddress();
             if ($defaultBilling){
-                return substr($locale_shop, 0, 3) . $defaultBilling->getCountry();
+                return $locale_substr . $defaultBilling->getCountry();
             }
         } else{
-            return substr($locale_shop, 0, 3) . $country_code;
+            return $locale_substr . $country_code;
         }
 
         $locale_shop = explode('_', $locale_shop);
@@ -54,6 +56,10 @@ class SPM_ShopyMind_DataMapper_Customer
 
     private function getDateLastOrder($id_customer)
     {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array ('ShopymindClient_CallbackOverride', __FUNCTION__), func_get_args());
+        }
+
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $read = Mage::getSingleton('core/resource')->getConnection('core_read');
         if (is_numeric($id_customer)) {
@@ -70,6 +76,10 @@ class SPM_ShopyMind_DataMapper_Customer
 
     private function countCustomerOrder($customerIdOrEmail, $sinceAgo = null)
     {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array ('ShopymindClient_CallbackOverride', __FUNCTION__), func_get_args());
+        }
+
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $read = Mage::getSingleton('core/resource')->getConnection('core_read');
 
@@ -85,6 +95,10 @@ class SPM_ShopyMind_DataMapper_Customer
 
     private function sumCustomerOrder($customerIdOrEmail, $sinceAgo = null)
     {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array ('ShopymindClient_CallbackOverride', __FUNCTION__), func_get_args());
+        }
+
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $read = Mage::getSingleton('core/resource')->getConnection('core_read');
 
@@ -100,6 +114,10 @@ class SPM_ShopyMind_DataMapper_Customer
 
     private function ordersConditionsForCustomer($customerIdOrEmail, $sinceAgo)
     {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array ('ShopymindClient_CallbackOverride', __FUNCTION__), func_get_args());
+        }
+
         $conditions = array('`base_total_invoiced` IS NOT NULL');
         if (!is_null($sinceAgo)) {
             $conditions[] = '`created_at` >= DATE_SUB("' . date('Y-m-d H:i:s') . '", INTERVAL ' . $sinceAgo . ')';
