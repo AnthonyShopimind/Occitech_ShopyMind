@@ -79,7 +79,7 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
             ->method('shortId')
             ->willReturn('test-3');
 
-        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, null, null, null, 12);
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, null, 10, null, null, null, 'ECPA2015');
         $ruleName = $GenerateVoucher->process();
         $this->couponToCleanup = $ruleName;
         $ruleId = Mage::getModel('salesrule/coupon')->load($ruleName, 'code')->getRuleId();
@@ -104,9 +104,65 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
             'to_date' => '2015-06-30',
             'uses_per_customer' => 100,
             'is_active' => 0,
-            'conditions_serialized' => 'a:6:{s:4:"type";s:32:"salesrule/rule_condition_combine";s:9:"attribute";N;s:8:"operator";N;s:5:"value";s:1:"1";s:18:"is_value_processed";N;s:10:"aggregator";s:3:"all";}',
-            'actions_serialized' => 'a:7:{s:4:"type";s:40:"salesrule/rule_condition_product_combine";s:9:"attribute";N;s:8:"operator";N;s:5:"value";s:1:"1";s:18:"is_value_processed";N;s:10:"aggregator";s:3:"all";s:10:"conditions";a:1:{i:0;a:7:{s:4:"type";s:40:"salesrule/rule_condition_product_combine";s:9:"attribute";N;s:8:"operator";N;s:5:"value";s:1:"1";s:18:"is_value_processed";N;s:10:"aggregator";s:3:"all";s:10:"conditions";a:2:{i:0;a:5:{s:4:"type";s:32:"salesrule/rule_condition_product";s:9:"attribute";s:12:"category_ids";s:8:"operator";s:2:"()";s:5:"value";s:23:"220, 227, 224, 225, 226";s:18:"is_value_processed";b:0;}i:1;a:5:{s:4:"type";s:32:"salesrule/rule_condition_product";s:9:"attribute";s:3:"sku";s:8:"operator";s:3:"!()";s:5:"value";s:195:"511-40108, 511-41186B, 511-41186C, 511-41186A, UKG-1011-01, UKG-1016-01, UKG-1017-01, UKG-1003-01, UKG-1009-01, UKG-5003-01, UKG-5007-02, UKG-5009-01, UKG-5009-02, UKG-5016, UKG-5017, UKG-1007-03";s:18:"is_value_processed";b:0;}}}}}',
+            'conditions_serialized' => 'a:6:{s:4:"type";s:32:"salesrule/rule_condition_combine";s:9:"attribute";N;s:8:"operator";N;s:5:"value";b:1;s:18:"is_value_processed";N;s:10:"aggregator";s:3:"all";}',
+            'actions_serialized' => 'a:6:{s:4:"type";s:40:"salesrule/rule_condition_product_combine";s:9:"attribute";N;s:8:"operator";N;s:5:"value";b:1;s:18:"is_value_processed";N;s:10:"aggregator";s:3:"all";}',
         );
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @loadFixture salesrule
+     */
+    public function testProcessDuplicateNonExistingRule()
+    {
+        $this->mockShopymindHelper->expects($this->any())
+            ->method('shortId')
+            ->willReturn('test-4');
+
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, null, null, null, 'non-existing-coupon');
+        $actual = $GenerateVoucher->process();
+
+        $this->assertFalse($actual);
+    }
+
+    /**
+     * @loadFixture salesrule
+     */
+    public function testProcessDuplicateExistingRuleAndUpdateDesc()
+    {
+        $this->mockShopymindHelper->expects($this->any())
+            ->method('shortId')
+            ->willReturn('test-5');
+
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, 'My new description', null, null, 'ECPA2015');
+        $ruleName = $GenerateVoucher->process();
+        $this->couponToCleanup = $ruleName;
+        $ruleId = Mage::getModel('salesrule/coupon')->load($ruleName, 'code')->getRuleId();
+        $this->ruleToCleanup = $ruleId;
+        $rule = Mage::getModel('salesrule/rule')->load($ruleId);
+
+        $actual = $rule->getDescription();
+        $expected = 'My new description';
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testProcessCreateVoucherWithSpecifiedStore()
+    {
+        $this->mockShopymindHelper->expects($this->any())
+            ->method('shortId')
+            ->willReturn('test-6');
+
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, 'My new description', null, 'store-1');
+        $ruleName = $GenerateVoucher->process();
+        $this->couponToCleanup = $ruleName;
+        $ruleId = Mage::getModel('salesrule/coupon')->load($ruleName, 'code')->getRuleId();
+        $this->ruleToCleanup = $ruleId;
+        $rule = Mage::getModel('salesrule/rule')->load($ruleId);
+
+        $actual = $rule->getWebsiteIds();
+        $expected = array(1);
 
         $this->assertEquals($expected, $actual);
     }

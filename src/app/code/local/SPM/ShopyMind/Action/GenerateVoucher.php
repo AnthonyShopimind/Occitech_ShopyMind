@@ -26,10 +26,14 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
         $rule = Mage::getModel('salesrule/rule');
 
         if (!empty($this->params['duplicateCode'])) {
-            $ruleData = Mage::getModel('salesrule/rule')->load($this->params['duplicateCode'])->getData();
+            $ruleId = Mage::getModel('salesrule/coupon')->load($this->params['duplicateCode'], 'code')->getRuleId();
+            if (!$ruleId) {
+                return false;
+            }
+            $ruleData = Mage::getModel('salesrule/rule')->load($ruleId)->getData();
+
             unset($ruleData['rule_id']);
             $rule->setData($ruleData);
-
         } else {
             $rule->setName($couponCode)
                 ->setFromDate($date)
@@ -56,19 +60,29 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
             } elseif ($this->params['type'] == 'shipping') {
                 $rule->setSimpleFreeShipping(1);
             }
-
-            if ($this->params['minimumOrder']) {
-                $condition = Mage::getModel('salesrule/rule_condition_address')
-                    ->setType('salesrule/rule_condition_address')
-                    ->setAttribute('base_subtotal')
-                    ->setOperator('>=')
-                    ->setValue((int)$this->params['minimumOrder']);
-
-                $rule->getConditions()->addCondition($condition);
-            }
         }
 
-        $this->createCouponFor($rule, $couponCode);
+        if ($this->params['description']) {
+            $rule->setDescription($this->params['description']);
+        }
+
+        if ($this->params['minimumOrder']) {
+            $condition = Mage::getModel('salesrule/rule_condition_address')
+                ->setType('salesrule/rule_condition_address')
+                ->setAttribute('base_subtotal')
+                ->setOperator('>=')
+                ->setValue((int) $this->params['minimumOrder']);
+
+            $rule->getConditions()->addCondition($condition);
+        }
+
+        if ($this->params['idShop']) {
+            $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($this->params['idShop']);
+            $stores = $scope->stores();
+            $websiteId = $stores[0]->getWebsiteId();
+        }
+
+        $this->createCouponFor($rule, $couponCode, $websiteId);
 
         if ($rule->save()) {
             return $couponCode;
@@ -110,8 +124,12 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
     }
 
 
-    private function createCouponFor($rule, $coupon_code)
+    private function createCouponFor($rule, $coupon_code, $websiteId = null)
     {
+        if (!$websiteId) {
+            $websiteId = $this->getAllWebsitesIds();
+        }
+
         $rule->setDiscountStep('0')
             ->setApplyToShipping('0')
             ->setTimesUsed('0')
@@ -119,7 +137,7 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
             ->setCouponType('2')
             ->setUsesPerCoupon(1)
             ->setCustomerGroupIds($this->getAllCustomerGroupsIds())
-            ->setWebsiteIds($this->getAllWebsitesIds())
+            ->setWebsiteIds($websiteId)
             ->setCouponCode($coupon_code);
     }
 }
