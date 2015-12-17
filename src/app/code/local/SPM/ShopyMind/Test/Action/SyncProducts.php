@@ -75,6 +75,18 @@ class SPM_ShopyMind_Test_Action_SyncProducts extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals(array($expected), array_values(array_map(function($product) { return $product->getId(); }, $actual->getItems())));
     }
 
+    public function testRetrieveProductsWithProductIds()
+    {
+        $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
+        $SyncProducts = new SPM_ShopyMind_Action_SyncProducts($scope, null, null, null, array(1, 2), false);
+
+        $actual = $SyncProducts->retrieveProducts();
+        $expected = array(1, 2);
+
+        $this->assertCount(2, $actual->getItems());
+        $this->assertEquals($expected, array_values(array_map(function($product) { return $product->getId(); }, $actual->getItems())));
+    }
+
     public function testRetrieveProductsWithLastUpdate()
     {
         $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();

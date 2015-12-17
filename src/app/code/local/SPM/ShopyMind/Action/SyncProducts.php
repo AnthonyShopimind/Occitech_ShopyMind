@@ -70,7 +70,8 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
         $productCollection->addAttributeToSelect('*');
 
         if ($this->params['productId']) {
-            $productCollection->addFieldToFilter('entity_id', array('eq' => (int)$this->params['productId']));
+            $conditions = is_array($this->params['productId']) ? array('in' => $this->params['productId']) : array('eq' => (int)$this->params['productId']);
+            $productCollection->addFieldToFilter('entity_id', $conditions);
         }
 
         if ($this->params['lastUpdate']) {
