@@ -124,6 +124,9 @@ class SPM_ShopyMind_Model_Scope
 
     public function getLang()
     {
+        if (!$this->isoLangCode) {
+            $this->isoLangCode = substr((string) $this->getConfig('general/locale/code'), 0, -3);
+        }
         return $this->isoLangCode;
     }
 
