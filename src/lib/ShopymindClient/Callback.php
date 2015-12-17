@@ -1979,4 +1979,17 @@ class ShopymindClient_Callback {
         return $SyncProductsAction->process();
     }
 
+    public static function syncProductsCategories($id_shop, $start, $limit, $lastUpdate, $idCategory = false, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $SyncProductCategoriesAction = new SPM_ShopyMind_Action_SyncProductCategories($scope, $start, $limit, $lastUpdate, $idCategory, $justCount);
+        return $SyncProductCategoriesAction->process();
+    }
 }
