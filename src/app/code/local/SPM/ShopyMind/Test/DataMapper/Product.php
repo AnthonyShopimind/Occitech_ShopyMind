@@ -4,7 +4,7 @@
  * @group dataMappers
  * @loadSharedFixture
  */
-class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Product extends EcomDev_PHPUnit_Test_Case
+class SPM_ShopyMind_Test_DataMapper_Product extends EcomDev_PHPUnit_Test_Case
 {
     public $SUT;
 
