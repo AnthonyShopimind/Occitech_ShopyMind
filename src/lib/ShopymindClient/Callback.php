@@ -1129,22 +1129,11 @@ class ShopymindClient_Callback {
         }
 
         $scope->restrictProductCollection($collection);
-
-        if ($collection && sizeof($collection)) {
-            foreach ( $collection as $product ) {
-                $image_url = Mage::helper('shopymind')->productImageUrlOf($product);
-                $product_url = Mage::helper('shopymind')->productUrlOf($product);
-                $return [] = array (
-                        'description' => $product->getName(),
-                        'price' => $product->getPrice(),
-                        'image_url' => $image_url,
-                        'product_url' => $product_url
-                );
-            }
-        }
         if ($lang || $id_shop)
             self::stopStoreEmulation();
-        return $return;
+
+        $ProductDataMapper = new SPM_ShopyMind_DataMapper_Product();
+        return array_values(array_map(array($ProductDataMapper, 'format'), iterator_to_array($collection)));
     }
 
     /**
