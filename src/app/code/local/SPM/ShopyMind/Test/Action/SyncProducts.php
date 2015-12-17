@@ -8,6 +8,14 @@
  */
 class SPM_ShopyMind_Test_Action_SyncProducts extends EcomDev_PHPUnit_Test_Case
 {
+    public function tearDown()
+    {
+        parent::tearDown();
+        if (session_id()) {
+            session_destroy();
+        }
+    }
+
     public function testRetrieveProductsWithoutRestrictions()
     {
         $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
