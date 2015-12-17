@@ -39,10 +39,12 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
             return $productCollection->count();
         }
 
-        $formatter = function ($formattedProduct) {
-            return array_merge($formattedProduct, $this->getScopedRelatedInformations($this->params['scope']));
+        $scopeData = $this->getScopedRelatedInformations($this->params['scope']);
+        $scopeDataEnricher = function($productData) use ($scopeData) {
+           return array_merge($productData, $scopeData);
         };
-        return array_map($formatter, array_map(
+
+        return array_map($scopeDataEnricher, array_map(
             array($this->getDataMapper(), 'format'),
             iterator_to_array($productCollection)
         ));
@@ -75,8 +77,8 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
             $productCollection->addFieldToFilter('updated_at', array('gt' => $this->params['lastUpdate']));
         }
 
-        $offset = !empty($this->params['start']) ? (int)$this->params['start'] : null;
-        $limit = !empty($this->params['limit']) ? (int)$this->params['limit'] : null;
+        $offset = !empty($this->params['start']) ? (int) $this->params['start'] : null;
+        $limit = !empty($this->params['limit']) ? (int) $this->params['limit'] : null;
 
         $productCollection->getSelect()->limit($limit, $offset);
 
