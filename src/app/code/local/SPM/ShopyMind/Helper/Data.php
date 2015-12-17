@@ -60,11 +60,10 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
             if (!empty($attributeNames)) {
                 $childProducts->addAttributeToSelect($attributeNames);
             }
-
-            $combinations = array_map(
+            $combinations = array_values(array_map(
                 $formatter,
                 iterator_to_array($childProducts->getIterator())
-            );
+            ));
         }
         return $combinations;
     }
