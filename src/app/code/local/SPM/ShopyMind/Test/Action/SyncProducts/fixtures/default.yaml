@@ -225,21 +225,3 @@ eav:
       b2b:
         name: Premier produit enfant
         status: 0
-
-tables:
-  eav_attribute_option:
-    - option_id: 3
-      attribute_id: 92
-      sort_order: 0
-    - option_id: 4
-      attribute_id: 92
-      sort_order: 0
-  eav_attribute_option_value:
-    - value_id: 3
-      option_id: 3
-      store_id: 0
-      value: black
-    - value_id: 4
-      option_id: 4
-      store_id: 0
-      value: white
