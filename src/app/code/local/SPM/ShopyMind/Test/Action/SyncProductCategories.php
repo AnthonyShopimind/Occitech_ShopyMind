@@ -102,6 +102,6 @@ class SPM_ShopyMind_Test_Action_SyncProductCategories extends PHPUnit_Framework_
             'active' => '1',
         );
 
-        $this->assertEquals($expected, $actual[6]);
+        $this->assertEquals($expected, $actual[0]);
     }
 }

@@ -28,7 +28,7 @@ class SPM_ShopyMind_Action_SyncProductCategories implements SPM_ShopyMind_Interf
         }
 
         $Formatter = new SPM_ShopyMind_DataMapper_Category($this->params['scope']);
-        $categories = array_map(array($Formatter, 'format'), iterator_to_array($categories->getIterator()));
+        $categories = array_values(array_map(array($Formatter, 'format'), iterator_to_array($categories->getIterator())));
         $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
 
         return $categories;
