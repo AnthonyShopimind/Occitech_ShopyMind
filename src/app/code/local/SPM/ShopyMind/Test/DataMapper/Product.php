@@ -60,19 +60,26 @@ QUERY
         $this->assertEquals($expectedData, $actual);
     }
 
-    public function testFormattingProductReturnsCorrectManufacturerIdWhenAvailable()
-    {
-        $this->markTestIncomplete('TODO');
-    }
-
     public function testFormattingProductReturnsCorrectSpecialPriceWhenProductHasOne()
     {
-        $this->markTestIncomplete('TODO');
+        $simpleProduct = Mage::getModel('catalog/product')->load(1);
+        $simpleProduct->setSpecialPrice(10.00);
+        $actual = $this->SUT->format($simpleProduct);
+
+        $this->assertEquals(10.00, $actual['price_discount']);
     }
 
     public function testFormattingProductReturnsInactiveWhenProductIsNotInStock()
     {
-        $this->markTestIncomplete('TODO');
+        $simpleProduct = Mage::getModel('catalog/product')->load(1);
+        $stockItem = $simpleProduct->getStockItem();
+        $stockItem->setIsInStock(0);
+        $this->assertTrue((bool) $stockItem->save(), 'precondition failed');
+
+        $simpleProduct = Mage::getModel('catalog/product')->load(1);
+        $actual = $this->SUT->format($simpleProduct);
+
+        $this->assertFalse($actual['active']);
     }
 
     /**

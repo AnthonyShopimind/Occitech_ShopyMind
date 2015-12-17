@@ -30,7 +30,7 @@ class SPM_ShopyMind_DataMapper_Product
                 'id_manufacturer' => $this->helper->manufacturerIdOf($product),
                 'quantity_remaining' => $product->getStockItem()->getQty(),
                 'date_creation' => $this->helper->formatDateTime($product->getCreatedAt()),
-                'active' => $product->getIsSalable(),
+                'active' => (bool) $product->getIsSalable(),
             )
         );
 
