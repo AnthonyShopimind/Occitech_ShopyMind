@@ -10,7 +10,6 @@
  */
 class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 {
-
     const MANUFACTURER_ATTRIBUTE_CODE = 'manufacturer';
 
     public function formatCustomerQuote(Mage_Sales_Model_Quote $quote)
@@ -31,12 +30,12 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function productUrlOf(Mage_Catalog_Model_Product $product)
     {
-        return str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
+        return str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
     }
 
     public function productImageUrlOf(Mage_Catalog_Model_Product $product)
     {
-        return str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
+        return str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
     }
 
     public function manufacturerIdOf(Mage_Catalog_Model_Product $product)
@@ -67,5 +66,4 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $combinations;
     }
-
 }

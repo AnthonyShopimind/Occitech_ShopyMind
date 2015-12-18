@@ -107,5 +107,4 @@ QUERY
 
         $this->assertEquals($expectedCombinations, $actual['combinations']);
     }
-
 }
