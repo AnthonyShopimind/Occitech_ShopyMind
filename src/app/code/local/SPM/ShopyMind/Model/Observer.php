@@ -20,8 +20,8 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     const OPTIONAL_CUSTOMER_DOB = 'opt';
     const REQUIRED_CUSTOMER_DOB = 'req';
 
-    public function orderUpdateObserver(Varien_Event_Observer $observer) {
-
+    public function orderUpdateObserver(Varien_Event_Observer $observer)
+    {
         try {
             $order = $observer->getOrder();
             if ($order->hasStatus()) {
@@ -31,8 +31,9 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             Mage::log($e->getMessage(), Zend_Log::ERR);
         }
     }
-    
-    public function customerCreateAccountObserver(Varien_Event_Observer $observer) {
+
+    public function customerCreateAccountObserver(Varien_Event_Observer $observer)
+    {
         try {
             $customer = $observer->getCustomer();
             if(is_object($customer))
@@ -41,8 +42,9 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             Mage::log($e->getMessage(), Zend_Log::ERR);
         }
     }
-    
-    public static function getUserLocale($id_customer, $store_id) {
+
+    public static function getUserLocale($id_customer, $store_id)
+    {
         $locale_shop = Mage::getStoreConfig('general/locale/code', $store_id);
         $customer = Mage::getModel('customer/customer')->load($id_customer);
         $defaultBilling = $customer->getDefaultBillingAddress();
