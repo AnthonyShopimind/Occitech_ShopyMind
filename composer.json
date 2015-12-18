@@ -26,12 +26,11 @@
   },
   "require": {
     "php": ">=5.3",
-    "ext-curl": "*",
-    "colinmollenhour/modman": "^1.12"
+    "ext-curl": "*"
   },
   "require-dev": {
-    "ecomdev/ecomdev_phpunit": "0.3.7"
-
+    "ecomdev/ecomdev_phpunit": "0.3.7",
+    "colinmollenhour/modman": "^1.12"
   },
   "extra": {
     "magento-root-dir": "root"

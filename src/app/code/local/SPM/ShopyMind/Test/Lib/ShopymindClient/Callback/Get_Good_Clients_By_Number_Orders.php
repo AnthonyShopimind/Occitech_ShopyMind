@@ -31,6 +31,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Number
                     'sum_order_year' => 0,
                     'region' => null,
                     'postcode' => null,
+                    'active' => true,
+                    'addresses' => array(),
                 ),
             ),
         );

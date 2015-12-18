@@ -61,17 +61,18 @@ class SPM_ShopyMind_Model_Scope
         return new self($id, $scope, $isoLangCode);
     }
 
-    public static function fromRequest() {
-        if(isset($_POST['shopIdShop']) && !empty($_POST['shopIdShop'])) {
+    public static function fromRequest()
+    {
+        if (!empty($_POST['shopIdShop'])) {
             return self::fromShopymindId($_POST['shopIdShop']);
-        }else {
-            $currentStore = Mage::app()->getStore();
-            if ($currentStore->isAdmin()) {
-                $request = Mage::app()->getRequest();
-                return self::fromMagentoCodes($request->getParam('website'), $request->getParam('store'));
-            }
-            return self::fromMagentoCodes($currentStore->getWebsite()->getCode(), $currentStore->getCode());
         }
+
+        $currentStore = Mage::app()->getStore();
+        if ($currentStore->isAdmin()) {
+            $request = Mage::app()->getRequest();
+            return self::fromMagentoCodes($request->getParam('website'), $request->getParam('store'));
+        }
+        return self::fromMagentoCodes($currentStore->getWebsite()->getCode(), $currentStore->getCode());
     }
 
     public function shopyMindId()
@@ -123,12 +124,20 @@ class SPM_ShopyMind_Model_Scope
 
     public function getLang()
     {
+        if (!$this->isoLangCode) {
+            $this->isoLangCode = substr((string) $this->getConfig('general/locale/code'), 0, -3);
+        }
         return $this->isoLangCode;
     }
 
     public function getId()
     {
         return $this->id;
+    }
+
+    public function currencyCode()
+    {
+        return Mage::app()->getStore($this->getId())->getCurrentCurrencyCode();
     }
 
     public function getConfig($path)
@@ -191,6 +200,7 @@ class SPM_ShopyMind_Model_Scope
         $collection->addAttributeToFilter(array(
             array('attribute' => 'path', 'like' => "%/$rootCategoryId/%"),
             array('attribute' => 'path', 'like' => "%/$rootCategoryId%"),
+            array('attribute' => 'path', 'like' => "%$rootCategoryId/%"),
         ));
     }
 

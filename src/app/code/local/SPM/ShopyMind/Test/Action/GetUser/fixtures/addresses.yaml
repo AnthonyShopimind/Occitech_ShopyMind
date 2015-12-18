@@ -1,0 +1,23 @@
+eav:
+  customer_address:
+    - entity_id: 1
+      entity_type_id: 2
+      parent_id: 1
+      postcode: 13006
+      city: Marseille
+      street: 92 rue Saint Jacques
+      telephone: 0102030405
+      company: Shopymind
+    - entity_id: 2
+      entity_type_id: 2
+      parent_id: 1
+      postcode: 31100
+      city: Toulouse
+      street: |
+        12 route d'Espagne
+        1er etage
+      telephone: 0504030201
+      company: Occitech
+    - entity_id: 3
+      entity_type_id: 2
+      parent_id: 1

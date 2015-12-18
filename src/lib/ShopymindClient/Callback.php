@@ -19,7 +19,6 @@ class ShopymindClient_Callback {
     protected static $appEmulation = false;
     protected static $initialEnvironmentInfo = false;
     const SEARCH_MIN_LENGTH = 3;
-    const MANUFACTURER_ATTRIBUTE_CODE = 'manufacturer';
 
     /**
      * @var null|int Current timestamp (to allow simulating time changes from tests)
@@ -39,159 +38,8 @@ class ShopymindClient_Callback {
                     __FUNCTION__
             ), func_get_args());
 
-        $tablePrefix = Mage::getConfig()->getTablePrefix();
-        $resource = Mage::getSingleton('core/resource');
-        $readConnection = $resource->getConnection('core_read');
-
-        $return = array();
-        if (is_numeric($idOrEmails)) {
-            $query = '
-                SELECT
-                    `customer_default_phone`.`value` as `phone`,
-                    `customer_default_billing_country`.`value` as `country_code`,
-                    `customer_default_billing_state`.`code` as `region_code`,
-                    `customer_default_billing_postcode`.`value` as `postcode`,
-                    `customer_primary_table`.`entity_id`,
-                    `customer_primary_table`.`store_id`,
-                    `customer_firstname_table`.`value` as `firstname`,
-                    `customer_lastname_table`.`value` as `lastname`,
-                    `customer_primary_table`.`email`,
-                    `customer_primary_table`.`created_at`,
-                    `customer_primary_table`.`group_id`,
-                    `customer_gender`.`value` AS `gender_id`,
-                    `customer_birth_table`.`value` AS `birthday`
-                FROM `' . $tablePrefix . 'customer_entity` AS `customer_primary_table`
-                LEFT JOIN `' . $tablePrefix . 'customer_entity_datetime` AS `customer_birth_table`
-                ON (
-                    `customer_birth_table`.`entity_id` = `customer_primary_table`.`entity_id`
-                    AND `customer_birth_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'dob') . '
-                )
-                LEFT JOIN `' . $tablePrefix . 'customer_entity_varchar` AS `customer_firstname_table`
-                ON
-                    (`customer_firstname_table`.`entity_id` = `customer_primary_table`.`entity_id`)
-                    AND (`customer_firstname_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'firstname') . ')
-                LEFT JOIN `' . $tablePrefix . 'customer_entity_varchar` AS `customer_lastname_table`
-                ON
-                    (`customer_lastname_table`.`entity_id` = `customer_primary_table`.`entity_id`)
-                    AND (`customer_lastname_table`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'lastname') . ')
-                LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_default_billing_jt`
-                ON
-                    (`customer_default_billing_jt`.`entity_id` = `customer_primary_table`.`entity_id`)
-                    AND (`customer_default_billing_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'default_shipping') . ')
-                LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_country`
-                ON
-                    (`customer_default_billing_jt`.`value` = `customer_default_billing_country`.`entity_id`)
-                    AND (`customer_default_billing_country`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
-                LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_billing_postcode`
-                ON
-                    (`customer_default_billing_jt`.`value` = `customer_default_billing_postcode`.`entity_id`)
-                    AND (`customer_default_billing_postcode`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'postcode') . ')
-                LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` AS `customer_default_phone`
-                ON
-                    (`customer_default_billing_jt`.`value` = `customer_default_phone`.`entity_id`)
-                    AND (`customer_default_phone`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'telephone') . ')
-                LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` AS `customer_default_billing_state_jt`
-                ON
-                    (`customer_default_billing_country`.`entity_id` = `customer_default_billing_state_jt`.`entity_id`)
-                    AND (
-                        `customer_default_billing_state_jt`.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . '
-                        OR `customer_default_billing_state_jt`.`attribute_id` IS NULL
-                    )
-                LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state`
-                ON (`customer_default_billing_state`.`region_id` = `customer_default_billing_state_jt`.`value`)
-                LEFT JOIN `' . $tablePrefix . 'customer_entity_int` AS `customer_gender`
-                ON
-                    (`customer_gender`.`entity_id` = `customer_primary_table`.`entity_id`)
-                    AND (`customer_gender`.`attribute_id` = ' . self::getMagentoAttributeCode('customer', 'gender') . ')
-
-                WHERE  `customer_primary_table`.`entity_id` IN(' . (implode(', ', (array) $idOrEmails)) . ')
-                GROUP BY `customer_primary_table`.`entity_id`';
-        } else {
-            if ($fromQuotes) {
-                $query = '
-                  SELECT
-                    `quote_address`.`telephone` as `phone`,
-                    `quote_address`.`country_id` as `country_code`,
-                    `directory_country_region`.`code` as `region_code`,
-                    `quote_address`.`postcode`,
-                    `quote_address`.`email` AS `entity_id`, `quote`.`store_id`,
-                    `quote_address`.`firstname`,
-                    `quote_address`.`lastname`,
-                    `quote_address`.`email`,
-                    `quote`.`created_at`,
-                    `quote`.`customer_group_id` AS `group_id`,
-                    `quote`.`customer_gender` AS `gender_id`,
-                    `quote`.`customer_dob` AS `birthday`
-                  FROM `' . $tablePrefix . 'sales_flat_quote_address` AS `quote_address`
-                  INNER JOIN `' . $tablePrefix . 'sales_flat_quote` AS `quote` ON (
-                    `quote`.`entity_id` = `quote_address`.`quote_id`
-                  )
-                  LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `directory_country_region` ON(`directory_country_region`.`region_id` = `quote_address`.`region_id`)
-                  WHERE
-                    `quote_address`.`email` IN("' . (implode('", "', (array) $idOrEmails)) . '")
-                    AND `quote_address`.`address_type` = "billing"
-                  GROUP BY `quote_address`.`email`
-                  ORDER BY `quote`.`entity_id` ASC';
-            } else {
-                $query = '
-                  SELECT
-                    `order_address`.`telephone` as `phone`,
-                    `order_address`.`country_id` as `country_code`,
-                    `directory_country_region`.`code` as `region_code`,
-                    `order_address`.`postcode`,
-                    `order_address`.`email` AS `entity_id`,
-                    `order`.`store_id`,
-                    `order_address`.`firstname`,
-                    `order_address`.`lastname`,
-                    `order_address`.`email`,
-                    `order`.`created_at`,
-                    `order`.`customer_group_id` AS `group_id`,
-                    `order`.`customer_gender` AS `gender_id`,
-                    `order`.`customer_dob` AS `birthday`
-                  FROM `' . $tablePrefix . 'sales_flat_order_address` AS `order_address`
-                  INNER JOIN `' . $tablePrefix . 'sales_flat_order` AS `order` ON (
-                    `order`.`entity_id` = `order_address`.`parent_id`
-                  )
-                  LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `directory_country_region` ON(`directory_country_region`.`region_id` = `order_address`.`region_id`)
-                  WHERE
-                    `order_address`.`email` IN("' . (implode('", "', (array) $idOrEmails)) . '")
-                    AND `order_address`.`address_type` = "billing"
-                  GROUP BY `order_address`.`email`
-                  ORDER BY `order`.`entity_id` ASC';
-            }
-        }
-
-        $results = $readConnection->fetchAll($query);
-        if ($results && is_array($results) && sizeof($results)) {
-            foreach ( $results as $row ) {
-                $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($row ['email']);
-                $return [] = array (
-                        'id_customer' => $row ['entity_id'],
-                        'shop_id_shop' => $row ['store_id'],
-                        'optin' => $subscriber->isSubscribed(),
-                        'customer_since' => $row ['created_at'],
-                        'last_name' => $row ['lastname'],
-                        'first_name' => $row ['firstname'],
-                        'email_address' => $row ['email'],
-                        'phone1' => (isset($row ['phone']) && $row ['phone'] ? $row ['phone'] : ''),
-                        'phone2' => '',
-                        'gender' => (isset($row ['gender_id']) && ($row ['gender_id'] == 1 || $row ['gender_id'] == 2) ? $row ['gender_id'] : 0),
-                        'birthday' => (isset($row ['birthday']) ? $row ['birthday'] : 0),
-                        'locale' => self::getUserLocale($row ['entity_id'], $row ['store_id'], $row ['country_code']),
-                        'region' => $row ['region_code'],
-                        'postcode' => $row ['postcode'],
-                        'date_last_order' => self::getDateLastOrder($row ['entity_id']),
-                        'nb_order' => self::countCustomerOrder($row['entity_id'], null),
-                        'sum_order' => self::sumCustomerOrder($row['entity_id']),
-                        'nb_order_year' => self::countCustomerOrder($row['entity_id'], '1 YEAR'),
-                        'sum_order_year' => self::sumCustomerOrder($row['entity_id'], '1 YEAR'),
-                        'groups' => array (
-                                $row ['group_id']
-                        )
-                );
-            }
-        }
-        return (sizeof($return) === 1 ? $return [0] : $return);
+        $GetUserAction = new SPM_ShopyMind_Action_GetUser($idOrEmails, $fromQuotes);
+        return $GetUserAction->process();
     }
 
     /**
@@ -1222,8 +1070,8 @@ class ShopymindClient_Callback {
 
         if ($collection && sizeof($collection)) {
             foreach ( $collection as $product ) {
-                $image_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
-                $product_url = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
+                $image_url = Mage::helper('shopymind')->productImageUrlOf($product);
+                $product_url = Mage::helper('shopymind')->productUrlOf($product);
                 $return [] = array (
                         'description' => $product->getName(),
                         'price' => $product->getPrice(),
@@ -1635,7 +1483,7 @@ class ShopymindClient_Callback {
         if (strlen($search) < self::SEARCH_MIN_LENGTH) {
             return array();
         }
-        $attribute = Mage::getModel('eav/config')->getAttribute('catalog_product', self::MANUFACTURER_ATTRIBUTE_CODE);
+        $attribute = Mage::getModel('eav/config')->getAttribute('catalog_product', SPM_ShopyMind_Helper_Data::MANUFACTURER_ATTRIBUTE_CODE);
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
         $scope->restrictEavAttribute($attribute);
@@ -1863,24 +1711,13 @@ class ShopymindClient_Callback {
 
     private static function combinationsOfProduct(Mage_Catalog_Model_Product $product)
     {
-        static $nameAttributeId = null;
-        if (is_null($nameAttributeId)) {
-            $nameAttributeId = Mage::getModel('eav/entity_attribute')->loadByCode(Mage_Catalog_Model_Product::ENTITY, 'name')->getId();
-        }
-
-        $combinations = array();
-        if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
-            $combinations = array_map(
-                function ($childProduct) {
-                    return array(
-                        'id'   => $childProduct->getId(),
-                        'name' => $childProduct->getName()
-                    );
-                },
-                Mage::getModel('catalog/product_type_configurable')->getUsedProducts(array($nameAttributeId), $product)
+        $formatter = function ($childProduct) {
+            return array(
+                'id' => $childProduct->getId(),
+                'name' => $childProduct->getName()
             );
-        }
-        return $combinations;
+        };
+        return Mage::helper('shopymind')->formatCombinationsOfProduct($product, $formatter, array('name'));
     }
 
     public static function findCategories($id_shop, $lang = false, $search) {
@@ -2066,4 +1903,31 @@ class ShopymindClient_Callback {
         return $SyncCustomersAction->process();
     }
 
+    public static function syncProducts($id_shop, $start, $limit, $lastUpdate, $idProduct= false, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $SyncProductsAction = new SPM_ShopyMind_Action_SyncProducts($scope, $start, $limit, $lastUpdate, $idProduct, $justCount);
+        return $SyncProductsAction->process();
+    }
+
+    public static function syncProductsCategories($id_shop, $start, $limit, $lastUpdate, $idCategory = false, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $SyncProductCategoriesAction = new SPM_ShopyMind_Action_SyncProductCategories($scope, $start, $limit, $lastUpdate, $idCategory, $justCount);
+        return $SyncProductCategoriesAction->process();
+    }
 }
