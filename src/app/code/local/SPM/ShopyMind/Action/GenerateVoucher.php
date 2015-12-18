@@ -21,44 +21,13 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
     public function process()
     {
         $couponCode = $this->generateCouponCode();
-        $date = date('Y-m-d H:i:s');
 
-        $rule = Mage::getModel('salesrule/rule');
-
-        if (!empty($this->params['duplicateCode'])) {
-            $ruleId = Mage::getModel('salesrule/coupon')->load($this->params['duplicateCode'], 'code')->getRuleId();
-            if (!$ruleId) {
-                return false;
-            }
-            $ruleData = Mage::getModel('salesrule/rule')->load($ruleId)->getData();
-
-            unset($ruleData['rule_id']);
-            $rule->setData($ruleData);
+        if (empty($this->params['duplicateCode'])) {
+            $rule = $this->makeNewRule($couponCode);
         } else {
-            $rule->setName($couponCode)
-                ->setFromDate($date)
-                ->setToDate((date('Y-m-d 23:59:59', mktime(date("H"), date("i"), date("s"), date("m"), date("d") + $this->params['nbDayValidate'], date("Y")))))
-                ->setUsesPerCustomer('1')
-                ->setIsActive('1')
-                ->setStopRulesProcessing('0')
-                ->setIsAdvanced('1')
-                ->setProductIds(NULL)
-                ->setSortOrder('0');
-
-            if ($this->params['type'] == 'percent') {
-                $rule->setSimpleAction('by_percent')
-                    ->setDiscountAmount($this->params['amount'])
-                    ->setDiscountQty(NULL)
-                    ->setSimpleFreeShipping('0');
-            }
-
-            if ($this->params['type'] == 'amount') {
-                $rule->setSimpleAction('cart_fixed')
-                    ->setDiscountAmount($this->params['amount'])
-                    ->setDiscountQty(NULL)
-                    ->setSimpleFreeShipping('0');
-            } elseif ($this->params['type'] == 'shipping') {
-                $rule->setSimpleFreeShipping(1);
+            $rule = $this->makeDuplicatedRule($this->params['duplicateCode']);
+            if (empty($rule)) {
+                return false;
             }
         }
 
@@ -87,7 +56,6 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
         if ($rule->save()) {
             return $couponCode;
         }
-
         return false;
     }
 
@@ -139,5 +107,54 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
             ->setCustomerGroupIds($this->getAllCustomerGroupsIds())
             ->setWebsiteIds($websiteId)
             ->setCouponCode($coupon_code);
+    }
+
+    private function makeNewRule($couponCode)
+    {
+        $now = date('Y-m-d H:i:s');
+        $rule = Mage::getModel('salesrule/rule');
+
+        $rule->setName($couponCode)
+            ->setFromDate($now)
+            ->setToDate((date('Y-m-d 23:59:59', mktime(date("H"), date("i"), date("s"), date("m"), date("d") + $this->params['nbDayValidate'], date("Y")))))
+            ->setUsesPerCustomer('1')
+            ->setIsActive('1')
+            ->setStopRulesProcessing('0')
+            ->setIsAdvanced('1')
+            ->setProductIds(NULL)
+            ->setSortOrder('0');
+
+        if ($this->params['type'] == 'percent') {
+            $rule->setSimpleAction('by_percent')
+                ->setDiscountAmount($this->params['amount'])
+                ->setDiscountQty(NULL)
+                ->setSimpleFreeShipping('0');
+        }
+
+        if ($this->params['type'] == 'amount') {
+            $rule->setSimpleAction('cart_fixed')
+                ->setDiscountAmount($this->params['amount'])
+                ->setDiscountQty(NULL)
+                ->setSimpleFreeShipping('0');
+        } elseif ($this->params['type'] == 'shipping') {
+            $rule->setSimpleFreeShipping(1);
+        }
+
+        return $rule;
+    }
+
+    private function makeDuplicatedRule($fromCode)
+    {
+        $ruleId = Mage::getModel('salesrule/coupon')->load($fromCode, 'code')->getRuleId();
+        if (!$ruleId) {
+            return false;
+        }
+
+        $ruleData = Mage::getModel('salesrule/rule')->load($ruleId)->getData();
+        unset($ruleData['rule_id']);
+
+        $rule = Mage::getModel('salesrule/rule');
+        $rule->setData($ruleData);
+        return $rule;
     }
 }
