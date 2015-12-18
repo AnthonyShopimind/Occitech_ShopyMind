@@ -158,7 +158,11 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function saveProductCategory(Varien_Event_Observer $observer)
     {
-        ShopymindClient_Bin_Notify::saveProductCategory($observer->getEvent()->getCategory()->getId());
+        $category = $observer->getEvent()->getCategory();
+        if ($category->hasInitialSetupFlag()) {
+            return; // Prevent triggering notifications during the setup of a Magento store (or during tests setup). See magento_src/app/code/core/Mage/Catalog/data/catalog_setup/data-install-1.6.0.0.php:52
+        }
+        ShopymindClient_Bin_Notify::saveProductCategory($category->getId());
     }
 
     /**
