@@ -649,29 +649,42 @@ class ShopymindClient_Callback {
         $results = $readConnection->fetchAll($query);
 
         if ($results && is_array($results) && sizeof($results)) {
-            foreach ( $results as $row ) {
-                self::startStoreEmulationByStoreId($row['store_id']);
-                $orderedProducts = self::productsOfCart($row['quote_id']);
+            foreach ($results as $row) {
+                $orderedProducts = self::productsOfOrder($id_shop, $row['entity_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
-                if (sizeof($orderedProducts)) {
+                if (!empty($orderedProducts)) {
                     $return [] = array(
                         'currency' => $row['order_currency_code'],
                         'total_amount' => $row['base_grand_total'],
-                        'articles' => $orderedProducts,
+                        'products' => $orderedProducts,
                         'date_order' => $row['created_at'],
                         'id_order' => $row['increment_id'],
                         'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email'])),
                         'shipping_number' => $shippingNumbers,
                     );
                 }
-
-                self::stopStoreEmulation();
             }
         }
         return ($justCount ? array (
                 'count' => sizeof($return)
         ) : $return);
+    }
+
+    private static function productsOfOrder($idshop, $orderId)
+    {
+        $resultProducts = Mage::getModel('sales/order')->load($orderId)->getAllVisibleItems();
+        if (empty($resultProducts) || !is_array($resultProducts)) {
+            return array();
+        }
+
+        $productIds = array_map(function($orderItem) {
+            return $orderItem->getProductId();
+        }, $resultProducts);
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($idshop);
+        $Action = new SPM_ShopyMind_Action_SyncProducts($scope, null, null, null, $productIds, false);
+        return $Action->process();
     }
 
     /**
@@ -1096,9 +1109,8 @@ class ShopymindClient_Callback {
                 self::startStoreEmulationByStoreId($storeIds[0]);
             }
         }
-        $return = array ();
-
         $collection = array ();
+
         if ($products) {
             $collection = Mage::getResourceModel('catalog/product_collection');
             $collection
@@ -1129,11 +1141,14 @@ class ShopymindClient_Callback {
         }
 
         $scope->restrictProductCollection($collection);
-        if ($lang || $id_shop)
-            self::stopStoreEmulation();
-
         $ProductDataMapper = new SPM_ShopyMind_DataMapper_Product();
-        return array_values(array_map(array($ProductDataMapper, 'format'), iterator_to_array($collection)));
+        $products = array_values(array_map(array($ProductDataMapper, 'format'), iterator_to_array($collection)));
+
+        if ($lang || $id_shop) {
+            self::stopStoreEmulation();
+        }
+
+        return $products;
     }
 
     /**
