@@ -10,6 +10,10 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Products extends EcomD
     {
         parent::tearDown();
         Mage::unregister('_resource_singleton/catalog/product_flat');
+
+        if (session_id()) {
+            session_destroy();
+        }
     }
 
     public function testCanGetRandomProducts()
