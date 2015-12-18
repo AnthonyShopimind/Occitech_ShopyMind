@@ -21,21 +21,22 @@ class SPM_ShopyMind_Test_DataMapper_Category extends EcomDev_PHPUnit_Test_Case
     public function testFieldsAreCorrectlyMapped()
     {
         $expected = array(
-            'shop_id_shop' => 1,
+            'shop_id_shop' => 0,
             'id_category' => 3,
             'id_parent_category' => 2,
-            'lang' => 'fr',
+            'lang' => 'en',
             'name' => 'Test Category 1',
             'description' => 'this is a test category',
             'link' => 'http://shopymind.test/catalog/category/view/s/test-category-1/id/3/',
-            'date_creation' => '2013-10-26T05:00:00-07:00',
+            'date_creation' => '2013-10-26 12:00:00',
             'active' => '1',
         );
 
         $category = Mage::getModel('catalog/category')->load(3);
-        $category->setData('locale', 'fr_FR');
-        $Formatter = new SPM_ShopyMind_DataMapper_Category($category);
-        $actual = $Formatter->format();
+
+        $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
+        $Formatter = new SPM_ShopyMind_DataMapper_Category($scope);
+        $actual = $Formatter->format($category);
 
         $this->assertEquals($expected, $actual);
     }

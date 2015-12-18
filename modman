@@ -3,3 +3,4 @@ src/app/design/frontend/base/default/layout/shopymind.xml           app/design/f
 src/app/design/frontend/base/default/template/shopymind             app/design/frontend/base/default/template/shopymind
 src/app/etc/modules/SPM_ShopyMind.xml                               app/etc/modules/SPM_ShopyMind.xml
 src/lib/ShopymindClient                                             lib/ShopymindClient
+src/shell/*                                                         shell/
