@@ -80,4 +80,17 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 
         return $code;
     }
+
+    public function startEmulatingScope(SPM_ShopyMind_Model_Scope $scope)
+    {
+        $storeIds = $scope->storeIds();
+        $appEmulation = Mage::getSingleton('core/app_emulation');
+        return $appEmulation->startEnvironmentEmulation($storeIds[0]);
+    }
+
+    public function stopEmulation($emulatedEnvironment)
+    {
+        Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($emulatedEnvironment);
+    }
+
 }

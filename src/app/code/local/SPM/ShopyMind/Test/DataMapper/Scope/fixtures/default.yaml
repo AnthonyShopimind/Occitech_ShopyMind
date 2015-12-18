@@ -1,0 +1,38 @@
+scope:
+  website: # Initialize websites
+    - website_id: 1
+      code: b2c
+      name: B2C
+      default_group_id: 1
+    - website_id: 2
+      code: b2b
+      name: B2B
+      default_group_id: 2
+  group: # Initializes store groups
+    - group_id: 1
+      website_id: 1
+      name: B2C
+      default_store_id: 1
+      root_category_id: 1 # Default Category
+    - group_id: 2
+      website_id: 2
+      name: B2B
+      default_store_id: 2
+      root_category_id: 1 # Default Category
+  store: # Initializes store views
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: b2c
+      name: France B2C
+      is_active: 1
+    - store_id: 2
+      website_id: 2
+      group_id: 2
+      code: b2b
+      name: France B2B
+      is_active: 1
+
+config:
+  websites/b2b/general/locale/code: fr_FR
+  stores/b2b/currency/options/default: EUR

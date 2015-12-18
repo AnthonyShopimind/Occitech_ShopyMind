@@ -122,21 +122,6 @@ class SPM_ShopyMind_Test_Action_SyncProducts extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals(array($expected), array_values(array_map(function($product) { return $product->getName(); }, $actual->getItems())));
     }
 
-    public function testGetScopedRelatedInformations()
-    {
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('website-2');
-        $SyncProducts = new SPM_ShopyMind_Action_SyncProducts($scope, null, null, null, 1, false);
-
-        $actual = $SyncProducts->getScopedRelatedInformations($scope);
-        $expected = array(
-            'shop_id_shop' => 2,
-            'lang' => 'fr',
-            'currency' => 'EUR'
-        );
-
-        $this->assertEquals($expected, $actual);
-    }
-
     public function testProcessActionWithMockedFormatter()
     {
         $MockedDataMapper = $this->getMock('SPM_ShopyMind_DataMapper_Product', array('format'));
