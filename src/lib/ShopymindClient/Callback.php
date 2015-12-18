@@ -650,7 +650,7 @@ class ShopymindClient_Callback {
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ($results as $row) {
-                $orderedProducts = self::productsOfOrder($id_shop, $row['entity_id']);
+                $orderedProducts = self::productsOfOrder($id_shop, $row['quote_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
                 if (!empty($orderedProducts)) {
@@ -671,15 +671,15 @@ class ShopymindClient_Callback {
         ) : $return);
     }
 
-    private static function productsOfOrder($idshop, $orderId)
+    private static function productsOfOrder($idshop, $quoteId)
     {
-        $resultProducts = Mage::getModel('sales/order')->load($orderId)->getAllVisibleItems();
+        $resultProducts = Mage::getModel('sales/quote')->load($quoteId)->getAllVisibleItems();
         if (empty($resultProducts) || !is_array($resultProducts)) {
             return array();
         }
 
-        $productIds = array_map(function($orderItem) {
-            return $orderItem->getProductId();
+        $productIds = array_map(function($quoteItem) {
+            return $quoteItem->getProductId();
         }, $resultProducts);
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($idshop);
