@@ -70,7 +70,7 @@ class ShopymindClient_Callback {
         }
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                $return [$row ['status']] = $row ['label'];
+                $return [$row['status']] = $row['label'];
             }
         }
         return $return;
@@ -182,10 +182,10 @@ class ShopymindClient_Callback {
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                if (! $row ['entity_id'])
+                if (! $row['entity_id'])
                     continue;
                 $return [] = array (
-                        'customer' => self::getUser($row ['entity_id'])
+                        'customer' => self::getUser($row['entity_id'])
                 );
             }
         }
@@ -203,7 +203,7 @@ class ShopymindClient_Callback {
             if ($results && is_array($results) && sizeof($results)) {
                 foreach ( $results as $row ) {
                     $return [] = array (
-                            'customer' => self::getUser($row ['customer_email'])
+                            'customer' => self::getUser($row['customer_email'])
                     );
                 }
             }
@@ -402,7 +402,7 @@ class ShopymindClient_Callback {
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
                 $return [] = array (
-                        'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']))
+                        'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']))
                 );
             }
         }
@@ -477,7 +477,7 @@ class ShopymindClient_Callback {
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
                 $return [] = array (
-                        'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']))
+                        'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']))
                 );
             }
         }
@@ -548,10 +548,10 @@ class ShopymindClient_Callback {
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                if (! $row ['entity_id'])
+                if (! $row['entity_id'])
                     continue;
                 $return [] = array (
-                        'customer' => self::getUser($row ['entity_id'])
+                        'customer' => self::getUser($row['entity_id'])
                 );
             }
         }
@@ -650,18 +650,18 @@ class ShopymindClient_Callback {
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                self::startStoreEmulationByStoreId($row ['store_id']);
+                self::startStoreEmulationByStoreId($row['store_id']);
                 $orderedProducts = self::productsOfCart($row['quote_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
                 if (sizeof($orderedProducts)) {
                     $return [] = array(
-                        'currency' => $row ['order_currency_code'],
-                        'total_amount' => $row ['base_grand_total'],
+                        'currency' => $row['order_currency_code'],
+                        'total_amount' => $row['base_grand_total'],
                         'articles' => $orderedProducts,
                         'date_order' => $row['created_at'],
-                        'id_order' => $row ['increment_id'],
-                        'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
+                        'id_order' => $row['increment_id'],
+                        'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email'])),
                         'shipping_number' => $shippingNumbers,
                     );
                 }
@@ -804,7 +804,7 @@ class ShopymindClient_Callback {
         $results = Mage::getResourceModel('customer/group_collection')->toOptionArray();
         if ($results) {
             foreach ( $results as $row ) {
-                $return [] = $row ['value'];
+                $return [] = $row['value'];
             }
         }
         return $return;
@@ -830,7 +830,7 @@ class ShopymindClient_Callback {
         $results = Mage::getResourceModel('customer/group_collection')->toOptionArray();
         if ($results) {
             foreach ( $results as $row ) {
-                $return [$row ['value']] = $row ['label'];
+                $return [$row['value']] = $row['label'];
             }
         }
         return $return;
@@ -851,8 +851,8 @@ class ShopymindClient_Callback {
         $results = Mage::getResourceModel('directory/country_collection')->loadByStore()->toOptionArray();
         if ($results) {
             foreach ( $results as $row ) {
-                if ($row ['value'])
-                    $return [$row ['value']] = $row ['label'];
+                if ($row['value'])
+                    $return [$row['value']] = $row['label'];
             }
         }
         return $return;
@@ -1062,7 +1062,7 @@ class ShopymindClient_Callback {
                 WHERE `name` LIKE "SPM-%" AND `to_date` <= DATE_SUB("' . $date . '", INTERVAL 7 DAY)');
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                $cartRule = Mage::getModel('salesrule/rule')->load($row ['id']);
+                $cartRule = Mage::getModel('salesrule/rule')->load($row['id']);
                 $cartRule->delete();
             }
         }
