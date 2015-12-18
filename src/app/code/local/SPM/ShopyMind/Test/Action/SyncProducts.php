@@ -11,9 +11,6 @@ class SPM_ShopyMind_Test_Action_SyncProducts extends EcomDev_PHPUnit_Test_Case
     public function tearDown()
     {
         parent::tearDown();
-        if (session_id()) {
-            session_destroy();
-        }
     }
 
     public function testRetrieveProductsWithoutRestrictions()
@@ -135,7 +132,7 @@ class SPM_ShopyMind_Test_Action_SyncProducts extends EcomDev_PHPUnit_Test_Case
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('website-2');
         $SyncProducts = new SPM_ShopyMind_Action_SyncProducts($scope, null, null, null, 1, false);
-        $SyncProducts->setDataMapper($MockedDataMapper);
+        $SyncProducts->setProductDataMapper($MockedDataMapper);
 
         $actual = $SyncProducts->process();
         $expectedKeys = array('shop_id_shop', 'lang', 'currency');

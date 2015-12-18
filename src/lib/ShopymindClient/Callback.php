@@ -647,10 +647,9 @@ class ShopymindClient_Callback {
             GROUP BY `order_primary`.`customer_email`';
 
         $results = $readConnection->fetchAll($query);
-
         if ($results && is_array($results) && sizeof($results)) {
             foreach ($results as $row) {
-                $orderedProducts = self::productsOfOrder($id_shop, $row['quote_id']);
+                $orderedProducts = self::productsOfOrder($scope, $row['quote_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
                 if (!empty($orderedProducts)) {
@@ -671,20 +670,28 @@ class ShopymindClient_Callback {
         ) : $return);
     }
 
-    private static function productsOfOrder($idshop, $quoteId)
+    private static function productsOfOrder(SPM_ShopyMind_Model_Scope $scope, $quoteId)
     {
+        $helper = Mage::helper('shopymind');
+        $emulatedEnvironment = $helper->startEmulatingScope($scope);
         $resultProducts = Mage::getModel('sales/quote')->load($quoteId)->getAllVisibleItems();
         if (empty($resultProducts) || !is_array($resultProducts)) {
             return array();
         }
 
-        $productIds = array_map(function($quoteItem) {
-            return $quoteItem->getProductId();
+        $products = array_map(function($quoteItem) {
+            return $quoteItem->getProduct();
         }, $resultProducts);
 
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($idshop);
-        $Action = new SPM_ShopyMind_Action_SyncProducts($scope, null, null, null, $productIds, false);
-        return $Action->process();
+        $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
+        $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            array($ProductMapper, 'format'),
+            SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope)
+        ));
+        $data = $formatter->format($products);
+        $helper->stopEmulation($emulatedEnvironment);
+
+        return $data;
     }
 
     /**

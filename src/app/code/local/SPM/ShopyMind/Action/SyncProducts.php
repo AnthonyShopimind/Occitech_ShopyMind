@@ -3,7 +3,7 @@
 class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Action
 {
     private $params;
-    private $dataMapper;
+    private $productDataMapper;
 
     public function __construct(SPM_ShopyMind_Model_Scope $scope, $start, $limit, $lastUpdate, $productId = false, $justCount = false)
     {
@@ -17,53 +17,38 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
         );
     }
 
-    public function setDataMapper(SPM_ShopyMind_DataMapper_Product $dataMapper = null)
+    public function setProductDataMapper(SPM_ShopyMind_DataMapper_Product $productDataMapper = null)
     {
-        $this->dataMapper = $dataMapper;
+        $this->productDataMapper = $productDataMapper;
     }
 
-    private function getDataMapper()
+    private function getProductDataMapper()
     {
-        if (is_null($this->dataMapper)) {
-            $this->dataMapper = new SPM_ShopyMind_DataMapper_Product();
+        if (is_null($this->productDataMapper)) {
+            $this->productDataMapper = new SPM_ShopyMind_DataMapper_Product();
         }
 
-        return $this->dataMapper;
+        return $this->productDataMapper;
     }
 
     public function process()
     {
         $productCollection = $this->retrieveProducts();
-
         if ($this->params['justCount']) {
             return $productCollection->count();
         }
 
-        $scopeData = $this->getScopedRelatedInformations($this->params['scope']);
-        $scopeDataEnricher = function($productData) use ($scopeData) {
-           return array_merge($productData, $scopeData);
-        };
-
-        return array_map($scopeDataEnricher, array_map(
-            array($this->getDataMapper(), 'format'),
-            iterator_to_array($productCollection)
+        $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            array($this->getProductDataMapper(), 'format'),
+            SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($this->params['scope']),
         ));
-    }
-
-    public function getScopedRelatedInformations(SPM_ShopyMind_Model_Scope $scope)
-    {
-        return array(
-            'shop_id_shop' => $scope->getId(),
-            'lang' => $scope->getLang(),
-            'currency' => $scope->currencyCode()
-        );
+        return $formatter->format(iterator_to_array($productCollection));
     }
 
     public function retrieveProducts()
     {
-        $storeIds = $this->params['scope']->storeIds();
-        $appEmulation = Mage::getSingleton('core/app_emulation');
-        $emulatedEnvironment = $appEmulation->startEnvironmentEmulation($storeIds[0]);
+        $helper = Mage::helper('shopymind');
+        $emulatedEnvironment = $helper->startEmulatingScope($this->params['scope']);
 
         $productCollection = Mage::getModel('catalog/product')->getCollection();
         $this->params['scope']->restrictProductCollection($productCollection);
@@ -82,8 +67,8 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
         $limit = !empty($this->params['limit']) ? (int) $this->params['limit'] : null;
 
         $productCollection->getSelect()->limit($limit, $offset);
-
-        $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
+        $helper->stopEmulation($emulatedEnvironment);
         return $productCollection;
     }
+
 }
