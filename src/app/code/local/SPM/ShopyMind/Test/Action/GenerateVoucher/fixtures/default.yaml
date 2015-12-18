@@ -1,0 +1,33 @@
+scope:
+  website:
+    - website_id: 1
+      code: b2c
+      name: B2C
+      default_group_id: 1
+  group:
+    - group_id: 1
+      website_id: 1
+      name: B2C
+      default_store_id: 1
+      root_category_id: 2
+  store:
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: b2c
+      name: France B2C
+      is_active: 1
+
+eav:
+ customer:
+   - entity_id: 1
+     entity_type_id: 1
+     attribute_set_id: 0
+     website_id: 1
+     store_id: 1
+     group_id: 1
+     is_active: 1
+     gender: 2
+     firstname: April
+     lastname: Oliver
+     email: april.oliver90@example.com

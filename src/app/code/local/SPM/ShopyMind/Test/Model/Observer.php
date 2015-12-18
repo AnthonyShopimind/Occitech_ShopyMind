@@ -2,8 +2,9 @@
 
 /**
  * @loadSharedFixture
+ * @group observer
  */
-class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
+class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case_Config
 {
     private $scope;
     private $SUT;
@@ -147,5 +148,23 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case
     {
         $this->scope->expects($this->once())->method('saveConfig')
             ->with($path, $value);
+    }
+
+    public function testNeededEventsAreListenedWithCorrectMethods()
+    {
+        $events = array(
+            'catalog_product_save_after' => 'saveProduct',
+            'catalog_product_delete_after_done' => 'deleteProduct',
+            'catalog_category_save_after' => 'saveProductCategory',
+            'catalog_category_delete_after' => 'deleteProductCategory',
+            'customer_save_after' => 'saveCustomer',
+            'customer_address_save_after' => 'saveCustomer',
+            'customer_address_delete_after' => 'saveCustomer',
+            'customer_delete_after' => 'deleteCustomer',
+        );
+
+        foreach($events as $event => $method) {
+            $this->assertEventObserverDefined('global', $event, 'shopymind/observer', $method);
+        }
     }
 }

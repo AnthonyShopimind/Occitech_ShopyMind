@@ -4,7 +4,7 @@
  * @loadSharedFixture
  * @group actions
  */
-class SPM_ShopyMind_Test_Action_SyncCustomers extends PHPUnit_Framework_TestCase
+class SPM_ShopyMind_Test_Action_SyncCustomers extends EcomDev_PHPUnit_Test_Case
 {
     public function testRetrieveCustomerEmailsWithoutRestrictions()
     {

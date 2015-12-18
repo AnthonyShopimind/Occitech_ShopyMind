@@ -57,6 +57,14 @@ QUERY
             'date_creation' => '2013-03-05 05:48:12',
             'active' => true,
         );
+
+        // Change assertion to match Magento 1.8.x core flaw with createdAt dates...
+        // See http://magento.stackexchange.com/a/31225
+        $versionInfo = Mage::getVersionInfo();
+        if ($versionInfo['major'] === '1' && $versionInfo['minor'] === '8') {
+            $expectedData['date_creation'] = '2013-05-03 05:48:12'; // This is a known behavior on an unpatched Magento 1.8 month/day will be switched
+        }
+
         $this->assertEquals($expectedData, $actual);
     }
 
