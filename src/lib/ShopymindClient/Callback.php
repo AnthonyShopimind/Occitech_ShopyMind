@@ -302,8 +302,7 @@ class ShopymindClient_Callback {
         $results = $readConnection->fetchAll($query);
         if (!empty($results) && is_array($results)) {
             foreach($results as $row) {
-                self::startStoreEmulationByStoreId($row['store_id']);
-                $cartProducts = self::productsOfCart($row['entity_id']);
+                $cartProducts = self::productsOfCart($scope, $row['entity_id']);
                 if (!empty($cartProducts)) {
                     $return[] = array(
                         'sum_cart' => ($row['base_grand_total'] / $row['store_to_base_rate']),
@@ -320,21 +319,25 @@ class ShopymindClient_Callback {
                         'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']), true)
                     );
                 }
-                self::stopStoreEmulation();
             }
         }
         return ($justCount ? array('count' => count($return)) : $return);
     }
 
-    private static function productsOfCart($cartId)
+    private static function productsOfCart(SPM_ShopyMind_Model_Scope $scope, $cartId)
     {
+        $helper = Mage::helper('shopymind');
+        $emulatedEnvironment = $helper->startEmulatingScope($scope);
+
         $resultProducts = Mage::getModel('sales/quote')->load($cartId)->getAllVisibleItems();
         if (empty($resultProducts) || !is_array($resultProducts)) {
             return array();
         }
 
         $QuoteItemDataMapper = new SPM_ShopyMind_DataMapper_QuoteItem();
-        return array_map(array($QuoteItemDataMapper, 'format'), $resultProducts);
+        $data = array_map(array($QuoteItemDataMapper, 'format'), $resultProducts);
+        $helper->stopEmulation($emulatedEnvironment);
+        return $data;
     }
 
     /**
@@ -1799,14 +1802,12 @@ class ShopymindClient_Callback {
         $collection = Mage::getResourceModel('sales/quote_collection')
             ->addFieldToFilter('entity_id', array('in' => (array) $id_cart));
 
-        SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)
-            ->restrictCollection($collection);
-
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $scope->restrictCollection($collection);
         $results = array();
 
         foreach ($collection as $quote) {
-            self::startStoreEmulationByStoreId($quote->getStoreId());
-            $cartProducts = self::productsOfCart($quote->getId());
+            $cartProducts = self::productsOfCart($scope, $quote->getId());
             $results[] = array(
                 'sum_cart' => ($quote->getBaseGrandTotal() / $quote->getStoreToBaseRate()),
                 'currency' => $quote->getBaseCurrencyCode(),
@@ -1822,7 +1823,6 @@ class ShopymindClient_Callback {
                 'products' => $cartProducts,
                 'customer' => self::getUser(($quote->getCustomerId() ? $quote->getCustomerId() : $quote->getCustomerEmail()), true)
             );
-            self::stopStoreEmulation();
         }
 
         return $results;
