@@ -33,17 +33,37 @@ scope:
       name: Store 2
       is_active: 1
 
+config:
+  default/currency/options/default: USD
+  default/general/locale/code: en_US
+
 eav:
   catalog_product:
     - entity_id: 1
-      sku: product_1
+      name: Produit 1
+      sku: some_sku
+      type_id: simple
       attribute_set_id: 4
       status: 1
+      stock:
+        qty: 100.00
+        is_in_stock: 1
+      category_ids:
+        - 2
+      price: 13.00
       website_ids:
         - website_1
     - entity_id: 2
-      sku: product_2
+      name: Produit 2
+      sku: some_sku2
+      type_id: simple
       attribute_set_id: 4
       status: 1
+      stock:
+        qty: 100.00
+        is_in_stock: 1
+      category_ids:
+        - 2
+      price: 13.00
       website_ids:
         - website_1

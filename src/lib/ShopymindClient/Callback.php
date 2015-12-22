@@ -1036,22 +1036,19 @@ class ShopymindClient_Callback {
      * @return array
      */
     public static function getProducts($id_shop, $lang, $products = false, $random = false, $maxProducts = 3) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
-        if ($lang) {
-            self::startStoreEmulationByIsoLang($lang,$id_shop);
-        } elseif ($id_shop) {
-            $storeIds = $scope->storeIds();
-            if (!empty($storeIds)) {
-                self::startStoreEmulationByStoreId($storeIds[0]);
-            }
         }
-        $collection = array ();
+        /** @var SPM_ShopyMind_Helper_Data $helper */
+        $helper = Mage::helper('shopymind');
 
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
+        $emulatedEnvironment = $helper->startEmulatingScope($scope);
+
+        $collection = array();
         if ($products) {
             $collection = Mage::getResourceModel('catalog/product_collection');
             $collection
@@ -1065,6 +1062,7 @@ class ShopymindClient_Callback {
                 ->addAttributeToFilter('visibility', array(
                         'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
                 )
+                ->setFlag('require_stock_items', true)
                 ->getSelect();
             $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         } elseif ($random) {
@@ -1077,19 +1075,21 @@ class ShopymindClient_Callback {
                 ->addAttributeToFilter('visibility', array(
                         'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
                 )
+                ->setFlag('require_stock_items', true)
                 ->getSelect()->order('rand()');
             $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         }
-
         $scope->restrictProductCollection($collection);
+
         $ProductDataMapper = new SPM_ShopyMind_DataMapper_Product();
-        $products = array_values(array_map(array($ProductDataMapper, 'format'), iterator_to_array($collection)));
+        $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            array($ProductDataMapper, 'format'),
+            SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope)
+        ));
+        $result = $formatter->format(iterator_to_array($collection));
 
-        if ($lang || $id_shop) {
-            self::stopStoreEmulation();
-        }
-
-        return $products;
+        $helper->stopEmulation($emulatedEnvironment);
+        return array_values($result);
     }
 
     /**
