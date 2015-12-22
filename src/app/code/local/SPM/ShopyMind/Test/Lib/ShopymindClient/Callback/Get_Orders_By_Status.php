@@ -75,26 +75,44 @@ QUERY
         $this->assertEquals($expected, $actual);
     }
 
-    public function testItShouldReturnsProductWithCorrectFormat()
+    public function testItShouldReturnProductsCorrectDataWithCommonFormatAndScopeInformation()
     {
-        $this->markTestIncomplete('No need to test it.');
-        $expectedProduct = array(
-            'id_product' => '1',
-            'id_combination' => '1',
-            'id_manufacturer' => null,
-            'price' => '13.0000',
-            'qty' => 2.0,
-        );
         $result = ShopymindClient_Callback::getOrdersByStatus(
-            false,
+            'store-1',
             '2015-01-01',
             array(array('country' => 'US')),
             0,
             'processing'
         );
+        $firstProduct = $result[0]['products'][0];
+        $firstProductKeys = array_keys($firstProduct);
 
-        unset($result[0]['products'][0]['image_link']);
-        $this->assertEquals($expectedProduct, $result[0]['products'][0]);
+        $expectedProductCommonFormatKeys = array(
+            'shop_id_shop',
+            'id_product',
+            'reference',
+            'lang',
+            'name',
+            'description_short',
+            'description',
+            'product_link',
+            'image_link',
+            'combinations',
+            'id_categories',
+            'id_manufacturer',
+            'currency',
+            'price',
+            'price_discount',
+            'quantity_remaining',
+            'date_creation',
+            'active',
+        );
+        sort($firstProductKeys);
+        sort($expectedProductCommonFormatKeys);
+
+        $this->assertEquals($expectedProductCommonFormatKeys, $firstProductKeys);
+        $this->assertEquals(100.0, $firstProduct['quantity_remaining']); // the real remaining quantity is returned, not the one ordered... this is a "feature"
+        $this->assertEquals(1, $firstProduct['shop_id_shop']);
     }
 
     public function testIfTheStoreHasNoOrderAnEmptyArrayIsReturned()

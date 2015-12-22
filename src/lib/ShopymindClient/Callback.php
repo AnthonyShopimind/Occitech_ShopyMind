@@ -678,18 +678,17 @@ class ShopymindClient_Callback {
             return array();
         }
 
-        $products = array_map(function($quoteItem) {
-            return $quoteItem->getProduct();
-        }, $resultProducts);
-
         $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
         $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            function (Mage_Sales_Model_Quote_Item $quoteItem) {
+                return $quoteItem->getProduct();
+            },
             array($ProductMapper, 'format'),
             SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope)
         ));
-        $data = $formatter->format($products);
-        $helper->stopEmulation($emulatedEnvironment);
+        $data = $formatter->format($resultProducts);
 
+        $helper->stopEmulation($emulatedEnvironment);
         return $data;
     }
 
