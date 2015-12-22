@@ -310,11 +310,7 @@ class ShopymindClient_Callback {
                         'tax_rate' => $row['store_to_base_rate'],
                         'id_cart' => $row['entity_id'],
                         'date_cart' => $row['created_at'],
-                        'link_cart' => str_replace(
-                            basename($_SERVER ['SCRIPT_NAME']) . '/',
-                            '',
-                            Mage::getUrl('checkout/cart', array('_nosid' => true)
-                        )),
+                        'link_cart' => Mage::helper('shopymind')->getUrl('checkout/cart'),
                         'products' => $cartProducts,
                         'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']), true)
                     );
@@ -994,9 +990,7 @@ class ShopymindClient_Callback {
             self::startStoreEmulationByIsoLang($lang,$id_shop);
         $return = array ();
         // Lien vers panier
-        $return ['link_cart'] = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', Mage::getUrl('checkout/cart', array (
-                '_nosid' => true
-        )));
+        $return ['link_cart'] = Mage::helper('shopymind')->getUrl('checkout/cart');
         // Article au hasard
         $return ['articles'] = self::getProducts($id_shop, $lang, false, true);
         if ($lang)
@@ -1804,8 +1798,8 @@ class ShopymindClient_Callback {
 
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
         $scope->restrictCollection($collection);
-        $results = array();
 
+        $results = array();
         foreach ($collection as $quote) {
             $cartProducts = self::productsOfCart($scope, $quote->getId());
             $results[] = array(
@@ -1815,11 +1809,7 @@ class ShopymindClient_Callback {
                 'id_cart' => $quote->getId(),
                 'date_cart' =>$quote->getCreatedAt(),
                 'date_upd' => $quote->getUpdatedAt(),
-                'link_cart' => str_replace(
-                    basename($_SERVER ['SCRIPT_NAME']) . '/',
-                    '',
-                    Mage::getUrl('checkout/cart', array('_nosid' => true)
-                    )),
+                'link_cart' => Mage::helper('shopymind')->getUrl('checkout/cart'),
                 'products' => $cartProducts,
                 'customer' => self::getUser(($quote->getCustomerId() ? $quote->getCustomerId() : $quote->getCustomerEmail()), true)
             );

@@ -3,13 +3,13 @@
 /**
  * @loadSharedFixture
  * @doNotIndexAll
- * @group 54
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status extends EcomDev_PHPUnit_Test_Case
 {
-    public function tearDown()
+    protected function setUp()
     {
-        parent::tearDown();
+        parent::setUp();
+        $this->replaceByMock('model', 'core/session', $this->guestSession());
     }
 
     public static function tearDownAfterClass()
@@ -85,7 +85,7 @@ QUERY
             'price' => '13.0000',
             'qty' => 2.0,
         );
-        $result =  ShopymindClient_Callback::getOrdersByStatus(
+        $result = ShopymindClient_Callback::getOrdersByStatus(
             false,
             '2015-01-01',
             array(array('country' => 'US')),

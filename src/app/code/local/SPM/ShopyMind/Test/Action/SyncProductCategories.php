@@ -3,7 +3,6 @@
 /**
  * @loadSharedFixture
  * @group actions
- * @group 58
  */
 class SPM_ShopyMind_Test_Action_SyncProductCategories extends PHPUnit_Framework_TestCase
 {

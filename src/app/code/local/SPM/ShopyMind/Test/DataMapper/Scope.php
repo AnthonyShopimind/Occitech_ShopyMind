@@ -2,11 +2,16 @@
 
 /**
  * Class SPM_ShopyMind_Test_DataMapper_Scope
- * @group tdd
  * @loadSharedFixture
  */
 class SPM_ShopyMind_Test_DataMapper_Scope extends EcomDev_PHPUnit_Test_Case
 {
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->replaceByMock('model', 'core/session', $this->guestSession());
+    }
+
     public function testFormatWithUnRestrictedScopeShouldReturnedMagentoDefaultInformation()
     {
         $ScopeFormatter = new SPM_ShopyMind_DataMapper_Scope();
@@ -22,9 +27,6 @@ class SPM_ShopyMind_Test_DataMapper_Scope extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @loadFixture default
-     */
     public function testFormatWithRestrictedScopeShouldReturnedShopInformation()
     {
         $ScopeFormatter = new SPM_ShopyMind_DataMapper_Scope();
