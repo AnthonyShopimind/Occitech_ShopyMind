@@ -588,20 +588,21 @@ class ShopymindClient_Callback {
      * @return array|int
      */
     public static function getOrdersByStatus($id_shop, $dateReference, $timezones, $nbDays, $idStatus, $justCount = false) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
             ), func_get_args());
-        $return = array ();
+        }
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
 
         $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
-        if (! $timezonesWhere)
+        if (!$timezonesWhere) {
             return false;
+        }
         $query = '
             SELECT
                 `order_primary`.`store_id`,
@@ -646,6 +647,7 @@ class ShopymindClient_Callback {
             GROUP BY `order_primary`.`customer_email`';
 
         $results = $readConnection->fetchAll($query);
+        $return = array();
         if ($results && is_array($results) && sizeof($results)) {
             foreach ($results as $row) {
                 $orderedProducts = self::productsOfOrder($scope, $row['quote_id']);
@@ -664,9 +666,7 @@ class ShopymindClient_Callback {
                 }
             }
         }
-        return ($justCount ? array (
-                'count' => sizeof($return)
-        ) : $return);
+        return ($justCount ? array('count' => sizeof($return)) : $return);
     }
 
     private static function productsOfOrder(SPM_ShopyMind_Model_Scope $scope, $quoteId)
