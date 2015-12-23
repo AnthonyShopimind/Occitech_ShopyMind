@@ -41,7 +41,7 @@ tables:
   sales/quote_item:
     - item_id: 1
       quote_id: 1
-      product_id: 1
+      product_id: 125
       parent_item_id: null
       is_virtual: 0
       sku: 14156575-XS-9394

@@ -108,7 +108,7 @@ tables:
       base_weee_tax_applied_row_amnt: null
     - item_id: 2
       quote_id: 1
-      product_id: 1
+      product_id: 125
       parent_item_id: 1
       is_virtual: 0
       sku: 14156575-XS

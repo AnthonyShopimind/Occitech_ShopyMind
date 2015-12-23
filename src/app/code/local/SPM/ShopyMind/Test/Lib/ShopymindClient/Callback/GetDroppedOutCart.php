@@ -72,12 +72,12 @@ QUERY
                 'date_cart' => '2014-01-29 12:45:46',
                 'products' => array (
                     array (
-                        'id_product' => 1,
+                        'id_product' => 125,
                         'id_manufacturer' => null,
                         'price' => '13.0000',
                         'reference' => '14156575-XS-9394',
                         'combinations' => array(),
-                        'product_link' => 'catalog/product/view/id/1/s/legging/',
+                        'product_link' => 'catalog/product/view/id/125/s/legging/',
                         'image_link' => 'media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
                         'price_discount' => '13.0000',
                         'name' => 'LEGGING',
@@ -153,7 +153,7 @@ QUERY
 
         $expectedResult = array(array(
             'id_product' => 2,
-            'id_combination' => 1,
+            'id_combination' => 125,
             'combination_name' => 'LEGGING',
             'id_manufacturer' => null,
             'price' => '13.0000',
