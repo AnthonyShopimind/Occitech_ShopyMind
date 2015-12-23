@@ -33,6 +33,10 @@ scope:
       name: France B2B
       is_active: 1
 
+config:
+  default/currency/options/default: USD
+  default/general/locale/code: en_US
+
 eav:
  catalog_product:
    - entity_id: 1
@@ -43,6 +47,9 @@ eav:
      weight: 0.4000
      price: 13.0000
      status: 1
+     stock:
+       qty: 4.00
+       is_in_stock: 1
      category_ids:
       - 2
       - 1

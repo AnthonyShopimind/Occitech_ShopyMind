@@ -7,7 +7,11 @@ eav:
      has_options: 1
      required_options: 1
      status: 1
+     price: 13.0000
+     status: 1
      name: "LEGGING configurable"
+     category_ids:
+      - 2
      website_ids:
        - b2c
 

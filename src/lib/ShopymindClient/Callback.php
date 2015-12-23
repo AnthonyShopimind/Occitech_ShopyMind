@@ -324,15 +324,30 @@ class ShopymindClient_Callback {
     {
         $helper = Mage::helper('shopymind');
         $emulatedEnvironment = $helper->startEmulatingScope($scope);
+        $currentCart = Mage::getModel('sales/quote')->load($cartId);
 
-        $resultProducts = Mage::getModel('sales/quote')->load($cartId)->getAllVisibleItems();
+        $resultProducts = $currentCart->getAllVisibleItems();
         if (empty($resultProducts) || !is_array($resultProducts)) {
             return array();
         }
 
-        $QuoteItemDataMapper = new SPM_ShopyMind_DataMapper_QuoteItem();
-        $data = array_map(array($QuoteItemDataMapper, 'format'), $resultProducts);
+        $products = array_map(function($quoteItem) {
+            $combinations = $quoteItem->getChildren();
+            $product = $quoteItem->getProduct();
+            if (count($combinations)) {
+                $product->setData('selected_combination', Mage::getModel('catalog/product')->load($combinations[0]->getProductId()));
+            }
+            return $product;
+        }, $resultProducts);
+
+        $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
+        $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            array($ProductMapper, 'formatProductWithCombination'),
+            SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope),
+        ));
+        $data = $formatter->format($products);
         $helper->stopEmulation($emulatedEnvironment);
+
         return $data;
     }
 
