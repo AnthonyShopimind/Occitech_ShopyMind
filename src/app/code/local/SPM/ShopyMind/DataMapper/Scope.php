@@ -2,7 +2,6 @@
 
 class SPM_ShopyMind_DataMapper_Scope
 {
-
     public function format(SPM_ShopyMind_Model_Scope $scope)
     {
         $shopymind = Mage::helper('shopymind');
@@ -15,7 +14,6 @@ class SPM_ShopyMind_DataMapper_Scope
         $shopymind->stopEmulation($emulatedEnvironment);
 
         return $scopeData;
-
     }
 
     public static function makeScopeEnricher(SPM_ShopyMind_Model_Scope $scope)
