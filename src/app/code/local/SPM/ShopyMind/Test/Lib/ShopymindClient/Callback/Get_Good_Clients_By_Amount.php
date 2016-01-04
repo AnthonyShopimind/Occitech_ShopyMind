@@ -6,9 +6,11 @@
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Amount extends EcomDev_PHPUnit_Test_Case
 {
 
+    /**
+     * @group fixtures-leaking
+     */
     public function testGetForADefinedStore()
     {
-        $this->markTestIncomplete('Skipped due to fixture leaking');
         $expected = array(
             array(
                 'customer' => array(

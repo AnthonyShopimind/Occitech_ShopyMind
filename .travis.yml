@@ -22,4 +22,5 @@ script:
   - docker-compose build
   - docker-compose up -d
   - sleep 20
-  - bin/test.sh ${MAGENTO_VERSION}
+  - bin/test.sh ${MAGENTO_VERSION} --exclude-group fixtures-leaking
+  - bin/test.sh ${MAGENTO_VERSION} --group fixtures-leaking

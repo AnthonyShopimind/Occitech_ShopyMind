@@ -27,6 +27,9 @@ QUERY
         );
     }
 
+    /**
+     * @group fixtures-leaking
+     */
     public function testCanGetProcessingOrders()
     {
         $expected = array(
