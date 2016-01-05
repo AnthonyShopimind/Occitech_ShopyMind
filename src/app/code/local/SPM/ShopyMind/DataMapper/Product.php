@@ -44,15 +44,9 @@ class SPM_ShopyMind_DataMapper_Product
         }
 
         $combinationData = array();
-
-        if ($combination = $product->getData('selected_combination')) {
-            $combination->unsetData('is_salable');
-            $combinationData = array(
-                'id_combination' => $combination->getId(),
-                'combination_name' => $combination->getName(),
-                'quantity_remaining' => $combination->getStockItem()->getQty(),
-                'active' => (bool) $combination->getIsSalable(),
-            );
+        $CombinationFormatter = new SPM_ShopyMind_DataMapper_Combination();
+        if ($CombinationFormatter->isApplicable($product)) {
+            $combinationData = $CombinationFormatter->formatSelectedCombinationData($product);
         } else {
             $combinationData['combinations'] = $this->formattedCombinationsOf($product);
         }
