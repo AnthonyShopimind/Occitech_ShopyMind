@@ -331,21 +331,14 @@ class ShopymindClient_Callback {
             return array();
         }
 
-        $products = array_map(function($quoteItem) {
-            $combinations = $quoteItem->getChildren();
-            $product = $quoteItem->getProduct();
-            if (count($combinations)) {
-                $product->setData('selected_combination', Mage::getModel('catalog/product')->load($combinations[0]->getProductId()));
-            }
-            return $product;
-        }, $resultProducts);
-
+        $DataTransformer = new SPM_ShopyMind_DataMapper_DataTransformer_QuoteItemToProduct();
         $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
         $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            array($DataTransformer, 'transform'),
             array($ProductMapper, 'formatProductWithCombination'),
             SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope),
         ));
-        $data = $formatter->format($products);
+        $data = $formatter->format($resultProducts);
         $helper->stopEmulation($emulatedEnvironment);
 
         return $data;
