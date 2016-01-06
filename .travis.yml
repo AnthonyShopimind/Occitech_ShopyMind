@@ -1,28 +1,20 @@
 language: php
 
 php:
-  - 5.6
+  - 5.3
+  - 5.4
+  - 5.5
 
 sudo: required
 services:
   - docker
 
 env:
-  - MAGENTO_VERSION=1.6.2.0-patch2  PHP_VERSION=5.3
-  - MAGENTO_VERSION=1.6.2.0-patch2  PHP_VERSION=5.4
-  - MAGENTO_VERSION=1.6.2.0-patch2  PHP_VERSION=5.5
-  - MAGENTO_VERSION=1.7.0.2-patch8  PHP_VERSION=5.3
-  - MAGENTO_VERSION=1.7.0.2-patch8  PHP_VERSION=5.4
-  - MAGENTO_VERSION=1.7.0.2-patch8  PHP_VERSION=5.5
-  - MAGENTO_VERSION=1.8.1.0-patch2  PHP_VERSION=5.3
-  - MAGENTO_VERSION=1.8.1.0-patch2  PHP_VERSION=5.4
-  - MAGENTO_VERSION=1.8.1.0-patch2  PHP_VERSION=5.5
-  - MAGENTO_VERSION=1.9.1.1-patch4  PHP_VERSION=5.3
-  - MAGENTO_VERSION=1.9.1.1-patch4  PHP_VERSION=5.4
-  - MAGENTO_VERSION=1.9.1.1-patch4  PHP_VERSION=5.5
-  - MAGENTO_VERSION=1.9.2.2-patch1  PHP_VERSION=5.3
-  - MAGENTO_VERSION=1.9.2.2-patch1  PHP_VERSION=5.4
-  - MAGENTO_VERSION=1.9.2.2-patch1  PHP_VERSION=5.5
+  - MAGENTO_VERSION=1.6.2.0-patch2
+  - MAGENTO_VERSION=1.7.0.2-patch8
+  - MAGENTO_VERSION=1.8.1.0-patch2
+  - MAGENTO_VERSION=1.9.1.1-patch4
+  - MAGENTO_VERSION=1.9.2.2-patch1
 
 matrix:
   fast_finish: true
@@ -34,7 +26,7 @@ before_install:
 
 script:
   - composer -n install
-  - TRAVIS_PHP_VERSION=${PHP_VERSION} docker-compose build
-  - TRAVIS_PHP_VERSION=${PHP_VERSION} docker-compose up -d
+  - TRAVIS_PHP_VERSION=${TRAVIS_PHP_VERSION} docker-compose build
+  - TRAVIS_PHP_VERSION=${TRAVIS_PHP_VERSION} docker-compose up -d
   - sleep 20
-  - TRAVIS_PHP_VERSION=${PHP_VERSION} bin/test.sh ${MAGENTO_VERSION}
+  - TRAVIS_PHP_VERSION=${TRAVIS_PHP_VERSION} bin/test.sh ${MAGENTO_VERSION}
