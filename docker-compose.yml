@@ -4,6 +4,7 @@ db:
     MYSQL_ROOT_PASSWORD: "root"
 
 test:
+  dockerfile: Dockerfile.${TRAVIS_PHP_VERSION}
   build: ./docker/magento-test
   volumes:
     - .:/src

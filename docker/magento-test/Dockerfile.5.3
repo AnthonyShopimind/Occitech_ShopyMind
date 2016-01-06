@@ -1,0 +1,15 @@
+FROM occitech/magento:php5.3-apache
+
+RUN yes | apt-get update \
+    && apt-get install -y php5-xdebug libxml2-dev php-soap \
+    && echo "xdebug.remote_enable=on" >> /etc/php5/conf.d/xdebug.ini \
+    && echo "xdebug.remote_autostart=off" >> /etc/php5/conf.d/xdebug.ini \
+    && echo "xdebug.max_nesting_level=500" >> /etc/php5/conf.d/xdebug.ini
+
+RUN apt-get update && apt-get install -y unzip wget
+
+COPY ./bin/test.sh /
+
+RUN rm -rf /var/www/htdocs
+WORKDIR /var/www
+CMD "/test.sh"
