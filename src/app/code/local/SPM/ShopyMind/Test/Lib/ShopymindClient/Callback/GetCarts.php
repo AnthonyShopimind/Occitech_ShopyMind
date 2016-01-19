@@ -28,7 +28,6 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetCarts extends EcomDev_P
                 'reference' => '14156575-XS-9394',
                 'combinations' => array(),
                 'product_link' => 'catalog/product/view/id/1/s/legging/',
-                'image_link' => 'media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
                 'price_discount' => '13.0000',
                 'name' => 'LEGGING',
                 'description_short' => null,
@@ -102,6 +101,7 @@ QUERY
     public function testGetASingleCart()
     {
         $results = ShopymindClient_Callback::getCarts('store-1', 1);
+        $results = $this->removeImageUrlKeyFrom($results);
 
         $expectedResult = array(
             $this->_anExpectedCart,
@@ -115,6 +115,7 @@ QUERY
     public function testGetMultipleCarts()
     {
         $results = ShopymindClient_Callback::getCarts('store-1', array(1, 2));
+        $results = $this->removeImageUrlKeyFrom($results);
 
         $anotherCart = array_merge(
             $this->_anExpectedCart,
@@ -131,5 +132,18 @@ QUERY
         );
 
         $this->assertEquals($expectedResult, $results);
+    }
+
+    private function removeImageUrlKeyFrom($results)
+    {
+        $results = array_map(function ($result) {
+            $result['products'] = array_map(function ($product) {
+                unset($product['image_link']);
+                return $product;
+            }, $result['products']);
+
+            return $result;
+        }, $results);
+        return $results;
     }
 }

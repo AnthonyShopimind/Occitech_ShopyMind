@@ -39,6 +39,7 @@ QUERY
     {
         $simpleProduct = Mage::getModel('catalog/product')->load(1);
         $actual = $this->SUT->format($simpleProduct);
+        unset($actual['image_link']);
 
         $expectedData = array(
             'id_product' => 1,
@@ -47,7 +48,6 @@ QUERY
             'description_short' => 'This is a short description',
             'description' => 'This is a long description',
             'product_link' => 'catalog/product/view/id/1/s/first-simple-product/',
-            'image_link' => 'media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
             'combinations' => array(),
             'id_categories' => array(1, 2),
             'id_manufacturer' => null,
