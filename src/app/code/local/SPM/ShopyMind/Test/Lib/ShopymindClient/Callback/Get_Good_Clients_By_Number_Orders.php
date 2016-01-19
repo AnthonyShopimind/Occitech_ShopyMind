@@ -22,7 +22,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Number
                     'customer_since' => '0000-00-00 00:00:00',
                     'phone1' => '',
                     'phone2' => '',
-                    'date_last_order' => '2014-12-24 10:00:00',
+                    'date_last_order' => '2015-12-24 10:00:00',
                     'nb_order' => '3',
                     'sum_order' => 0,
                     'groups' => array('1'),
@@ -39,7 +39,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Number
 
         $actual = ShopymindClient_Callback::getGoodClientsByNumberOrders(
             'store-1',
-            date('2015-01-01 00:00:00'),
+            date('2016-01-01 00:00:00'),
             array(array('country' => 'US')),
             2,
             0,
@@ -47,7 +47,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Good_Clients_By_Number
             8
         );
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual, 'TODO Prevent this test to break when changing year');
     }
 
 }

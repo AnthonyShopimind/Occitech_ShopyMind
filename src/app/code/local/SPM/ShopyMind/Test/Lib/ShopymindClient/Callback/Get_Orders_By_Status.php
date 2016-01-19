@@ -40,7 +40,7 @@ QUERY
                     'gender' => '2',
                     'birthday' => '1990-01-01 00:00:00',
                     'locale' => '_00',
-                    'date_last_order' => '2015-01-01 10:00:00',
+                    'date_last_order' => '2016-01-01 10:00:00',
                     'nb_order' => '1',
                     'sum_order' => 0,
                     'groups' => array('1'),
@@ -53,20 +53,20 @@ QUERY
                     'addresses' => array(),
                 ),
                 'shipping_number' => array(),
-                'date_order' => '2015-01-01 10:00:00'
+                'date_order' => '2016-01-01 10:00:00'
             ),
         );
 
         $actual = ShopymindClient_Callback::getOrdersByStatus(
             false,
-            '2015-01-01',
+            '2016-01-01',
             array(array('country' => 'US')),
             0,
             'processing'
         );
 
         unset($actual[0]['articles']);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual, 'TODO Prevent this test to break when changing year');
     }
 
     public function testItShouldReturnsProductWithCorrectFormat()
@@ -80,7 +80,7 @@ QUERY
         );
         $result =  ShopymindClient_Callback::getOrdersByStatus(
             false,
-            '2015-01-01',
+            '2016-01-01',
             array(array('country' => 'US')),
             0,
             'processing'
@@ -94,7 +94,7 @@ QUERY
     {
         $actual = ShopymindClient_Callback::getOrdersByStatus(
             'store-2',
-            '2015-01-01',
+            '2016-01-01',
             array(array('country' => 'US')),
             0,
             'processing'
@@ -105,19 +105,19 @@ QUERY
 
     public function testItReturnsFalseWhenNoTimezonesPassed()
     {
-        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2015-01-30 17:40:00', array(), 0, 0, false);
+        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2016-01-30 17:40:00', array(), 0, 0, false);
         $this->assertFalse($result);
     }
 
     public function testItReturnsEmptyArrayWhenNoOrdersMatched()
     {
-        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2015-01-30 17:40:00', array(array('country' => 'US')), 0, 0, false);
+        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2016-01-30 17:40:00', array(array('country' => 'US')), 0, 0, false);
         $this->assertEmpty($result);
     }
 
     public function testItReturnsOrdersCountIfJustCountParameterIsTrue()
     {
-        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2015-01-30 17:40:00', array(array('country' => 'US')), 0, 0, true);
+        $result = ShopymindClient_Callback::getOrdersByStatus(false, '2016-01-30 17:40:00', array(array('country' => 'US')), 0, 0, true);
         $expected = array('count' => 0);
         $this->assertEquals($expected, $result);
     }
@@ -129,7 +129,7 @@ QUERY
     {
         $result = ShopymindClient_Callback::getOrdersByStatus(
             false,
-            '2015-01-11',
+            '2016-01-11',
             array(array('country' => 'US')),
             0,
             'processing'
