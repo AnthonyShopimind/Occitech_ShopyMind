@@ -45,6 +45,8 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
             $rule->getConditions()->addCondition($condition);
         }
 
+        $websiteId = null;
+
         if ($this->params['idShop']) {
             $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($this->params['idShop']);
             $stores = $scope->stores();
