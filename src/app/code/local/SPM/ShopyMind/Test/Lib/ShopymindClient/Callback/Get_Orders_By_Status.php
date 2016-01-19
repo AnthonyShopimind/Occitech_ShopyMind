@@ -6,6 +6,12 @@
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Orders_By_Status extends EcomDev_PHPUnit_Test_Case
 {
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->replaceByMock('model', 'core/session', $this->guestSession());
+    }
+
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
@@ -39,7 +45,7 @@ QUERY
                     'phone2' => '',
                     'gender' => '2',
                     'birthday' => '1990-01-01 00:00:00',
-                    'locale' => '_00',
+                    'locale' => 'en_00',
                     'date_last_order' => '2016-01-01 10:00:00',
                     'nb_order' => '1',
                     'sum_order' => 0,

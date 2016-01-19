@@ -33,6 +33,10 @@ scope:
       name: Store 2
       is_active: 1
 
+config:
+  default/currency/options/default: USD
+  default/general/locale/code: en_US
+
 eav:
   catalog_product:
    - entity_id: 1
