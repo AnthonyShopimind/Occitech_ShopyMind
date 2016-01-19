@@ -6,7 +6,67 @@
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetCarts extends EcomDev_PHPUnit_Test_Case
 {
-    protected $_aCart;
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->replaceByMock('model', 'core/session', $this->guestSession());
+    }
+
+    protected $_anExpectedCart = array(
+        'sum_cart' => 173.88999999999999,
+        'currency' => 'USD',
+        'tax_rate' => '1.0000',
+        'id_cart' => '1',
+        'link_cart' => 'checkout/cart/',
+        'date_cart' => '2014-01-29 12:45:46',
+        'date_upd' => '2014-01-30 13:45:46',
+        'products' => array (
+            array (
+                'id_product' => 1,
+                'id_manufacturer' => null,
+                'price' => '13.0000',
+                'reference' => '14156575-XS-9394',
+                'combinations' => array(),
+                'product_link' => 'catalog/product/view/id/1/s/legging/',
+                'image_link' => 'media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
+                'price_discount' => '13.0000',
+                'name' => 'LEGGING',
+                'description_short' => null,
+                'description' => null,
+                'id_categories' => array(1, 2),
+                'date_creation' => '1970-01-01 00:00:00',
+                'active' => true,
+                'quantity_remaining' => '8.0000',
+                'shop_id_shop' => '1',
+                'lang' => 'en',
+                'currency' => 'USD',
+            ),
+        ),
+        'customer' => array(
+            'id_customer' => '1234',
+            'optin' => false,
+            'customer_since' => '0000-00-00 00:00:00',
+            'last_name' => 'Oliver',
+            'first_name' => 'April',
+            'email_address' => 'april.oliver90@example.com',
+            'phone1' => '',
+            'phone2' => '',
+            'gender' => '2',
+            'birthday' => 0,
+            'locale' => 'en_00',
+            'date_last_order' => 0,
+            'nb_order' => '0',
+            'sum_order' => 0,
+            'groups' => array ('1'),
+            'shop_id_shop' => '1',
+            'nb_order_year' => '0',
+            'sum_order_year' => 0,
+            'region' => null,
+            'postcode' => null,
+            'active' => true,
+            'addresses' => array(),
+        ),
+    );
 
     public static function tearDownAfterClass()
     {
@@ -23,62 +83,6 @@ QUERY
         );
     }
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        if (session_id()) {
-            session_destroy();
-        }
-    }
-
-    public function setUp()
-    {
-        $this->_aCart = array(
-            'sum_cart' => 173.88999999999999,
-            'currency' => 'USD',
-            'tax_rate' => '1.0000',
-            'id_cart' => '1',
-            'link_cart' => 'checkout/cart/',
-            'date_cart' => '2014-01-29 12:45:46',
-            'date_upd' => '2014-01-30 13:45:46',
-            'products' => array (
-                array (
-                    'id_product' => 1,
-                    'id_combination' => 1,
-                    'id_manufacturer' => null, // See test below
-                    'price' => '13.0000',
-                    'qty' => '2.0000',
-                ),
-            ),
-            'customer' => array(
-                'id_customer' => '1234',
-                'optin' => false,
-                'customer_since' => '0000-00-00 00:00:00',
-                'last_name' => 'Oliver',
-                'first_name' => 'April',
-                'email_address' => 'april.oliver90@example.com',
-                'phone1' => '',
-                'phone2' => '',
-                'gender' => '2',
-                'birthday' => 0,
-                'locale' => '_00',
-                'date_last_order' => 0,
-                'nb_order' => '0',
-                'sum_order' => 0,
-                'groups' => array ('1'),
-                'shop_id_shop' => '1',
-                'nb_order_year' => '0',
-                'sum_order_year' => 0,
-                'region' => null,
-                'postcode' => null,
-                'active' => true,
-                'addresses' => array(),
-            ),
-        );
-
-        parent::setUp();
-    }
     public function testGetCartsReturnEmptyListIfTheCartIdDoesNotExists()
     {
         $this->assertEmpty(ShopymindClient_Callback::getCarts('store-1', 1));
@@ -100,7 +104,7 @@ QUERY
         $results = ShopymindClient_Callback::getCarts('store-1', 1);
 
         $expectedResult = array(
-            $this->_aCart,
+            $this->_anExpectedCart,
         );
         $this->assertEquals($expectedResult, $results);
     }
@@ -113,28 +117,19 @@ QUERY
         $results = ShopymindClient_Callback::getCarts('store-1', array(1, 2));
 
         $anotherCart = array_merge(
-            $this->_aCart,
+            $this->_anExpectedCart,
             array(
                 'id_cart' => '2',
                 'date_cart' => '2014-01-30 12:45:46',
                 'date_upd' => '2014-01-31 13:45:46',
             )
         );
-        $anotherCart['products'][0]['qty'] = '1.0000';
 
         $expectedResult = array(
-            $this->_aCart,
+            $this->_anExpectedCart,
             $anotherCart,
         );
 
         $this->assertEquals($expectedResult, $results);
-    }
-
-    private function placeholderImageUrl()
-    {
-        if (!function_exists('imagecreatefromjpeg')) {
-            $this->markTestSkipped('Impossible to work with jpeg images on your system');
-        }
-        return '/catalog/product/cache/1/small_image/200x/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg';
     }
 }

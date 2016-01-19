@@ -94,7 +94,6 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
 
     /**
      * @loadFixture anotherUserWithOrders
-     * @group bugged?
      */
     public function testItDoesNotReturnOrderStatsWhenSearchingByCustomerEmails()
     {

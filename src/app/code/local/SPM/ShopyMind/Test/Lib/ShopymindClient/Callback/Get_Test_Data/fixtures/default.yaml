@@ -39,11 +39,17 @@ eav:
       sku: product_1
       attribute_set_id: 4
       status: 1
+      stock:
+        qty: 100.00
+        is_in_stock: 1
       website_ids:
         - website_1
     - entity_id: 2
       sku: product_2
       attribute_set_id: 4
       status: 1
+      stock:
+        qty: 110.00
+        is_in_stock: 0
       website_ids:
         - website_1

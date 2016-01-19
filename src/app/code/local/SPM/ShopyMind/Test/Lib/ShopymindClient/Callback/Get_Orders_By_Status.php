@@ -59,7 +59,7 @@ QUERY
                     'addresses' => array(),
                 ),
                 'shipping_number' => array(),
-                'date_order' => '2016-01-01 10:00:00'
+                'date_order' => '2016-01-01 10:00:00',
             ),
         );
 
@@ -71,7 +71,7 @@ QUERY
             'processing'
         );
 
-        unset($actual[0]['articles']);
+        unset($actual[0]['products']);
         $this->assertEquals($expected, $actual, 'TODO Prevent this test to break when changing year');
     }
 
@@ -79,12 +79,24 @@ QUERY
     {
         $expectedProduct = array(
             'id_product' => '1',
-            'id_combination' => '1',
             'id_manufacturer' => null,
             'price' => '13.0000',
-            'qty' => 2.0,
+            'reference' => 'some_sku',
+            'product_link' => 'catalog/product/view/id/1/',
+            'price_discount' => 13.0,
+            'name' => 'Produit 1',
+            'description_short' => null,
+            'description' => null,
+            'combinations' => array(),
+            'id_categories' => array(2),
+            'quantity_remaining' => '100.0000',
+            'date_creation' => '1970-01-01 00:00:00',
+            'active' => false,
+            'shop_id_shop' => 0,
+            'lang' => 'en',
+            'currency' => 'USD'
         );
-        $result =  ShopymindClient_Callback::getOrdersByStatus(
+        $result = ShopymindClient_Callback::getOrdersByStatus(
             false,
             '2016-01-01',
             array(array('country' => 'US')),
@@ -92,8 +104,8 @@ QUERY
             'processing'
         );
 
-        unset($result[0]['articles'][0]['image_url']);
-        $this->assertEquals($expectedProduct, $result[0]['articles'][0]);
+        unset($result[0]['products'][0]['image_link']);
+        $this->assertEquals($expectedProduct, $result[0]['products'][0]);
     }
 
     public function testIfTheStoreHasNoOrderAnEmptyArrayIsReturned()

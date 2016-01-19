@@ -19,9 +19,6 @@ QUERY
         );
     }
 
-    /**
-     * @group bugged
-     */
     public function testShouldGetCustomersWhoNeverOrdered()
     {
         $this->markTestIncomplete('Bugged method?');

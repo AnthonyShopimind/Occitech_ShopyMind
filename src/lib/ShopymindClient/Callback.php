@@ -70,7 +70,7 @@ class ShopymindClient_Callback {
         }
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                $return [$row ['status']] = $row ['label'];
+                $return [$row['status']] = $row['label'];
             }
         }
         return $return;
@@ -182,10 +182,10 @@ class ShopymindClient_Callback {
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                if (! $row ['entity_id'])
+                if (! $row['entity_id'])
                     continue;
                 $return [] = array (
-                        'customer' => self::getUser($row ['entity_id'])
+                        'customer' => self::getUser($row['entity_id'])
                 );
             }
         }
@@ -203,7 +203,7 @@ class ShopymindClient_Callback {
             if ($results && is_array($results) && sizeof($results)) {
                 foreach ( $results as $row ) {
                     $return [] = array (
-                            'customer' => self::getUser($row ['customer_email'])
+                            'customer' => self::getUser($row['customer_email'])
                     );
                 }
             }
@@ -302,8 +302,7 @@ class ShopymindClient_Callback {
         $results = $readConnection->fetchAll($query);
         if (!empty($results) && is_array($results)) {
             foreach($results as $row) {
-                self::startStoreEmulationByStoreId($row['store_id']);
-                $cartProducts = self::productsOfCart($row['entity_id']);
+                $cartProducts = self::productsOfCart($scope, $row['entity_id']);
                 if (!empty($cartProducts)) {
                     $return[] = array(
                         'sum_cart' => ($row['base_grand_total'] / $row['store_to_base_rate']),
@@ -311,30 +310,38 @@ class ShopymindClient_Callback {
                         'tax_rate' => $row['store_to_base_rate'],
                         'id_cart' => $row['entity_id'],
                         'date_cart' => $row['created_at'],
-                        'link_cart' => str_replace(
-                            basename($_SERVER ['SCRIPT_NAME']) . '/',
-                            '',
-                            Mage::getUrl('checkout/cart', array('_nosid' => true)
-                        )),
+                        'link_cart' => Mage::helper('shopymind')->getUrl('checkout/cart'),
                         'products' => $cartProducts,
                         'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']), true)
                     );
                 }
-                self::stopStoreEmulation();
             }
         }
         return ($justCount ? array('count' => count($return)) : $return);
     }
 
-    private static function productsOfCart($cartId)
+    private static function productsOfCart(SPM_ShopyMind_Model_Scope $scope, $cartId)
     {
-        $resultProducts = Mage::getModel('sales/quote')->load($cartId)->getAllVisibleItems();
+        $helper = Mage::helper('shopymind');
+        $emulatedEnvironment = $helper->startEmulatingScope($scope);
+        $currentCart = Mage::getModel('sales/quote')->load($cartId);
+
+        $resultProducts = $currentCart->getAllVisibleItems();
         if (empty($resultProducts) || !is_array($resultProducts)) {
             return array();
         }
 
-        $QuoteItemDataMapper = new SPM_ShopyMind_DataMapper_QuoteItem();
-        return array_map(array($QuoteItemDataMapper, 'format'), $resultProducts);
+        $DataTransformer = new SPM_ShopyMind_DataMapper_DataTransformer_QuoteItemToProduct();
+        $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
+        $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            array($DataTransformer, 'transform'),
+            array($ProductMapper, 'formatProductWithCombination'),
+            SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope),
+        ));
+        $data = $formatter->format($resultProducts);
+        $helper->stopEmulation($emulatedEnvironment);
+
+        return $data;
     }
 
     /**
@@ -402,7 +409,7 @@ class ShopymindClient_Callback {
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
                 $return [] = array (
-                        'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']))
+                        'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']))
                 );
             }
         }
@@ -477,7 +484,7 @@ class ShopymindClient_Callback {
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
                 $return [] = array (
-                        'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email']))
+                        'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email']))
                 );
             }
         }
@@ -548,10 +555,10 @@ class ShopymindClient_Callback {
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                if (! $row ['entity_id'])
+                if (! $row['entity_id'])
                     continue;
                 $return [] = array (
-                        'customer' => self::getUser($row ['entity_id'])
+                        'customer' => self::getUser($row['entity_id'])
                 );
             }
         }
@@ -589,20 +596,21 @@ class ShopymindClient_Callback {
      * @return array|int
      */
     public static function getOrdersByStatus($id_shop, $dateReference, $timezones, $nbDays, $idStatus, $justCount = false) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array(
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
             ), func_get_args());
-        $return = array ();
+        }
         $tablePrefix = Mage::getConfig()->getTablePrefix();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
         $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
 
         $timezonesWhere = self::generateTimezonesWhere($timezones, 'order_address', 'country_id');
-        if (! $timezonesWhere)
+        if (!$timezonesWhere) {
             return false;
+        }
         $query = '
             SELECT
                 `order_primary`.`store_id`,
@@ -647,31 +655,49 @@ class ShopymindClient_Callback {
             GROUP BY `order_primary`.`customer_email`';
 
         $results = $readConnection->fetchAll($query);
-
+        $return = array();
         if ($results && is_array($results) && sizeof($results)) {
-            foreach ( $results as $row ) {
-                self::startStoreEmulationByStoreId($row ['store_id']);
-                $orderedProducts = self::productsOfCart($row['quote_id']);
+            foreach ($results as $row) {
+                $orderedProducts = self::productsOfOrder($scope, $row['quote_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
-                if (sizeof($orderedProducts)) {
+                if (!empty($orderedProducts)) {
                     $return [] = array(
-                        'currency' => $row ['order_currency_code'],
-                        'total_amount' => $row ['base_grand_total'],
-                        'articles' => $orderedProducts,
+                        'currency' => $row['order_currency_code'],
+                        'total_amount' => $row['base_grand_total'],
+                        'products' => $orderedProducts,
                         'date_order' => $row['created_at'],
-                        'id_order' => $row ['increment_id'],
-                        'customer' => self::getUser(($row ['customer_id'] ? $row ['customer_id'] : $row ['customer_email'])),
+                        'id_order' => $row['increment_id'],
+                        'customer' => self::getUser(($row['customer_id'] ? $row['customer_id'] : $row['customer_email'])),
                         'shipping_number' => $shippingNumbers,
                     );
                 }
-
-                self::stopStoreEmulation();
             }
         }
-        return ($justCount ? array (
-                'count' => sizeof($return)
-        ) : $return);
+        return ($justCount ? array('count' => sizeof($return)) : $return);
+    }
+
+    private static function productsOfOrder(SPM_ShopyMind_Model_Scope $scope, $quoteId)
+    {
+        $helper = Mage::helper('shopymind');
+        $emulatedEnvironment = $helper->startEmulatingScope($scope);
+        $resultProducts = Mage::getModel('sales/quote')->load($quoteId)->getAllVisibleItems();
+        if (empty($resultProducts) || !is_array($resultProducts)) {
+            return array();
+        }
+
+        $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
+        $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            function (Mage_Sales_Model_Quote_Item $quoteItem) {
+                return $quoteItem->getProduct();
+            },
+            array($ProductMapper, 'format'),
+            SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope)
+        ));
+        $data = $formatter->format($resultProducts);
+
+        $helper->stopEmulation($emulatedEnvironment);
+        return $data;
     }
 
     /**
@@ -768,7 +794,7 @@ class ShopymindClient_Callback {
         $results = Mage::getResourceModel('customer/group_collection')->toOptionArray();
         if ($results) {
             foreach ( $results as $row ) {
-                $return [$row ['value']] = $row ['label'];
+                $return[$row['value']] = $row['label'];
             }
         }
         return $return;
@@ -789,8 +815,8 @@ class ShopymindClient_Callback {
         $results = Mage::getResourceModel('directory/country_collection')->loadByStore()->toOptionArray();
         if ($results) {
             foreach ( $results as $row ) {
-                if ($row ['value'])
-                    $return [$row ['value']] = $row ['label'];
+                if ($row['value'])
+                    $return[$row['value']] = $row['label'];
             }
         }
         return $return;
@@ -971,9 +997,7 @@ class ShopymindClient_Callback {
             self::startStoreEmulationByIsoLang($lang,$id_shop);
         $return = array ();
         // Lien vers panier
-        $return ['link_cart'] = str_replace(basename($_SERVER ['SCRIPT_NAME']) . '/', '', Mage::getUrl('checkout/cart', array (
-                '_nosid' => true
-        )));
+        $return ['link_cart'] = Mage::helper('shopymind')->getUrl('checkout/cart');
         // Article au hasard
         $return ['articles'] = self::getProducts($id_shop, $lang, false, true);
         if ($lang)
@@ -1000,7 +1024,7 @@ class ShopymindClient_Callback {
                 WHERE `name` LIKE "SPM-%" AND `to_date` <= DATE_SUB("' . $date . '", INTERVAL 7 DAY)');
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
-                $cartRule = Mage::getModel('salesrule/rule')->load($row ['id']);
+                $cartRule = Mage::getModel('salesrule/rule')->load($row['id']);
                 $cartRule->delete();
             }
         }
@@ -1020,23 +1044,19 @@ class ShopymindClient_Callback {
      * @return array
      */
     public static function getProducts($id_shop, $lang, $products = false, $random = false, $maxProducts = 3) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
                     __FUNCTION__
             ), func_get_args());
-        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
-        if ($lang) {
-            self::startStoreEmulationByIsoLang($lang,$id_shop);
-        } elseif ($id_shop) {
-            $storeIds = $scope->storeIds();
-            if (!empty($storeIds)) {
-                self::startStoreEmulationByStoreId($storeIds[0]);
-            }
         }
-        $return = array ();
+        /** @var SPM_ShopyMind_Helper_Data $helper */
+        $helper = Mage::helper('shopymind');
 
-        $collection = array ();
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop, $lang);
+        $emulatedEnvironment = $helper->startEmulatingScope($scope);
+
+        $collection = array();
         if ($products) {
             $collection = Mage::getResourceModel('catalog/product_collection');
             $collection
@@ -1050,6 +1070,7 @@ class ShopymindClient_Callback {
                 ->addAttributeToFilter('visibility', array(
                         'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
                 )
+                ->setFlag('require_stock_items', true)
                 ->getSelect();
             $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         } elseif ($random) {
@@ -1062,27 +1083,21 @@ class ShopymindClient_Callback {
                 ->addAttributeToFilter('visibility', array(
                         'in' => Mage::getModel('catalog/product_visibility')->getVisibleInCatalogIds())
                 )
+                ->setFlag('require_stock_items', true)
                 ->getSelect()->order('rand()');
             $collection->setPage(1, ($maxProducts ? $maxProducts : 3));
         }
-
         $scope->restrictProductCollection($collection);
 
-        if ($collection && sizeof($collection)) {
-            foreach ( $collection as $product ) {
-                $image_url = Mage::helper('shopymind')->productImageUrlOf($product);
-                $product_url = Mage::helper('shopymind')->productUrlOf($product);
-                $return [] = array (
-                        'description' => $product->getName(),
-                        'price' => $product->getPrice(),
-                        'image_url' => $image_url,
-                        'product_url' => $product_url
-                );
-            }
-        }
-        if ($lang || $id_shop)
-            self::stopStoreEmulation();
-        return $return;
+        $ProductDataMapper = new SPM_ShopyMind_DataMapper_Product();
+        $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+            array($ProductDataMapper, 'format'),
+            SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope)
+        ));
+        $result = $formatter->format(iterator_to_array($collection));
+
+        $helper->stopEmulation($emulatedEnvironment);
+        return array_values($result);
     }
 
     /**
@@ -1788,14 +1803,12 @@ class ShopymindClient_Callback {
         $collection = Mage::getResourceModel('sales/quote_collection')
             ->addFieldToFilter('entity_id', array('in' => (array) $id_cart));
 
-        SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop)
-            ->restrictCollection($collection);
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $scope->restrictCollection($collection);
 
         $results = array();
-
         foreach ($collection as $quote) {
-            self::startStoreEmulationByStoreId($quote->getStoreId());
-            $cartProducts = self::productsOfCart($quote->getId());
+            $cartProducts = self::productsOfCart($scope, $quote->getId());
             $results[] = array(
                 'sum_cart' => ($quote->getBaseGrandTotal() / $quote->getStoreToBaseRate()),
                 'currency' => $quote->getBaseCurrencyCode(),
@@ -1803,15 +1816,10 @@ class ShopymindClient_Callback {
                 'id_cart' => $quote->getId(),
                 'date_cart' =>$quote->getCreatedAt(),
                 'date_upd' => $quote->getUpdatedAt(),
-                'link_cart' => str_replace(
-                    basename($_SERVER ['SCRIPT_NAME']) . '/',
-                    '',
-                    Mage::getUrl('checkout/cart', array('_nosid' => true)
-                    )),
+                'link_cart' => Mage::helper('shopymind')->getUrl('checkout/cart'),
                 'products' => $cartProducts,
                 'customer' => self::getUser(($quote->getCustomerId() ? $quote->getCustomerId() : $quote->getCustomerEmail()), true)
             );
-            self::stopStoreEmulation();
         }
 
         return $results;

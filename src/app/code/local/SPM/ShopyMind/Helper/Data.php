@@ -28,14 +28,24 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
         return $eavAttribute->getIdByCode($model, $attribute_code);
     }
 
+    public function getUrl($route)
+    {
+        return $this->relativeUrl(Mage::getUrl($route, array('_nosid' => true)));
+    }
+
     public function productUrlOf(Mage_Catalog_Model_Product $product)
     {
-        return str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getProductUrl(false));
+        return $this->relativeUrl($product->getProductUrl(false));
     }
 
     public function productImageUrlOf(Mage_Catalog_Model_Product $product)
     {
-        return str_replace(basename($_SERVER['SCRIPT_NAME']) . '/', '', $product->getSmallImageUrl(200, 200));
+        return $this->relativeUrl($product->getSmallImageUrl(200, 200));
+    }
+
+    private function relativeUrl($url)
+    {
+        return str_replace(Mage::getBaseUrl(), '', $url);
     }
 
     public function manufacturerIdOf(Mage_Catalog_Model_Product $product)
@@ -80,4 +90,17 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 
         return $code;
     }
+
+    public function startEmulatingScope(SPM_ShopyMind_Model_Scope $scope)
+    {
+        $storeIds = $scope->storeIds();
+        $appEmulation = Mage::getSingleton('core/app_emulation');
+        return $appEmulation->startEnvironmentEmulation($storeIds[0]);
+    }
+
+    public function stopEmulation($emulatedEnvironment)
+    {
+        Mage::getSingleton('core/app_emulation')->stopEnvironmentEmulation($emulatedEnvironment);
+    }
+
 }

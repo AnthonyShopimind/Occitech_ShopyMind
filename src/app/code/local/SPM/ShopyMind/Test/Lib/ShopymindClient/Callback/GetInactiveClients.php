@@ -72,9 +72,6 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
         $this->assertEquals(array('count' => 1), $actual);
     }
 
-    /**
-     * @group test
-     */
     public function testItCanRetrieveDataForMutlipleTimezones()
     {
         $actual = ShopymindClient_Callback::getInactiveClients(

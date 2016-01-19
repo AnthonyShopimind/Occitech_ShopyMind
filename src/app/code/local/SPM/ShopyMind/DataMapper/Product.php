@@ -37,6 +37,40 @@ class SPM_ShopyMind_DataMapper_Product
         return $shopymindData;
     }
 
+    public function formatProductWithCombination(Mage_Catalog_Model_Product $product)
+    {
+        if (!$product->getId()) {
+            return array();
+        }
+
+        $combinationData = array();
+        $CombinationFormatter = new SPM_ShopyMind_DataMapper_Combination();
+        if ($CombinationFormatter->isApplicable($product)) {
+            $combinationData = $CombinationFormatter->formatSelectedCombinationData($product);
+        } else {
+            $combinationData['combinations'] = $this->formattedCombinationsOf($product);
+        }
+
+        $product->unsetData('is_salable');
+        $shopymindData = array_merge(
+            $this->formatProductCommonData($product),
+            array(
+                'id_product' => $product->getId(),
+                'name' => $product->getName(),
+                'description_short' => $product->getShortDescription(),
+                'description' => $product->getDescription(),
+                'id_categories' => $product->getCategoryIds(),
+                'id_manufacturer' => $this->helper->manufacturerIdOf($product),
+                'date_creation' => $this->helper->formatDateTime($product->getCreatedAt()),
+                'active' => (bool) $product->getIsSalable(),
+                'quantity_remaining' => $product->getStockItem()->getQty(),
+            ),
+            $combinationData
+        );
+
+        return $shopymindData;
+    }
+
     private function formattedCombinationsOf(Mage_Catalog_Model_Product $product)
     {
         $attributeNames = array('name', 'stock_item', 'price', 'final_price');

@@ -46,8 +46,8 @@ QUERY
             'name' => 'First simple product',
             'description_short' => 'This is a short description',
             'description' => 'This is a long description',
-            'product_link' => 'http://shopymind.test/catalog/product/view/id/1/s/first-simple-product/',
-            'image_link' => 'http://shopymind.test/media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
+            'product_link' => 'catalog/product/view/id/1/s/first-simple-product/',
+            'image_link' => 'media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
             'combinations' => array(),
             'id_categories' => array(1, 2),
             'id_manufacturer' => null,
@@ -103,8 +103,8 @@ QUERY
         $expectedCombinations = array (
             array(
                 'reference' => 'sku43-configurable-pr',
-                'product_link' => 'http://shopymind.test/catalog/product/view/id/1/s/first-simple-product/',
-                'image_link' => 'http://shopymind.test/media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
+                'product_link' => 'catalog/product/view/id/1/s/first-simple-product/',
+                'image_link' => 'media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
                 'combination_name' => 'First simple product',
                 'id_combination' => 1,
                 'price' => 13.00,

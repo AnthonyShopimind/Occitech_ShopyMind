@@ -6,6 +6,12 @@
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetDroppedOutCart extends EcomDev_PHPUnit_Test_Case
 {
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->replaceByMock('model', 'core/session', $this->guestSession());
+    }
+
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
@@ -66,11 +72,24 @@ QUERY
                 'date_cart' => '2014-01-29 12:45:46',
                 'products' => array (
                     array (
-                        'id_product' => 1,
-                        'id_combination' => 1,
-                        'id_manufacturer' => null, // See test below
+                        'id_product' => 125,
+                        'id_manufacturer' => null,
                         'price' => '13.0000',
-                        'qty' => '2.0000',
+                        'reference' => '14156575-XS-9394',
+                        'combinations' => array(),
+                        'product_link' => 'catalog/product/view/id/125/s/legging/',
+                        'image_link' => 'media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
+                        'price_discount' => '13.0000',
+                        'name' => 'LEGGING',
+                        'description_short' => null,
+                        'description' => null,
+                        'id_categories' => array(1, 2),
+                        'date_creation' => '1970-01-01 00:00:00',
+                        'active' => true,
+                        'quantity_remaining' => 4.000,
+                        'shop_id_shop' => '1',
+                        'lang' => 'en',
+                        'currency' => 'USD',
                     ),
                 ),
                 'customer' => array(
@@ -84,7 +103,7 @@ QUERY
                     'phone2' => '',
                     'gender' => '2',
                     'birthday' => 0,
-                    'locale' => '_00',
+                    'locale' => 'en_00',
                     'date_last_order' => 0,
                     'nb_order' => '0',
                     'sum_order' => 0,
@@ -99,6 +118,7 @@ QUERY
                 ),
             ),
         );
+        unset($expectedResult[0]['products'][0]['image_link'], $results[0]['products'][0]['image_link']);
         $this->assertEquals($expectedResult, $results);
     }
 
@@ -133,11 +153,27 @@ QUERY
 
         $expectedResult = array(array(
             'id_product' => 2,
-            'id_combination' => 1,
+            'id_combination' => 125,
+            'combination_name' => 'LEGGING',
             'id_manufacturer' => null,
             'price' => '13.0000',
-            'qty' => '2.0000',
+            'quantity_remaining' => '4.0000',
+            'reference' => '14156575-XS',
+            'product_link' => 'catalog/product/view/id/2/',
+            'image_link' => '/catalog/product/cache/1/smal...ge.jpg',
+            'price_discount' => '13.0000',
+            'name' => 'LEGGING configurable',
+            'description_short' => null,
+            'description' => null,
+            'id_categories' => array(2),
+            'date_creation' => '1970-01-01 00:00:00',
+            'active' => true,
+            'shop_id_shop' => '1',
+            'lang' => 'en',
+            'currency' => 'USD',
         ));
+
+        unset($expectedResult[0]['image_link'], $results[0]['products'][0]['image_link']);
         $this->assertEquals($expectedResult, $results[0]['products']);
     }
 
