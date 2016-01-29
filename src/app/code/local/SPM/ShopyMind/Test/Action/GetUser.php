@@ -3,31 +3,31 @@
 /**
  * @loadSharedFixture
  * @group actions
+ * @group customers
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PHPUnit_Test_Case
 {
 
     private $aCustomer = array(
-        'id_customer'     => 1,
-        'shop_id_shop'    => 1,
-        'optin'           => false,
-        'customer_since'  => '2014-10-21 14:10:59',
-        'last_name'       => 'Oliver',
-        'first_name'      => 'April',
-        'email_address'   => 'april.oliver90@example.com',
-        'phone1'          => '',
-        'phone2'          => '',
-        'gender'          => 2,
-        'birthday'        => 0,
-        'locale'          => '_00',
+        'id_customer' => 1,
+        'shop_id_shop' => 1,
+        'optin' => false,
+        'newsletter' => '',
+        'customer_since' => '2014-10-21',
+        'last_name' => 'Oliver',
+        'first_name' => 'April',
+        'email' => 'april.oliver90@example.com',
+        'phone1' => '',
+        'phone2' => '',
+        'gender' => 2,
+        'birthday' => 0,
+        'locale' => '_00',
         'date_last_order' => 0,
-        'nb_order'        => 0,
-        'sum_order'       => 0,
-        'nb_order_year'   => 0,
-        'sum_order_year'  => 0,
-        'groups'          => array(1),
-        'region' => null,
-        'postcode' => null,
+        'nb_order' => 0,
+        'sum_order' => 0,
+        'nb_order_year' => 0,
+        'sum_order_year' => 0,
+        'groups' => array(1),
         'active' => true,
         'addresses' => array(),
     );
@@ -132,27 +132,23 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
                 'shop_id_shop' => 2,
-                'customer_since' => '2015-01-21 14:14:04',
+                'customer_since' => '2015-01-21',
                 'last_name' => 'Doe',
                 'first_name' => 'Jane',
-                'email_address' => 'jane.doe34@example.com',
+                'email' => 'jane.doe34@example.com',
                 'phone1' => '0102030455',
                 'locale' => 'FR',
                 'gender' => 1,
                 'groups' => array(1),
-                'region' => '92',
-                'postcode' => '31100',
             )),
             array_merge($this->aCustomer, array(
                 'id_customer' => 'april.oliver90@example.com',
-                'customer_since' => '2014-02-06 14:14:04',
+                'customer_since' => '2014-02-06',
                 'phone1' => '0102030405',
                 'gender' => 2,
                 'birthday' => '1962-08-29 00:00:00',
                 'locale' => 'FR',
                 'groups' => array(1),
-                'region' => '92',
-                'postcode' => 92000,
             ))
         );
         $this->assertEquals($expectedData, $result);
@@ -173,27 +169,23 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
                 'shop_id_shop' => 2,
-                'customer_since' => '2015-01-21 14:14:04',
+                'customer_since' => '2015-01-21',
                 'last_name' => 'Doe',
                 'first_name' => 'Jane',
-                'email_address' => 'jane.doe34@example.com',
+                'email' => 'jane.doe34@example.com',
                 'phone1' => '0102030455',
                 'locale' => 'FR',
                 'gender' => 1,
                 'groups' => array(1),
-                'region' => '92',
-                'postcode' => '31100',
             )),
             array_merge($this->aCustomer, array(
                 'id_customer' => 'april.oliver90@example.com',
-                'customer_since' => '2014-02-06 14:14:04',
+                'customer_since' => '2014-02-06',
                 'phone1' => '0102030405',
                 'gender' => 2,
                 'birthday' => '1962-08-29 00:00:00',
                 'locale' => 'FR',
                 'groups' => array(1),
-                'region' => '92',
-                'postcode' => '92000'
             ))
         );
         $this->assertEquals($expectedData, $result);
@@ -201,6 +193,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
 
     /**
      * @loadFixture addresses
+     * @group mine
      */
     public function testItReturnCustomerAddresses()
     {
@@ -216,6 +209,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'city' => 'Marseille',
                 'other' => '',
                 'active' => '',
+                'region' => '',
             ),
             array(
                 'id_address' => 2,
@@ -228,6 +222,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'city' => 'Toulouse',
                 'other' => '',
                 'active' => '',
+                'region' => '',
             ),
             array(
                 'id_address' => 3,
@@ -240,6 +235,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'city' => '',
                 'other' => '',
                 'active' => '',
+                'region' => '',
             ),
         );
         $GetUser = new SPM_ShopyMind_Action_GetUser(1);

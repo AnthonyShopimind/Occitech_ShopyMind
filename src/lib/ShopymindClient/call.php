@@ -154,7 +154,7 @@ try {
                 $params = $server->retrieveParams();
                 $server->sendResponse(array(
                     'lastUpdate' => date('Y-m-d H:i:s'),
-                    'customers' => ShopymindClient_Callback::syncCustomers((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
+                    'customers' => ShopymindClient_Callback::syncCustomers((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['idCustomer']) ? $params['idCustomer'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
                 ), true);
             }
         } elseif ($server->getTypeRequest() === 'syncProducts') {

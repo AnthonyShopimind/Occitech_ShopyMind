@@ -11,17 +11,16 @@ class SPM_ShopyMind_DataMapper_Customer
             'id_customer' => $user['entity_id'],
             'shop_id_shop' => $user['store_id'],
             'optin' => $subscriber->isSubscribed(),
-            'customer_since' => $user['created_at'],
+            'newsletter' => $subscriber->isSubscribed(),
+            'customer_since' => date('Y-m-d', strtotime($user['created_at'])),
             'last_name' => $user['lastname'],
             'first_name' => $user['firstname'],
-            'email_address' => $user['email'],
+            'email' => $user['email'],
             'phone1' => (isset($user['phone']) && $user['phone'] ? $user['phone'] : ''),
             'phone2' => '',
             'gender' => (isset($user['gender_id']) && ($user['gender_id'] == 1 || $user['gender_id'] == 2) ? $user['gender_id'] : 0),
             'birthday' => (isset($user['birthday']) ? $user['birthday'] : 0),
             'locale' => $this->getUserLocale($user['entity_id'], $user['store_id'], $user['country_code']),
-            'region' => $user['region_code'],
-            'postcode' => $user['postcode'],
             'date_last_order' => $this->getDateLastOrder($user['entity_id']),
             'nb_order' => $this->countCustomerOrder($user['entity_id'], null),
             'sum_order' => $this->sumCustomerOrder($user['entity_id']),
@@ -145,6 +144,7 @@ class SPM_ShopyMind_DataMapper_Customer
                 'city' => $address->getCity(),
                 'other' => '',
                 'active' => '',
+                'region' => $address->getRegionCode(),
             );
         }
 
