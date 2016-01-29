@@ -27,7 +27,7 @@ class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
 
-        if (is_numeric($this->params['identifier'])) {
+        if ($this->identifierAreIds()) {
             $query = '
                 SELECT
                     `customer_default_phone`.`value` as `phone`,
@@ -145,5 +145,10 @@ class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
         }
 
         return $readConnection->fetchAll($query);
+    }
+
+    private function identifierAreIds()
+    {
+        return is_numeric($this->params['identifier']) || (is_array($this->params['identifier']) && is_numeric(array_shift(array_values($this->params['identifier']))));
     }
 }

@@ -17,16 +17,16 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
 
     public function process()
     {
-        $customerEmails = $this->retrieveCustomerEmails();
+        $customerIds = $this->retrieveCustomerIds();
         if ($this->params['justCount']) {
-            return $customerEmails;
+            return $customerIds;
         }
 
-        $GetUsers = new SPM_ShopyMind_Action_GetUser($customerEmails);
+        $GetUsers = new SPM_ShopyMind_Action_GetUser($customerIds);
         return $GetUsers->process();
     }
 
-    public function retrieveCustomerEmails()
+    public function retrieveCustomerIds()
     {
         $customerCollection = Mage::getModel('customer/customer')->getCollection()
             ->addFieldToFilter('updated_at', array('gt' => $this->params['lastUpdate']));
@@ -49,7 +49,7 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
         }
 
         return array_map(function($customer) {
-            return $customer->getEmail();
+            return $customer->getEntityId();
         }, iterator_to_array($customerCollection->getIterator()));
     }
 }

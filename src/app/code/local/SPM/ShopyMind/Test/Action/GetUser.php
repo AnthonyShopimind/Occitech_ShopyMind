@@ -12,7 +12,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         'id_customer' => 1,
         'shop_id_shop' => 1,
         'optin' => false,
-        'newsletter' => '',
+        'newsletter' => false,
         'customer_since' => '2014-10-21',
         'last_name' => 'Oliver',
         'first_name' => 'April',
@@ -70,10 +70,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItAcceptsSeveralCustomerEmails()
     {
-        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
-            'jane.doe34@example.com',
-            'april.oliver90@example.com'
-        ));
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(1, 2));
         $result = $GetUser->process();
         $this->assertCount(2, $result);
     }
@@ -83,11 +80,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItReturnsOnlyEmailAddressesFound()
     {
-        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
-            'jane.doe34@example.com',
-            'april.oliver90@example.com',
-            'unknown-email@example.com',
-        ));
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(1, 2, 100001));
         $result = $GetUser->process();
         $this->assertCount(2, $result);
     }
@@ -97,10 +90,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
      */
     public function testItDoesNotReturnOrderStatsWhenSearchingByCustomerEmails()
     {
-        $GetUser = new SPM_ShopyMind_Action_GetUser(array(
-            'jane.doe34@example.com',
-            'april.oliver90@example.com'
-        ));
+        $GetUser = new SPM_ShopyMind_Action_GetUser(array(1, 2));
         $results = $GetUser->process();
 
         $noOrderStats = array(
@@ -193,7 +183,6 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
 
     /**
      * @loadFixture addresses
-     * @group mine
      */
     public function testItReturnCustomerAddresses()
     {
