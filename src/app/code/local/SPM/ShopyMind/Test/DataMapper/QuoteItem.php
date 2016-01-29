@@ -30,4 +30,9 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_QuoteItem extends EcomDe
         $actual = $this->SUT->format($productItem);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testFormProductItemWithOrderItem()
+    {
+        $this->markTestIncomplete('Implement me ...');
+    }
 }
