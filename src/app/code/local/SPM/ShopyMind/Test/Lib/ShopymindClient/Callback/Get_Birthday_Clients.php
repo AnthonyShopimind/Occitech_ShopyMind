@@ -27,11 +27,12 @@ QUERY
                     'id_customer' => '1',
                     'last_name' => 'Oliver',
                     'first_name' => 'April',
-                    'email_address' => 'april.oliver90@example.com',
+                    'email' => 'april.oliver90@example.com',
                     'gender' => '2',
                     'locale' => 'US',
-                    'birthday' => '1990-01-01 00:00:00',
+                    'birthday' => '1990-01-01',
                     'optin' => false,
+                    'newsletter' => false,
                     'customer_since' => '0000-00-00 00:00:00',
                     'phone1' => '',
                     'phone2' => '',
@@ -42,8 +43,6 @@ QUERY
                     'shop_id_shop' => '1',
                     'nb_order_year' => '0',
                     'sum_order_year' => 0,
-                    'region' => 'GA',
-                    'postcode' => null,
                     'active' => true,
                     'addresses' => array(
                         array(
@@ -57,6 +56,7 @@ QUERY
                             'city' => null,
                             'other' => '',
                             'active' => '',
+                            'region' => 'NY',
                         )
                     ),
                 ),
@@ -66,11 +66,12 @@ QUERY
                     'id_customer' => '2',
                     'last_name' => 'Perez',
                     'first_name' => 'Gary',
-                    'email_address' => 'gary.perez41@example.com',
+                    'email' => 'gary.perez41@example.com',
                     'gender' => '1',
                     'locale' => 'US',
-                    'birthday' => '1990-01-01 00:00:00',
+                    'birthday' => '1990-01-01',
                     'optin' => false,
+                    'newsletter' => false,
                     'customer_since' => '0000-00-00 00:00:00',
                     'phone1' => '',
                     'phone2' => '',
@@ -81,8 +82,6 @@ QUERY
                     'shop_id_shop' => '1',
                     'nb_order_year' => '0',
                     'sum_order_year' => 0,
-                    'region' => 'NY',
-                    'postcode' => null,
                     'active' => true,
                     'addresses' => array(
                         array(
@@ -96,6 +95,7 @@ QUERY
                             'city' => null,
                             'other' => '',
                             'active' => '',
+                            'region' => 'NY',
                         )
                     ),
                 ),

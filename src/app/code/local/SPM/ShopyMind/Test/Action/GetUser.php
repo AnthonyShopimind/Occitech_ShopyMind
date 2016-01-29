@@ -13,7 +13,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         'shop_id_shop' => 1,
         'optin' => false,
         'newsletter' => false,
-        'customer_since' => '2014-10-21',
+        'customer_since' => '2014-10-21 14:10:59',
         'last_name' => 'Oliver',
         'first_name' => 'April',
         'email' => 'april.oliver90@example.com',
@@ -62,7 +62,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             'nb_order_year' => 1,
             'sum_order_year' => 14.00,
         );
-        $this->assertEquals($expectedOrderStats, array_intersect_key($result, $expectedOrderStats));
+        $this->assertEquals($expectedOrderStats, array_intersect_key($result, $expectedOrderStats), 'TODO Prevent this test to break when changing year');
     }
 
     /**
@@ -122,7 +122,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
                 'shop_id_shop' => 2,
-                'customer_since' => '2015-01-21',
+                'customer_since' => '2015-01-21 14:14:04',
                 'last_name' => 'Doe',
                 'first_name' => 'Jane',
                 'email' => 'jane.doe34@example.com',
@@ -133,10 +133,10 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             )),
             array_merge($this->aCustomer, array(
                 'id_customer' => 'april.oliver90@example.com',
-                'customer_since' => '2014-02-06',
+                'customer_since' => '2014-02-06 14:14:04',
                 'phone1' => '0102030405',
                 'gender' => 2,
-                'birthday' => '1962-08-29 00:00:00',
+                'birthday' => '1962-08-29',
                 'locale' => 'FR',
                 'groups' => array(1),
             ))
@@ -159,7 +159,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             array_merge($this->aCustomer, array(
                 'id_customer' => 'jane.doe34@example.com',
                 'shop_id_shop' => 2,
-                'customer_since' => '2015-01-21',
+                'customer_since' => '2015-01-21 14:14:04',
                 'last_name' => 'Doe',
                 'first_name' => 'Jane',
                 'email' => 'jane.doe34@example.com',
@@ -170,10 +170,10 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
             )),
             array_merge($this->aCustomer, array(
                 'id_customer' => 'april.oliver90@example.com',
-                'customer_since' => '2014-02-06',
+                'customer_since' => '2014-02-06 14:14:04',
                 'phone1' => '0102030405',
                 'gender' => 2,
-                'birthday' => '1962-08-29 00:00:00',
+                'birthday' => '1962-08-29',
                 'locale' => 'FR',
                 'groups' => array(1),
             ))
