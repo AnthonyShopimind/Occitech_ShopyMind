@@ -81,7 +81,6 @@ QUERY
             'id_manufacturer' => null,
             'price' => '13.0000',
             'reference' => 'some_sku',
-            'product_link' => 'catalog/product/view/id/1/',
             'price_discount' => 13.0,
             'name' => 'Produit 1',
             'description_short' => null,
@@ -103,7 +102,7 @@ QUERY
             'processing'
         );
 
-        unset($result[0]['products'][0]['image_link']);
+        unset($result[0]['products'][0]['image_link'], $result[0]['products'][0]['product_link']);
         $this->assertEquals($expectedProduct, $result[0]['products'][0]);
     }
 

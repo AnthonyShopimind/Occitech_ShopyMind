@@ -30,12 +30,12 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getUrl($route)
     {
-        return $this->relativeUrl(Mage::getUrl($route, array('_nosid' => true)));
+        return Mage::getUrl($route, array('_nosid' => true));
     }
 
     public function productUrlOf(Mage_Catalog_Model_Product $product)
     {
-        return $this->relativeUrl($product->getProductUrl(false));
+        return $product->getProductUrl(false);
     }
 
     public function productImageUrlOf(Mage_Catalog_Model_Product $product)

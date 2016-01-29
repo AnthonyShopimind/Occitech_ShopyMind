@@ -4,6 +4,7 @@
  * Class SPM_ShopyMind_Test_Action_SyncProducts
  * @group actions
  * @loadSharedFixture
+ * @group products
  */
 class SPM_ShopyMind_Test_Action_SyncProducts extends EcomDev_PHPUnit_Test_Case
 {

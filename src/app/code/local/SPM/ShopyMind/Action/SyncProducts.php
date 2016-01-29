@@ -53,6 +53,7 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
         $productCollection = Mage::getModel('catalog/product')->getCollection();
         $this->params['scope']->restrictProductCollection($productCollection);
         $productCollection->addAttributeToSelect('*');
+        $productCollection->addFieldToFilter('visibility', array('in', Mage::getSingleton('catalog/product_visibility')->getVisibleInCatalogIds()));
 
         if ($this->params['productId']) {
             $conditions = is_array($this->params['productId']) ? array('in' => $this->params['productId']) : array('eq' => (int)$this->params['productId']);

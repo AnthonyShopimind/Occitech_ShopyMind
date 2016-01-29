@@ -173,7 +173,7 @@ eav:
      type_id: simple
      attribute_set_id: 4
      status: 1
-     visibility: 1
+     visibility: 4
      short_description: "This is a short description for child product"
      description: "This is a long description for child product"
      url_key: "first-child-product"

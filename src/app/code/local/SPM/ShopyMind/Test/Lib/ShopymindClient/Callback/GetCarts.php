@@ -105,6 +105,8 @@ QUERY
         $expectedResult = array(
             $this->_anExpectedCart,
         );
+
+        $expectedResult= $this->removeImageUrlKeyFrom($expectedResult);
         $this->assertEquals($expectedResult, $results);
     }
 
@@ -130,14 +132,16 @@ QUERY
             $anotherCart,
         );
 
+        $expectedResult= $this->removeImageUrlKeyFrom($expectedResult);
         $this->assertEquals($expectedResult, $results);
     }
 
     private function removeImageUrlKeyFrom($results)
     {
         $results = array_map(function ($result) {
+            unset($result['link_cart']);
             $result['products'] = array_map(function ($product) {
-                unset($product['image_link']);
+                unset($product['image_link'], $product['product_link']);
                 return $product;
             }, $result['products']);
 
