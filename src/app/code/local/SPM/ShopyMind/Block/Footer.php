@@ -142,13 +142,14 @@ class SPM_ShopyMind_Block_Footer extends Mage_Core_Block_Template
                 'country' => (is_object($primaryAddress) ? $primaryAddress->getCountryId() : ''),
             );
 
-            $quote = Mage::getSingleton('checkout/session')->getQuote();
-            $currentUserInfos['cart'] = Mage::helper('shopymind')->formatCustomerQuote($quote);
-        } else
+        } else {
             $currentUserInfos ['user'] = null;
+        }
+
+        $quote = Mage::getSingleton('checkout/session')->getQuote();
+        $currentUserInfos['cart'] = Mage::helper('shopymind')->formatCustomerQuote($quote);
 
         // Id du panier
-
         $currentUserInfos ['id_cart'] = $this->_getSessionCartId();
         $currentUserInfos ['id_product'] = (is_object(Mage::registry('current_product')) ? Mage::registry('current_product')->getId() : '');
         $currentUserInfos ['id_category'] = (is_object(Mage::registry('current_category')) ? Mage::registry('current_category')->getId() : '');
