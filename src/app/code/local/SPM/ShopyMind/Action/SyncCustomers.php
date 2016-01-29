@@ -6,7 +6,6 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
 
     public function __construct(SPM_ShopyMind_Model_Scope $scope, $start, $limit, $lastUpdate, $customerId, $justCount)
     {
-        $this->scope = $scope;
         $this->params['start'] = $start;
         $this->params['limit'] = $limit;
         $this->params['lastUpdate'] = $lastUpdate;
@@ -30,7 +29,10 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
     {
         $customerCollection = Mage::getModel('customer/customer')->getCollection()
             ->addFieldToFilter('updated_at', array('gt' => $this->params['lastUpdate']));
-        $this->params['scope']->restrictCollection($customerCollection);
+
+        if ($this->params['scope']->getId()) {
+            $this->params['scope']->restrictCollection($customerCollection);
+        }
 
         if (!is_array($this->params['customerId']) && !empty($this->params['customerId'])) {
             return $this->params['customerId'];

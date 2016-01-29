@@ -40,7 +40,7 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function productImageUrlOf(Mage_Catalog_Model_Product $product)
     {
-        return $this->relativeUrl($product->getSmallImageUrl(200, 200));
+        return $product->getSmallImageUrl(200, 200);
     }
 
     private function relativeUrl($url)
