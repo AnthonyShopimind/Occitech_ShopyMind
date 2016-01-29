@@ -47,7 +47,12 @@ class SPM_ShopyMind_DataMapper_Order
 
     private function cartDateFor($order)
     {
-        $cart = $order->getQuote();
+        $cartId = $order->getQuoteId();
+        $cart = Mage::getModel('sales/quote')->load($cartId);
+        if (!$cart) {
+            return false;
+        }
+
         return ($cart->getUpdatedAt() !== null && $cart->getUpdatedAt() !== '') ? $cart->getUpdatedAt() : $order->getCreatedAt();
     }
 
@@ -56,7 +61,7 @@ class SPM_ShopyMind_DataMapper_Order
         $ItemFormatter = new SPM_ShopyMind_DataMapper_QuoteItem();
         return array_map(
             array($ItemFormatter, 'format'),
-            $order->getQuote()->getAllVisibleItems()
+            $order->getAllVisibleItems()
         );
     }
 

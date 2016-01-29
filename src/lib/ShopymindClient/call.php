@@ -181,7 +181,7 @@ try {
                 $params = $server->retrieveParams();
                 $server->sendResponse(array(
                     'lastUpdate' => date('Y-m-d H:i:s'),
-                    'orders' => ShopymindClient_Callback::syncOrders((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
+                    'orders' => ShopymindClient_Callback::syncOrders((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['idOrder']) ? $params['idOrder'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
                 ), true);
             }
         }

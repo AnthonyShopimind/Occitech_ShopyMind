@@ -1938,4 +1938,18 @@ class ShopymindClient_Callback {
         $SyncProductCategoriesAction = new SPM_ShopyMind_Action_SyncProductCategories($scope, $start, $limit, $lastUpdate, $idCategory, $justCount);
         return $SyncProductCategoriesAction->process();
     }
+
+    public static function syncOrders($id_shop, $start, $limit, $lastUpdate, $orderId = false, $justCount = false)
+    {
+        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
+            return call_user_func_array(array (
+                'ShopymindClient_CallbackOverride',
+                __FUNCTION__
+            ), func_get_args());
+        }
+
+        $scope = SPM_ShopyMind_Model_Scope::fromShopymindId($id_shop);
+        $SyncCustomersAction = new SPM_ShopyMind_Action_SyncOrders($scope, $start, $limit, $lastUpdate, $orderId, $justCount);
+        return $SyncCustomersAction->process();
+    }
 }
