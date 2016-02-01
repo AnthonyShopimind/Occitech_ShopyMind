@@ -57,22 +57,26 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $combinations = array();
         if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
-            $attributesToJoin = array_map(function($attribute) { return $attribute['attribute_code']; }, $parentSuperAttributes);
 
-            $attributeNames = array_merge(
-                $attributesToJoin,
-                array('name', 'stock_item', 'price', 'final_price')
-            );
             $ids = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
             $childProducts = Mage::getModel('catalog/product')
                 ->getCollection()
                 ->addAttributeToFilter('entity_id', $ids);
 
-            if (!empty($attributesToJoin)) {
+            $attributesToJoin = array();
+            if (!empty($parentSuperAttributes)) {
+                $attributesToJoin = array_map(function($attribute) { return $attribute['attribute_code']; }, $parentSuperAttributes);
+
                 foreach($attributesToJoin as $attributeToJoin) {
                     $childProducts->joinAttribute($attributeToJoin, 'catalog_product/' . $attributeToJoin, 'entity_id', null, 'left');
                 }
             }
+
+
+            $attributeNames = array_merge(
+                $attributesToJoin,
+                $attributeNames
+            );
 
             if (!empty($attributeNames)) {
                 $childProducts->addAttributeToSelect($attributeNames);

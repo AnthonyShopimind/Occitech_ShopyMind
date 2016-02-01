@@ -73,7 +73,10 @@ class SPM_ShopyMind_DataMapper_Product
 
     private function formattedCombinationsOf(Mage_Catalog_Model_Product $product)
     {
-        $parentSuperAttributes = $product->getTypeInstance(true)->getConfigurableAttributesAsArray($product);
+        $parentSuperAttributes = null;
+        if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
+            $parentSuperAttributes = $product->getTypeInstance(true)->getConfigurableAttributesAsArray($product);
+        }
         $attributeNames = array('name', 'stock_item', 'price', 'final_price');
 
         $commonDataFormatter = array($this, 'formatProductCommonData');
