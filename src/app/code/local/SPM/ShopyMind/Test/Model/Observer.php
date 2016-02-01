@@ -158,8 +158,8 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case_Config
             'catalog_category_save_after' => 'saveProductCategory',
             'catalog_category_delete_after' => 'deleteProductCategory',
             'customer_save_after' => 'saveCustomer',
-            'customer_address_save_after' => 'saveCustomer',
-            'customer_address_delete_after' => 'saveCustomer',
+            'customer_address_save_after' => 'saveCustomerAddress',
+            'customer_address_delete_after' => 'saveCustomerAddress',
             'customer_delete_after' => 'deleteCustomer',
         );
 

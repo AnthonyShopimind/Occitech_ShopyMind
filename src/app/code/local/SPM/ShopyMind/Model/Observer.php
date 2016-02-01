@@ -174,10 +174,18 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         ShopymindClient_Bin_Notify::deleteProductCategory($params);
     }
 
+
     /**
-     * @event customer_save_after
      * @event customer_address_save_after
      * @event customer_address_delete_after
+     */
+    public function saveCustomerAddress(Varien_Event_Observer $observer)
+    {
+        ShopymindClient_Bin_Notify::saveCustomer($observer->getCustomerAddress()->getCustomerId());
+    }
+
+    /**
+     * @event customer_save_after
      */
     public function saveCustomer(Varien_Event_Observer $observer)
     {

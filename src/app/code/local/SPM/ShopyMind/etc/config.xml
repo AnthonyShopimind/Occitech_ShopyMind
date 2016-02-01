@@ -7,7 +7,7 @@
     </modules>
 
     <global>
-    	<blocks>
+        <blocks>
             <spm_shopymind>
                 <class>SPM_ShopyMind_Block</class>
             </spm_shopymind>
@@ -108,7 +108,7 @@
                     <SPM_ShopyMind_Model_Observer>
                         <type>singleton</type>
                         <class>shopymind/observer</class>
-                        <method>saveCustomer</method>
+                        <method>saveCustomerAddress</method>
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
             </customer_address_save_after>
@@ -117,7 +117,7 @@
                     <SPM_ShopyMind_Model_Observer>
                         <type>singleton</type>
                         <class>shopymind/observer</class>
-                        <method>saveCustomer</method>
+                        <method>saveCustomerAddress</method>
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
             </customer_address_delete_after>
