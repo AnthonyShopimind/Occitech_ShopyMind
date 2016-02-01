@@ -3,6 +3,7 @@
 /**
  * @group dataMappers
  * @loadSharedFixture
+ * @group productMapper
  */
 class SPM_ShopyMind_Test_DataMapper_Product extends EcomDev_PHPUnit_Test_Case
 {
@@ -106,6 +107,10 @@ QUERY
                 'image_link' => 'media/catalog/product/cache/1/small_image/200x200/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/small_image.jpg',
                 'combination_name' => 'First simple product',
                 'id_combination' => 1,
+                'values' => array(
+                    'color' => 'white',
+                    'size' => 'XL',
+                ),
                 'price' => 13.00,
                 'price_discount' => 13.00,
                 'quantity_remaining' => 100,

@@ -43,11 +43,6 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
         return $product->getSmallImageUrl(200, 200);
     }
 
-    private function relativeUrl($url)
-    {
-        return str_replace(Mage::getBaseUrl(), '', $url);
-    }
-
     public function manufacturerIdOf(Mage_Catalog_Model_Product $product)
     {
         return $product->getData(self::MANUFACTURER_ATTRIBUTE_CODE);
@@ -58,17 +53,31 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
         return date('Y-m-d H:i:s', strtotime($date));
     }
 
-    public function formatCombinationsOfProduct(Mage_Catalog_Model_Product $product, $formatter, $attributeNames = null)
+    public function formatCombinationsOfProduct(Mage_Catalog_Model_Product $product, $formatter, $attributeNames = null, $parentSuperAttributes = null)
     {
         $combinations = array();
         if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
+            $attributesToJoin = array_map(function($attribute) { return $attribute['attribute_code']; }, $parentSuperAttributes);
+
+            $attributeNames = array_merge(
+                $attributesToJoin,
+                array('name', 'stock_item', 'price', 'final_price')
+            );
             $ids = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
             $childProducts = Mage::getModel('catalog/product')
                 ->getCollection()
                 ->addAttributeToFilter('entity_id', $ids);
+
+            if (!empty($attributesToJoin)) {
+                foreach($attributesToJoin as $attributeToJoin) {
+                    $childProducts->joinAttribute($attributeToJoin, 'catalog_product/' . $attributeToJoin, 'entity_id', null, 'left');
+                }
+            }
+
             if (!empty($attributeNames)) {
                 $childProducts->addAttributeToSelect($attributeNames);
             }
+
             $combinations = array_values(array_map(
                 $formatter,
                 iterator_to_array($childProducts->getIterator())

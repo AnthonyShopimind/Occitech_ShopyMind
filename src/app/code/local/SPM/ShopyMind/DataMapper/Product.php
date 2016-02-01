@@ -73,10 +73,12 @@ class SPM_ShopyMind_DataMapper_Product
 
     private function formattedCombinationsOf(Mage_Catalog_Model_Product $product)
     {
+        $parentSuperAttributes = $product->getTypeInstance(true)->getConfigurableAttributesAsArray($product);
         $attributeNames = array('name', 'stock_item', 'price', 'final_price');
 
         $commonDataFormatter = array($this, 'formatProductCommonData');
-        $formatter = function (Mage_Catalog_Model_Product $childProduct) use ($commonDataFormatter) {
+        $childAttributesFormatter = array($this, 'childAttributesFormatter');
+        $formatter = function (Mage_Catalog_Model_Product $childProduct) use ($commonDataFormatter, $childAttributesFormatter, $parentSuperAttributes) {
             $stockItemModel = Mage::getModel('cataloginventory/stock_item');
             return array_merge(
                 call_user_func($commonDataFormatter, $childProduct),
@@ -84,10 +86,11 @@ class SPM_ShopyMind_DataMapper_Product
                     'combination_name' => $childProduct->getName(),
                     'id_combination' => $childProduct->getId(),
                     'quantity_remaining' => $stockItemModel->loadByProduct($childProduct)->getQty(),
+                    'values' => call_user_func($childAttributesFormatter, $childProduct, $parentSuperAttributes),
                 )
             );
         };
-        return $this->helper->formatCombinationsOfProduct($product, $formatter, $attributeNames);
+        return $this->helper->formatCombinationsOfProduct($product, $formatter, $attributeNames, $parentSuperAttributes);
     }
 
     public function formatProductCommonData(Mage_Catalog_Model_Product $product)
@@ -99,5 +102,23 @@ class SPM_ShopyMind_DataMapper_Product
             'price' => $product->getPrice(),
             'price_discount' => $product->getFinalPrice(),
         );
+    }
+
+    public function childAttributesFormatter(Mage_Catalog_Model_Product $product, $parentSuperAttributes)
+    {
+        return array_map(function($attribute) use ($product) {
+            $label = '';
+            foreach($attribute['values'] as $value) {
+                if ($product->getData($attribute['attribute_code']) == $value['value_index']) {
+                    $label = $value['store_label'];
+                    continue;
+                }
+            }
+
+            return array(
+                'name' => $attribute['store_label'],
+                'value' => $label
+            );
+        }, $parentSuperAttributes);
     }
 }

@@ -92,6 +92,7 @@ eav:
      small_image: "/m/s/msj000t_1_not_existing.jpg"
      created_at: "2013-03-05 05:48:12"
      color: white
+     size: XL
      stock:
       qty: 100.00
       is_in_stock: 1
