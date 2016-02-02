@@ -5,7 +5,7 @@ class SPM_ShopyMind_DataMapper_QuoteItem
     public function format(Mage_Sales_Model_Quote_Item $quoteItem)
     {
         $product = $quoteItem->getProduct();
-        $combinationId = $this->getCombinationId($quoteItem, $product);
+        $combinationId = $this->getCombinationId($quoteItem);
 
         return array(
             'id_product' => $product->getId(),
