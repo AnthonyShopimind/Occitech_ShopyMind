@@ -32,17 +32,6 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
         }
     }
 
-    public function customerCreateAccountObserver(Varien_Event_Observer $observer)
-    {
-        try {
-            $customer = $observer->getCustomer();
-            if(is_object($customer))
-                ShopymindClient_Callback::sendCustomerCreationToSPM($customer->getId());
-        } catch ( Exception $e ) {
-            Mage::log($e->getMessage(), Zend_Log::ERR);
-        }
-    }
-
     public static function getUserLocale($id_customer, $store_id)
     {
         $locale_shop = Mage::getStoreConfig('general/locale/code', $store_id);

@@ -32,15 +32,6 @@
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
             </sales_order_save_after>
-            <customer_register_success>
-                <observers>
-                    <SPM_ShopyMind_Model_Observer>
-                        <type>singleton</type>
-                        <class>shopymind/observer</class>
-                        <method>customerCreateAccountObserver</method>
-                    </SPM_ShopyMind_Model_Observer>
-                </observers>
-            </customer_register_success>
             <admin_system_config_changed_section_shopymind_configuration>
                 <observers>
                     <spm_shopymind_model_observer>
