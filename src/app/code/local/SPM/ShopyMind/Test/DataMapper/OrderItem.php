@@ -3,7 +3,6 @@
 /**
  * @group dataMappers
  * @loadSharedFixture
- * @group spm
  */
 class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_OrderItem extends EcomDev_PHPUnit_Test_Case
 {
@@ -16,15 +15,15 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_OrderItem extends EcomDe
 
     public function testFormatProductItem()
     {
-        $productItem = Mage::getModel('sales/order_item')->load(1);
-        $quote = Mage::getModel('sales/order')->load(1);
+        $productItem = Mage::getModel('sales/order_item')->load(3);
+        $quote = Mage::getModel('sales/order')->load(3);
         $productItem->setQuote($quote);
 
         $expected = array(
             'id_product' => 1,
             'id_combination' => 1,
             'id_manufacturer' => null,
-            'price' => 3.5000,
+            'price' => 13.0000,
             'qty' => 8.0000,
         );
 

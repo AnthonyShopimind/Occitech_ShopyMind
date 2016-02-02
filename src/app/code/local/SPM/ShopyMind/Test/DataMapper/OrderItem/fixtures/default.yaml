@@ -19,6 +19,9 @@ scope:
       name: First Store
       is_active: 1
 
+config:
+  stores/default/general/locale/code: fr_FR
+
 eav:
   catalog_product:
     - entity_id: 1
@@ -27,58 +30,102 @@ eav:
       attribute_set_id: 1
 
 tables:
+  sales/order:
+    - entity_id: 3
+      base_total_invoiced: 50.0000
+      created_at: 2016-01-11 10:00:00
+      store_id: 1
+      quote_id: 3
+      status: processing
+      order_currency_code: USD
+      base_grand_total: 100.0000
+
   sales/quote:
     - entity_id: 3
       store_id: 1
+      created_at: "2015-01-29 12:45:46 "
+      updated_at: "2015-01-30 13:45:46"
+      reserved_order_id: null
+      is_active: 1
+      is_virtual: 0
+      is_multi_shipping: 0
+      items_count: 1
+      items_qty: 8.0000
+      orig_order_id: 0
+      store_to_base_rate: 1.0000
+      store_to_quote_rate: 1.0000
+      base_currency_code: "USD"
+      store_currency_code: "USD"
+      quote_currency_code: "USD"
+      grand_total: 173.8900
+      base_grand_total: 173.8900
+      global_currency_code: "USD"
+      base_to_global_rate: 1.0000
+      base_to_quote_rate: 1.0000
+      subtotal: 144.9100
+      base_subtotal: 144.9100
+      subtotal_with_discount: 144.9100
+      base_subtotal_with_discount: 144.9100
+      is_changed: 1
+      trigger_recollect: 0
+      is_persistent: 0
 
   sales/quote_item:
-    - item_id: 1
+    - item_id: 3
       quote_id: 3
-      created_at: "2015-04-10 20:53:06"
-      updated_at: "2015-12-01 17:10:49"
       product_id: 1
-      store_id: 1
-      sku: "product-1"
+      parent_item_id: null
+      is_virtual: 0
+      sku: product-1
+      name: Produit 1
+      description: null
+      applied_rule_ids: 0
+      additional_data: null
       free_shipping: 0
       is_qty_decimal: 0
       no_discount: 0
-      weight: 0.0000
-      qty_ordered: 8.0000
-      price: 2.9200
-      base_price: 2.9200
+      weight: 0.4000
+      qty: 8
+      price: 13.0000
+      base_price: 13.0000
+      custom_price: 10.0000
       discount_percent: 0.0000
       discount_amount: 0.0000
       base_discount_amount: 0.0000
-      tax_percent: 20.0000
-      tax_amount: 4.6700
-      base_tax_amount: 4.6700
-      row_total: 23.3600
-      base_row_total: 23.3600
+      tax_percent: 0.0000
+      tax_amount: 0.0000
+      base_tax_amount: 0.0000
+      row_total: 20.0000
+      base_row_total: 20.0000
       row_total_with_discount: 0.0000
       row_weight: 0.0000
-      product_type: "simple"
-      base_cost: 0.0000
-      price_incl_tax: 3.5000
-      base_price_incl_tax: 3.5000
-      row_total_incl_tax: 28.0300
-      base_row_total_incl_tax: 28.0300
+      product_type: simple
+      base_tax_before_discount: null
+      tax_before_discount: null
+      original_custom_price: 10.0000
+      redirect_url: null
+      base_cost: null
+      price_incl_tax: 13.0000
+      base_price_incl_tax: 13.0000
+      row_total_incl_tax: 26.0000
+      base_row_total_incl_tax: 26.0000
+      hidden_tax_amount: null
+      base_hidden_tax_amount: null
+      gift_message_id: null
+      weee_tax_disposition: 0.0000
+      weee_tax_row_disposition: 0.0000
+      base_weee_tax_disposition: 0.0000
+      base_weee_tax_row_disposition: 0.0000
+      weee_tax_applied: 'a:0:{}'
+      weee_tax_applied_amount: 0.0000
+      weee_tax_applied_row_amount: 0.0000
+      base_weee_tax_applied_amount: 0.0000
+      base_weee_tax_applied_row_amnt: null
 
-  sales/order:
-    - entity_id: 3
-      store_id: 1
-      status: pending
-      state: processing
-      increment_id: 10002
-      created_at: "2015-12-09 11:53:06"
-      base_grand_total: 28.0300
-      base_to_order_rate: 1.0000
-      order_currency_code: "EUR"
-      discount_amount: -10.0000
-      quote_id: 3
-      coupon_code: "ML9DUOQZLISN"
-
-  sales/quote:
-    - entity_id: 2
-      store_id: 1
-      created_at: "2015-12-09 11:53:06"
-      updated_at: "2015-12-09 13:53:06"
+  sales/order_item:
+    - item_id: 3
+      order_id: 3
+      quote_item_id: 3
+      product_id: 1
+      qty_ordered: 8.0000
+      price_incl_tax: 13.0000
