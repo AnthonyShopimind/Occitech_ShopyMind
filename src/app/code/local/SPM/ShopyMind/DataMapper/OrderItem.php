@@ -8,7 +8,7 @@ class SPM_ShopyMind_DataMapper_OrderItem
         $combinationId = $this->getCombinationId($orderItem, $product);
 
         return array(
-            'id_product' => $product->getId(),
+            'id_product' => $orderItem->getProductId(),
             'id_combination' => $combinationId,
             'id_manufacturer' => Mage::helper('shopymind')->manufacturerIdOf($product),
             'price' => $orderItem->getPriceInclTax(),
