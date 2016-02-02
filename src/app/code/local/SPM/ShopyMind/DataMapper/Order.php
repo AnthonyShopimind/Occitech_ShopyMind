@@ -58,7 +58,7 @@ class SPM_ShopyMind_DataMapper_Order
 
     private function productsFor($order)
     {
-        $ItemFormatter = new SPM_ShopyMind_DataMapper_QuoteItem();
+        $ItemFormatter = new SPM_ShopyMind_DataMapper_OrderItem();
         return array_map(
             array($ItemFormatter, 'format'),
             $order->getAllVisibleItems()
