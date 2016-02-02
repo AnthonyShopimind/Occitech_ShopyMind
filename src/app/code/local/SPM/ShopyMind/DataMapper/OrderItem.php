@@ -4,7 +4,7 @@ class SPM_ShopyMind_DataMapper_OrderItem
 {
     public function format(Mage_Sales_Model_Order_Item $orderItem)
     {
-        $product = $orderItem->getProduct();
+        $product = Mage::getModel('catalog/product')->load($orderItem->getProductId());
         $combinationId = $this->getCombinationId($orderItem);
 
         return array(
