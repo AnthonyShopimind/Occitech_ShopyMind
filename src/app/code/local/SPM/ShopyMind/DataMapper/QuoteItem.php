@@ -8,7 +8,7 @@ class SPM_ShopyMind_DataMapper_QuoteItem
         $combinationId = $this->getCombinationId($quoteItem);
 
         return array(
-            'id_product' => $product->getId(),
+            'id_product' => $quoteItem->getProductId(),
             'id_combination' => $combinationId,
             'id_manufacturer' => Mage::helper('shopymind')->manufacturerIdOf($product),
             'price' => $quoteItem->getPriceInclTax(),
