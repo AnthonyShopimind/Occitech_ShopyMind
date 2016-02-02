@@ -16,9 +16,10 @@ class SPM_ShopyMind_DataMapper_OrderItem
         );
     }
 
-    private function getCombinationId(Mage_Sales_Model_Order_Item $quoteItem)
+    private function getCombinationId(Mage_Sales_Model_Order_Item $orderItem)
     {
-            $combinationId = $quoteItem->getHasChildren() ? $quoteItem->getProduct()->loadByAttribute('sku', $quoteItem->getSku())->getId() : $quoteItem->getProduct()->getId();
+        $Product = Mage::getModel('catalog/product');
+        $combinationId = $orderItem->getHasChildren() ? $Product->getIdBySku($orderItem->getSku()) : $orderItem->getProductId();
 
         return $combinationId;
     }
