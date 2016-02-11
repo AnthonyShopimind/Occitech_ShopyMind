@@ -145,6 +145,8 @@ class SPM_ShopyMind_DataMapper_Customer
                 'other' => '',
                 'active' => '',
                 'region' => $address->getRegionCode(),
+                'first_name' => $address->getFirstname(),
+                'last_name' => $address->getLastname(),
             );
         }
 

@@ -57,6 +57,8 @@ QUERY
                             'other' => '',
                             'active' => '',
                             'region' => 'NY',
+                            'first_name' => '',
+                            'last_name' => '',
                         )
                     ),
                 ),
@@ -96,6 +98,8 @@ QUERY
                             'other' => '',
                             'active' => '',
                             'region' => 'NY',
+                            'first_name' => '',
+                            'last_name' => '',
                         )
                     ),
                 ),

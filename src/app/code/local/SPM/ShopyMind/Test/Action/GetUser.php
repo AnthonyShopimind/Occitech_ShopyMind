@@ -199,6 +199,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'other' => '',
                 'active' => '',
                 'region' => '',
+                'first_name' => 'John',
+                'last_name' => 'Doe',
             ),
             array(
                 'id_address' => 2,
@@ -212,6 +214,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'other' => '',
                 'active' => '',
                 'region' => '',
+                'first_name' => 'Jane',
+                'last_name' => 'Doe',
             ),
             array(
                 'id_address' => 3,
@@ -225,6 +229,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
                 'other' => '',
                 'active' => '',
                 'region' => '',
+                'first_name' => '',
+                'last_name' => '',
             ),
         );
         $GetUser = new SPM_ShopyMind_Action_GetUser(1);
