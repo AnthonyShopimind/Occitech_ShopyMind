@@ -5,10 +5,11 @@ class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
     private $params;
     private $helper;
 
-    public function __construct($idOrEmails, $fromQuotes = false)
+    public function __construct($idOrEmails, $fromQuotes = false, $fromSync = false)
     {
         $this->params['identifier'] = $idOrEmails;
         $this->params['fromQuote'] = $fromQuotes;
+        $this->params['fromSync'] = $fromSync;
         $this->helper = Mage::helper('shopymind');
     }
 
@@ -18,7 +19,7 @@ class SPM_ShopyMind_Action_GetUser implements SPM_ShopyMind_Interface_Action
         $Formatter = new SPM_ShopyMind_DataMapper_Customer();
         $return = array_map(array($Formatter, 'format'), $users);
 
-        return (sizeof($return) === 1 ? $return[0] : $return);
+        return (sizeof($return) === 1 && !$this->params['fromSync']) ? $return[0] : $return;
     }
 
     public function fetchUsers()

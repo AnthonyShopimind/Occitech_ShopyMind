@@ -21,7 +21,7 @@ class SPM_ShopyMind_Action_SyncCustomers implements SPM_ShopyMind_Interface_Acti
             return $customerIds;
         }
 
-        $GetUsers = new SPM_ShopyMind_Action_GetUser($customerIds);
+        $GetUsers = new SPM_ShopyMind_Action_GetUser($customerIds, false, true);
         return $GetUsers->process();
     }
 
