@@ -52,14 +52,14 @@ try {
         } elseif ($server->getTypeRequest() === 'generateVouchers') {
             require_once dirname(__FILE__) . '/Callback.php';
             if (method_exists('ShopymindClient_Callback', 'generateVouchers')) {
-                $params = $server->retrieveParams();
+                $params = $server->retrieveParams();				
                 $server->sendResponse(array(
                     'vouchers' => ShopymindClient_Callback::generateVouchers(
                         $params['voucherInfos'],
                         $params['voucherEmails'],
                         (isset($params['shopIdShop']) ? $params['shopIdShop'] : false),
-                        (isset($params['dynamicPrefix']) ? $params['dynamicPrefix'] : false),
-                        (isset($params['duplicateCode']) ? $params['duplicateCode'] : false)
+                        (isset($params['voucherInfos']['dynamicPrefix']) ? $params['voucherInfos']['dynamicPrefix'] : false),
+                        (isset($params['voucherInfos']['duplicateCode']) ? $params['voucherInfos']['duplicateCode'] : false)
                 )
                 ), true);
             }
@@ -228,8 +228,8 @@ try {
             $relaunch = $server->retrieveRelaunch();
             $params = $server->retrieveParams();
 
-            if ($relaunch !== null) {
-                if (file_exists('src/Reminders/' . ucfirst($relaunch) . '.php')) {
+            if ($relaunch !== null) {				
+                if (file_exists(dirname(__FILE__) . '/Src/Reminders/' . ucfirst($relaunch) . '.php')) {
                     require_once dirname(__FILE__) . '/Src/Reminders/' . ucfirst($relaunch) . '.php';
                     $classRelaunch = 'ShopymindClient_Src_Reminders_' . ucfirst($relaunch);
                     $relaunch = call_user_func(array(
@@ -238,7 +238,7 @@ try {
                     ), $params);
                     if ($relaunch !== null && ! is_string($relaunch)) {
                         $response = $relaunch->get();
-
+						
                         if ($response !== null && is_array($response)) {
                             $server->sendResponse(array(
                                 'clients' => $response
