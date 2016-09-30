@@ -100,7 +100,7 @@ class SPM_ShopyMind_DataMapper_Product
     {
         return array(
             'reference' => $product->getSku(),
-            'product_link' => $this->helper->productUrlOf($product),
+            'product_link' => str_replace(array('call.php', 'testclient.php', 'checkCallback.php'), 'index.php', $this->helper->productUrlOf($product)),
             'image_link' => $this->helper->productImageUrlOf($product),
             'price' => $product->getPrice(),
             'price_discount' => $product->getFinalPrice(),
