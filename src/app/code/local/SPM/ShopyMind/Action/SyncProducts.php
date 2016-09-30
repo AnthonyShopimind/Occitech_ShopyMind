@@ -33,19 +33,35 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
 
     public function process()
     {
-        $productCollection = $this->retrieveProducts();
-        if ($this->params['justCount']) {
-            return $productCollection->count();
+        $storeIds = $this->params['scope']->storeIds();
+        $return = array();
+        /** @var  $appEmulation Mage_Core_Model_App_Emulation */
+        $appEmulation = Mage::getSingleton('core/app_emulation');
+        foreach ($storeIds AS $storeId) {
+            $initialScope = $this->params['scope'];
+            $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-'.$storeId);
+            $this->params['scope'] = $scope;
+
+            $emulatedEnvironment = $appEmulation->startEnvironmentEmulation($storeId);
+
+            $productCollection = $this->retrieveProducts($storeId);
+            if ($this->params['justCount']) {
+                return $productCollection->count();
+            }
+
+            $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+                array($this->getProductDataMapper(), 'format'),
+                SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($this->params['scope']),
+            ));
+            $return = array_merge($return,$formatter->format(iterator_to_array($productCollection)));
+            $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
+            $this->params['scope'] = $initialScope;
         }
 
-        $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
-            array($this->getProductDataMapper(), 'format'),
-            SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($this->params['scope']),
-        ));
-        return $formatter->format(iterator_to_array($productCollection));
+        return $return;
     }
 
-    public function retrieveProducts()
+    public function retrieveProducts($storeId = false)
     {
         $helper = Mage::helper('shopymind');
         $emulatedEnvironment = $helper->startEmulatingScope($this->params['scope']);
@@ -69,6 +85,15 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
         $limit = !empty($this->params['limit']) ? (int) $this->params['limit'] : null;
 
         $productCollection->getSelect()->limit($limit, $offset);
+        $newCollection = array();
+
+        if($storeId) {
+            foreach ($productCollection as $key=>$product) {
+                if(!in_array($storeId,$product->getStoreIds())){
+                    $productCollection->removeItemByKey($key);
+                }
+            }
+        }
         $helper->stopEmulation($emulatedEnvironment);
         return $productCollection;
     }
