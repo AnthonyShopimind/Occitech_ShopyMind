@@ -28,9 +28,9 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
         return $eavAttribute->getIdByCode($model, $attribute_code);
     }
 
-    public function getUrl($route)
+    public function getUrl($route, $params = array())
     {
-        return Mage::getUrl($route, array('_nosid' => true));
+        return Mage::getUrl($route, $params);
     }
 
     public function productUrlOf(Mage_Catalog_Model_Product $product)
@@ -72,7 +72,6 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
 
-
             $attributeNames = array_merge(
                 $attributesToJoin,
                 $attributeNames
@@ -82,10 +81,12 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
                 $childProducts->addAttributeToSelect($attributeNames);
             }
 
-            $combinations = array_values(array_map(
-                $formatter,
-                iterator_to_array($childProducts->getIterator())
-            ));
+			if(is_array($childProducts->getSelect()->getPart('where')) && array_key_exists(0, $childProducts->getSelect()->getPart('where')) && preg_match('#[a-zA-Z0-9]#', $childProducts->getSelect()->getPart('where')[0])) {
+				$combinations = array_values(array_map(
+					$formatter,
+					iterator_to_array($childProducts->getIterator())
+				));
+			}
         }
         return $combinations;
     }
@@ -104,11 +105,17 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
         return $code;
     }
 
-    public function startEmulatingScope(SPM_ShopyMind_Model_Scope $scope)
+    public function startEmulatingScope(SPM_ShopyMind_Model_Scope $scope, $storeId = null)
     {
-        $storeIds = $scope->storeIds();
         $appEmulation = Mage::getSingleton('core/app_emulation');
-        return $appEmulation->startEnvironmentEmulation($storeIds[0]);
+
+		if ($storeId == null) {
+			$storeIds = $scope->storeIds();
+			return $appEmulation->startEnvironmentEmulation($storeIds[0]);
+		}
+		else {
+			return $appEmulation->startEnvironmentEmulation($storeId);
+		}
     }
 
     public function stopEmulation($emulatedEnvironment)

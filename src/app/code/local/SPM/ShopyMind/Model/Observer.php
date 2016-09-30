@@ -26,6 +26,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             $order = $observer->getOrder();
             if ($order->hasStatus()) {
                 ShopymindClient_Callback::checkNewOrder($order);
+                //ShopymindClient_Callback::saveOrder($order); // TODO : A remettre en service quand checkNewOrder sera dépréciée
             }
         } catch ( Exception $e ) {
             Mage::log($e->getMessage(), Zend_Log::ERR);

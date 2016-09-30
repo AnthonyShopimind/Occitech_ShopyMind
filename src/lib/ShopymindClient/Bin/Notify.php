@@ -57,8 +57,8 @@ class ShopymindClient_Bin_Notify {
      * @return boolean
      */
     public static function newOrder(array $params) {
-        if (!isset($params['dateOrder'])) {
-            $params['dateOrder'] = date('Y-m-d H:i:s');
+        if (!isset($params['date_order'])) {
+            $params['date_order'] = date('Y-m-d H:i:s');
         }
 
         $requestServer = new ShopymindClient_Bin_RequestServer;
@@ -70,6 +70,21 @@ class ShopymindClient_Bin_Notify {
 
         if($requestServer->send() === true)
         	return $requestServer->getResponse();
+        return false;
+    }
+
+    /**
+     * Permet d'ordonner la synchroniser d'une commande
+     *
+     * @param array $params
+     * @return boolean
+     */
+    public static function saveOrder($id_order) {
+        $requestServer = new ShopymindClient_Bin_RequestServer;
+        $requestServer->setRestService('saveorder');
+        $requestServer->addParam('order', array($id_order));
+        if($requestServer->send() === true)
+            return $requestServer->getResponse();
         return false;
     }
 
