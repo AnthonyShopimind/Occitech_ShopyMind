@@ -6,6 +6,17 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
 
     public function __construct($id_customer, $type, $amount, $amountCurrency, $minimumOrder, $nbDayValidate, $description, $idShop, $prefix = null, $duplicateCode = null)
     {
+        $baseCurrency = Mage::app()->getStore()->getBaseCurrencyCode();
+
+        if($baseCurrency && $amountCurrency && $baseCurrency !== $amountCurrency) {
+            //Set amount to tax rate
+            if ($type == 'amount')
+                $amount = Mage::helper('directory')->currencyConvert($amount, $amountCurrency, $baseCurrency);
+           if ($minimumOrder)
+               $minimumOrder = Mage::helper('directory')->currencyConvert($minimumOrder, $amountCurrency, $baseCurrency);
+        }
+
+
         $this->params['customerIdentifier'] = $id_customer;
         $this->params['type'] = $type;
         $this->params['amount'] = $amount;
@@ -99,15 +110,16 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
         if (!$websiteId) {
             $websiteId = $this->getAllWebsitesIds();
         }
-
-        $rule->setDiscountStep('0')
+        if (empty($this->params['duplicateCode'])) {
+            $rule->setDiscountStep('0')
             ->setApplyToShipping('0')
             ->setTimesUsed('0')
             ->setIsRss('0')
             ->setCouponType('2')
             ->setUsesPerCoupon(1)
-            ->setCustomerGroupIds($this->getAllCustomerGroupsIds())
-            ->setWebsiteIds($websiteId)
+            ->setCustomerGroupIds($this->getAllCustomerGroupsIds());
+        }
+        $rule->setWebsiteIds($websiteId)
             ->setCouponCode($coupon_code);
     }
 
@@ -134,6 +146,7 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
         }
 
         if ($this->params['type'] == 'amount') {
+
             $rule->setSimpleAction('cart_fixed')
                 ->setDiscountAmount($this->params['amount'])
                 ->setDiscountQty(NULL)
@@ -157,6 +170,11 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
 
         $rule = Mage::getModel('salesrule/rule');
         $rule->setData($ruleData);
+
+        //Set date
+        $now = date('Y-m-d H:i:s');
+        $rule->setFromDate($now)
+        ->setToDate((date('Y-m-d 23:59:59', mktime(date("H"), date("i"), date("s"), date("m"), date("d") + $this->params['nbDayValidate'], date("Y")))));
         return $rule;
     }
 }

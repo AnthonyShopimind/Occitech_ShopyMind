@@ -107,7 +107,8 @@ class ShopymindClient_Callback {
         $readConnection = $resource->getConnection('core_read');
         $query = 'SELECT a.`value` as `country_code`, c.`code` as `region_code`
          FROM `' . $tablePrefix . 'customer_entity` AS d
-        LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` a ON(d.`entity_id` = a.`entity_id`)
+        JOIN `' . $tablePrefix . 'customer_address_entity` e ON(d.`entity_id` = e.`parent_id`)
+        LEFT JOIN `' . $tablePrefix . 'customer_address_entity_varchar` a ON(e.`entity_id` = a.`entity_id`)
         LEFT JOIN `' . $tablePrefix . 'customer_address_entity_int` b ON(a.`entity_id` = b.`entity_id`)
         LEFT JOIN `' . $tablePrefix . 'directory_country_region` c ON(c.`region_id` = b.`value`)
         WHERE (b.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'region_id') . ' OR b.`attribute_id` IS NULL) AND ( a.`attribute_id` = ' . self::getMagentoAttributeCode('customer_address', 'country_id') . ')
@@ -151,7 +152,7 @@ class ShopymindClient_Callback {
      *
      * @return array|int
      */
-    public static function getBirthdayClients($id_shop, $dateReference, $timezones, $nbDays = 0, $justCount = false) {
+    public static function getBirthdayClients($id_shop, $dateReference, $timezones, $nbDays = 0, $justCount = false, $start = null, $limit = null) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -178,7 +179,10 @@ class ShopymindClient_Callback {
         WHERE  DATE_FORMAT(`customer_birth_table`.`value`,"%m-%d") = "' . $birthDate . '" AND ' . $timezonesWhere . ' AND `customer_primary_table`.`is_active` = 1
         AND `customer_primary_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
         GROUP BY `customer_primary_table`.`entity_id`';
-        $results = $readConnection->fetchAll($query);
+		
+		if(!is_null($start) && !is_null($limit)) {
+			$query .= 'LIMIT '.$start.', '.$limit;
+		}
 
         if ($results && is_array($results) && sizeof($results)) {
             foreach ( $results as $row ) {
@@ -197,7 +201,13 @@ class ShopymindClient_Callback {
 	            LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
 	            LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
 	            WHERE `order_primary`.`customer_is_guest` = 1 AND DATE_FORMAT(`order_primary`.`customer_dob`,"%m-%d") = "' . $birthDate . '" AND ' . $timezonesWhere . '
+	            AND `order_primary`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
 	            GROUP BY `order_primary`.`customer_email`';
+		
+			if(!is_null($start) && !is_null($limit)) {
+				$query .= 'LIMIT '.$start.', '.$limit;
+			}
+			
             $results = $readConnection->fetchAll($query);
 
             if ($results && is_array($results) && sizeof($results)) {
@@ -224,7 +234,7 @@ class ShopymindClient_Callback {
      *
      * @return array $customers
      */
-    public static function getBirthdayClientsSignUp($storeId, $dateReference, $timezones, $justCount = false)
+    public static function getBirthdayClientsSignUp($storeId, $dateReference, $timezones, $justCount = false, $start = null, $limit = null)
     {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array(
@@ -252,7 +262,11 @@ class ShopymindClient_Callback {
                 ->joinTable('directory/country_region', 'region_id=customer_region_id', array('code'), null, 'left');
             $customerCollection->getSelect()->where($timezonesWhere);
         }
-
+		
+		if($start >= 0 && $limit > 0) {
+			$customerCollection->getSelect()->limit($limit, $start);
+		}
+		
         return self::returnCollectionDataOrCount($customerCollection, $justCount);
     }
 
@@ -300,16 +314,20 @@ class ShopymindClient_Callback {
         ';
 
         $results = $readConnection->fetchAll($query);
-		$countIds = count($scope->storeIds());
-		
+
         if (!empty($results) && is_array($results)) {
             foreach($results as $row) {
-                $cartProducts = self::productsOfCart($scope, ($countIds > 1) ? $row['store_id'] : null, $row['entity_id']);
+                if($row['store_id'])
+                    $currentScope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-'.$row['store_id']);
+                else $currentScope = $scope;
+                $cartProducts = self::productsOfCart($currentScope, ($row['store_id']) ? $row['store_id'] : null, $row['entity_id']);
                 if (!empty($cartProducts)) {
+                    $currency = (isset($row['quote_currency_code']) && $row['quote_currency_code'] ? $row['quote_currency_code']:(isset($row['store_currency_code']) && $row['store_currency_code'] ? $row['store_currency_code'] : $row['base_currency_code']));
+                    $currency_rate = (isset($row['store_to_quote_rate']) ? $row['store_to_quote_rate'] : $row['store_to_base_rate']);
                     $return[] = array(
-                        'sum_cart' => ($row['base_grand_total'] / $row['store_to_base_rate']),
-                        'currency' => $row['base_currency_code'],
-                        'tax_rate' => $row['store_to_base_rate'],
+                        'sum_cart' => ($row['grand_total']),
+                        'currency' => $currency,
+                        'tax_rate' => $currency_rate,
                         'id_cart' => $row['entity_id'],
                         'date_cart' => $row['created_at'],
                         'link_cart' => Mage::helper('shopymind')->getUrl('checkout/cart', array(
@@ -333,7 +351,8 @@ class ShopymindClient_Callback {
     {
         $helper = Mage::helper('shopymind');
         $emulatedEnvironment = $helper->startEmulatingScope($scope, $storeId);
-		
+
+
         $currentCart = Mage::getModel('sales/quote')->load($cartId);
 
         $resultProducts = $currentCart->getAllVisibleItems();
@@ -342,6 +361,7 @@ class ShopymindClient_Callback {
         }
 
         $DataTransformer = new SPM_ShopyMind_DataMapper_DataTransformer_QuoteItemToProduct();
+        //$DataTransformer2 = new SPM_ShopyMind_DataMapper_QuoteItem();
         $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
         $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
             array($DataTransformer, 'transform'),
@@ -401,11 +421,11 @@ class ShopymindClient_Callback {
         $query = 'SELECT `order_last`.`entity_id`, `order_primary`.`customer_id`, `order_primary`.`customer_email`,
             SUM((`order_primary`.`base_total_invoiced`*`order_primary`.`base_to_order_rate`)) AS Total
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d %H:%i:%s"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d 23:59:59"))
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last2` ON (((`order_last2`.`customer_id` IS NOT NULL AND `order_last2`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last2`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d"))
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
             LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
-            WHERE DATE_FORMAT(DATE_SUB("' . $dateReference . '",INTERVAL ' . (int) $duration . ' DAY),"%Y-%m-%d %H:%i:%s") <= DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d %H:%i:%s")
+            WHERE DATE_FORMAT(DATE_SUB("' . $dateReference . '",INTERVAL ' . (int) $duration . ' DAY),"%Y-%m-%d 23:59:59") <= DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d %H:%i:%s")
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
             AND `order_last2`.`base_total_invoiced` IS NOT NULL
@@ -475,11 +495,11 @@ class ShopymindClient_Callback {
         $query = 'SELECT `order_last`.`entity_id`, `order_primary`.`customer_id`, `order_primary`.`customer_email`,
             COUNT(`order_primary`.`entity_id`) AS Total
             FROM `' . $tablePrefix . 'sales_flat_order` AS `order_primary`
-            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d %H:%i:%s"))
+            LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last` ON (((`order_last`.`customer_id` IS NOT NULL AND `order_last`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last`.`created_at`,"%Y-%m-%d %H:%i:%s") >= DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . ((int) $nbDaysLastOrder - 1) . ' DAY),"%Y-%m-%d 23:59:59"))
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order` AS `order_last2` ON (((`order_last2`.`customer_id` IS NOT NULL AND `order_last2`.`customer_id` = `order_primary`.`customer_id`)) AND DATE_FORMAT(`order_last2`.`created_at`,"%Y-%m-%d") = DATE_FORMAT(DATE_SUB("' . $dateReference . '", INTERVAL ' . (int) $nbDaysLastOrder . ' DAY),"%Y-%m-%d"))
             LEFT JOIN `' . $tablePrefix . 'sales_flat_order_address` AS `order_address` ON(`order_address`.`parent_id` = `order_primary`.`entity_id`) AND (`order_address`.`address_type` = "billing")
             LEFT JOIN `' . $tablePrefix . 'directory_country_region` AS `customer_default_billing_state` ON(`customer_default_billing_state`.`region_id` = `order_address`.`region_id`)
-            WHERE DATE_FORMAT(DATE_SUB("' . $dateReference . '",INTERVAL ' . (int) $duration . ' DAY),"%Y-%m-%d %H:%i:%s") <= DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d %H:%i:%s")
+            WHERE DATE_FORMAT(DATE_SUB("' . $dateReference . '",INTERVAL ' . (int) $duration . ' DAY),"%Y-%m-%d 23:59:59") <= DATE_FORMAT(`order_primary`.`created_at`,"%Y-%m-%d %H:%i:%s")
             AND ' . $timezonesWhere . '
             AND `order_primary`.`base_total_invoiced` IS NOT NULL
             AND `order_last2`.`base_total_invoiced` IS NOT NULL
@@ -545,7 +565,6 @@ class ShopymindClient_Callback {
             return false;
 
         $tablePrefix = Mage::getConfig()->getTablePrefix();
-        $date = date('Y-m-d 00:00:00');
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
         $query = 'SELECT `customer_primary_table`.`entity_id`
@@ -560,7 +579,7 @@ class ShopymindClient_Callback {
         AND ' . $timezonesWhere . '
          AND `customer_primary_table`.`is_active` = 1
         AND `customer_primary_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
-        GROUP BY `customer_order`.`customer_id`';
+        GROUP BY `customer_primary_table`.`entity_id`';
         $results = $readConnection->fetchAll($query);
 
         if ($results && is_array($results) && sizeof($results)) {
@@ -627,7 +646,8 @@ class ShopymindClient_Callback {
                 `order_primary`.`entity_id`,
                 `order_primary`.`increment_id`,
                 `order_primary`.`order_currency_code`,
-                `order_primary`.`base_grand_total`,
+                `order_primary`.`store_to_order_rate`,
+                `order_primary`.`grand_total`,
                 `order_primary`.`customer_id`,
                 `order_primary`.`created_at`,
                 `order_primary`.`customer_email`,
@@ -668,13 +688,16 @@ class ShopymindClient_Callback {
         $return = array();
         if ($results && is_array($results) && sizeof($results)) {
             foreach ($results as $row) {
-                $orderedProducts = self::productsOfOrder($scope, $row['quote_id']);
+                if($row['store_id'])
+                    $currentScope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-'.$row['store_id']);
+                else $currentScope = $scope;
+                $orderedProducts = self::productsOfOrder($currentScope, $row['quote_id']);
                 $shippingNumbers = self::getShippingNumbersForOrderId($row['entity_id']);
 
                 if (!empty($orderedProducts)) {
                     $return [] = array(
                         'currency' => $row['order_currency_code'],
-                        'total_amount' => $row['base_grand_total'],
+                        'total_amount' => $row['grand_total'],
                         'products' => $orderedProducts,
                         'date_order' => $row['created_at'],
                         'id_order' => $row['increment_id'],
@@ -699,7 +722,9 @@ class ShopymindClient_Callback {
         $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
         $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
             function (Mage_Sales_Model_Quote_Item $quoteItem) {
-                return $quoteItem->getProduct();
+                $product = $quoteItem->getProduct();
+                $product->setData('quoteItem',$quoteItem);
+                return $product;
             },
             array($ProductMapper, 'format'),
             SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($scope)
@@ -857,7 +882,7 @@ class ShopymindClient_Callback {
         if (self::$appEmulation !== false)
             return;
         if (!empty($id_shop)) {
-            list($scope, $website_id_needed) = explode('-', $id_shop);
+            list($scope, $id_needed) = explode('-', $id_shop);
         }
         $stores = Mage::app()->getStores();
 
@@ -865,9 +890,21 @@ class ShopymindClient_Callback {
             $store_id = $store->getId();
             $website_id = $store->getWebsite()->getId();
             $locale_store = Mage::getStoreConfig('general/locale/code', $store_id);
-            if ($lang === substr($locale_store, 0, - 3) && (!isset($website_id_needed) || $website_id_needed == $website_id)) {
+            $iso_lang = substr($locale_store, 0, - 3);
+            if(!isset($id_needed) || $id_needed == 0) {
                 self::startStoreEmulationByStoreId($store_id);
                 break;
+            }
+            elseif($scope === 'store') {
+                if($id_needed == $store_id) {
+                    self::startStoreEmulationByStoreId($store_id);
+                    break;
+                }
+            }elseif($scope === 'website') {
+                if ($lang === substr($locale_store, 0, - 3) && $id_needed == $website_id) {
+                    self::startStoreEmulationByStoreId($store_id);
+                    break;
+                }
             }
         }
     }
@@ -936,7 +973,7 @@ class ShopymindClient_Callback {
     		), func_get_args());
     	$return = array ();
     	if (!empty($id_shop)) {
-    		list($scope, $website_id_needed) = explode('-', $id_shop);
+    		list($scope, $id_needed) = explode('-', $id_shop);
     	}
     	$stores = Mage::app()->getStores();
 
@@ -945,8 +982,17 @@ class ShopymindClient_Callback {
     		$website_id = $store->getWebsite()->getId();
     		$locale_store = Mage::getStoreConfig('general/locale/code', $store_id);
     		$iso_lang = substr($locale_store, 0, - 3);
-    		if ((!isset($website_id_needed) || $website_id_needed == $website_id)) {
-    			$return[$iso_lang] = $iso_lang;
+    		if(!isset($id_needed) || $id_needed == 0)
+    		    $return[$iso_lang] = $iso_lang;
+    		elseif($scope === 'store') {
+    		    if($id_needed == $store_id) {
+    		        $return[$iso_lang] = $iso_lang;
+    		        break;
+    		    }
+    		}elseif($scope === 'website') {
+    		    if($id_needed == $website_id) {
+    		        $return[$iso_lang] = $iso_lang;
+    		    }
     		}
     	}
     	return $return;
@@ -1005,9 +1051,25 @@ class ShopymindClient_Callback {
             ), func_get_args());
         if ($lang)
             self::startStoreEmulationByIsoLang($lang,$id_shop);
-        $return = array ();
+
+        if (!is_null($id_shop)) {
+            //$store_id = explode('-', $id_shop);
+            $store_id = Mage::app()->getStore()->getId();
+        }
+        else {
+            $store_id = null;
+        }
+
         // Lien vers panier
-        $return ['link_cart'] = Mage::helper('shopymind')->getUrl('checkout/cart');
+        $return = array();
+        $return ['link_cart'] = Mage::helper('shopymind')->getUrl('checkout/cart', array(
+			'_current' => false,
+			'_use_rewrite' => true,
+			'_secure' => true,
+			'_store' => $store_id,
+			'_store_to_url' => false,
+			'_nosid' => true
+		));
         // Article au hasard
         $return ['articles'] = self::getProducts($id_shop, $lang, false, true);
         if ($lang)
@@ -1339,7 +1401,7 @@ class ShopymindClient_Callback {
      *
      * @param array $order
      */
-    public static function checkNewOrder($order) {
+    /*public static function checkNewOrder($order) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -1347,14 +1409,14 @@ class ShopymindClient_Callback {
             ), func_get_args());
 
         self::sendOrderToSPM($order);
-    }
+    }*/
 
     /**
      * Envoi des ventes générées suite à une relance à ShopyMind
      *
      * @param Mage_Sales_Model_Order $order
      */
-    public static function sendOrderToSPM($order) {
+    /*public static function sendOrderToSPM($order) {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
             return call_user_func_array(array (
                     'ShopymindClient_CallbackOverride',
@@ -1367,7 +1429,7 @@ class ShopymindClient_Callback {
         $params = self::formatOrderData($order);
         ShopymindClient_Bin_Notify::newOrder($params);
         self::stopStoreEmulation();
-    }
+    }*/
 
     public static function saveOrder($order)
     {
@@ -1376,8 +1438,8 @@ class ShopymindClient_Callback {
                 'ShopymindClient_CallbackOverride',
                 __FUNCTION__
             ), func_get_args());
+
         self::startStoreEmulationByStoreId($order->getStoreId());
-		
         include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
         ShopymindClient_Bin_Notify::saveOrder($order->getId());
         self::stopStoreEmulation();
@@ -1811,18 +1873,29 @@ class ShopymindClient_Callback {
         $scope->restrictCollection($collection);
 
         $results = array();
-		$countIds = count($scope->storeIds());
-		
+
         foreach ($collection as $quote) {
-			$cartProducts = self::productsOfCart($scope, ($countIds > 1) ? $quote->getData()['store_id'] : null, $quote->getId());
+            if($quote->getData()['store_id'])
+            $currentScope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-'.$quote->getData()['store_id']);
+            else $currentScope = $scope;
+			$cartProducts = self::productsOfCart($currentScope, ($quote->getData()['store_id']) ? $quote->getData()['store_id'] : null, $quote->getId());
+            $currency = ($quote->getQuoteCurrencyCode() !== null && $quote->getQuoteCurrencyCode() ? $quote->getQuoteCurrencyCode() : ($quote->getStoreCurrencyCode() !== null && $quote->getStoreCurrencyCode() ? $quote->getStoreCurrencyCode() : $quote->getBaseCurrencyCode()));
+            $currency_rate = ($quote->getStoreToQuoteRate() ? $quote->getStoreToQuoteRate() : $quote->getStoreToBaseRate());
             $results[] = array(
-                'sum_cart' => ($quote->getBaseGrandTotal() / $quote->getStoreToBaseRate()),
-                'currency' => $quote->getBaseCurrencyCode(),
-                'tax_rate' => $quote->getStoreToBaseRate(),
+                'sum_cart' => ($quote->getBaseGrandTotal() * $currency_rate),
+                'currency' => $currency,
+                'tax_rate' => $currency_rate,
                 'id_cart' => $quote->getId(),
                 'date_cart' =>$quote->getCreatedAt(),
                 'date_upd' => $quote->getUpdatedAt(),
-                'link_cart' => Mage::helper('shopymind')->getUrl('checkout/cart'),
+                'link_cart' => Mage::helper('shopymind')->getUrl('checkout/cart', array(
+        			'_current' => false,
+        			'_use_rewrite' => true,
+        			'_secure' => true,
+        			'_store' => ($quote->getData()['store_id']) ? $quote->getData()['store_id'] : null,
+        			'_store_to_url' => false,
+        			'_nosid' => true
+        		)),
                 'products' => $cartProducts,
                 'customer' => self::getUser(($quote->getCustomerId() ? $quote->getCustomerId() : $quote->getCustomerEmail()), true)
             );

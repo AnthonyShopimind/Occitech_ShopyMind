@@ -1,7 +1,7 @@
 <?php
 /**
  * Server
- * 
+ *
  * @package     ShopymindClient
  * @copyright   Copyright (c) 2013 - IDVIVE SARL (http://www.idvive.com)
  * @license     New BSD license (http://license.idvive.com)
@@ -22,13 +22,13 @@ if (!isset($SHOPYMIND_CLIENT_CONFIGURATION)) {
 
 final class ShopymindClient_Src_Server {
 
-    /** 
+    /**
      * Requête http
      *
      * @var SZend_Controller_Request_Http
      */
     private $_request;
-     
+
     public function __construct() {
         $this->_initRequest();
     }
@@ -41,9 +41,9 @@ final class ShopymindClient_Src_Server {
           $options['glued_string'] .= $key.$options['glue'];
           $options['glued_string'] .= $value.$options['glue'];
         }
-    }   
+    }
     private function implode_recursive(array $array, $glue = ';') {
-         $glued_string = '';         
+         $glued_string = '';
          // Recursively iterates array and adds key/value to glued string
          array_walk_recursive($array, array($this, 'formatString'), array('glue' => $glue, 'glued_string' => &$glued_string));
         // Removes last $glue from string
@@ -81,7 +81,7 @@ final class ShopymindClient_Src_Server {
         return (md5($hmac) === md5($request_hmac) && md5($config['api']['identifiant']) === md5($client_id));
     }
 
-    
+
     /**
      * Permet de renseigner une request
      *
@@ -92,9 +92,9 @@ final class ShopymindClient_Src_Server {
         $this->_request = $request;
         return $this;
     }
-    
+
     /**
-     * Permet de récupérer la requête 
+     * Permet de récupérer la requête
      *
      * @return SZend_Controller_Request_Http
      */
@@ -104,7 +104,7 @@ final class ShopymindClient_Src_Server {
 
     /**
      * Permet de retrouver la relance concernée par la requête
-     * 
+     *
      * @return string
      */
     public function retrieveRelaunch() {
@@ -125,7 +125,7 @@ final class ShopymindClient_Src_Server {
 
     /**
      * Permet de retrouver les paramètres de relance
-     * 
+     *
      * @return array
      */
     public function retrieveParams() {
@@ -151,7 +151,7 @@ final class ShopymindClient_Src_Server {
 
     /**
      * Permet de récupérer le type de requête que l'on souhaite executer
-     * 
+     *
      * @return string
      */
     public function getTypeRequest() {
@@ -162,7 +162,7 @@ final class ShopymindClient_Src_Server {
 
     /**
      * Permet d'envoyer une réponse
-     * 
+     *
      * @param array|string $data
      * @return string
      */
@@ -170,7 +170,7 @@ final class ShopymindClient_Src_Server {
         header('Cache-Control: no-cache, must-revalidate');
         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
         header('Content-type: application/json');
-        
+
         if (!isset($data['success'])) {
             $data['success'] = $success;
         }

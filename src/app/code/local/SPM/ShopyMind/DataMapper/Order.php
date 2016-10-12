@@ -27,7 +27,7 @@ class SPM_ShopyMind_DataMapper_Order
             'products' => $this->productsFor($order),
             'customer' => $customer,
             'shipping_number' => $shippingNumber,
-            'amount_without_tax' => $order->getBaseSubtotal(), // AJOUT
+			'amount_without_tax' => $order->getBaseSubtotal(), // AJOUT
         );
     }
 

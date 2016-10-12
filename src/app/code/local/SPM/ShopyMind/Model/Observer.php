@@ -20,13 +20,54 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     const OPTIONAL_CUSTOMER_DOB = 'opt';
     const REQUIRED_CUSTOMER_DOB = 'req';
 
+    /**
+     * Vérifie si une synchro peut être effectuée en respectant un délai minimum
+     * @param string $type
+     */
+    public static function checkSyncDate($type) {
+		return true;
+		
+        $lastCall = Mage::getConfig()->getNode('shopymind/configuration/lastsync_'.$type);
+        $pass = true;
+
+        if (!is_null($lastCall) && $lastCall != '') {
+            $datetime1 = new DateTime();
+            $datetime2 = new DateTime($lastCall);
+            $interval = ($datetime1->format('U')-$datetime2->format('U'))/60;
+
+            if($interval < 1) {
+                $pass = false;
+            }
+        }
+
+        return $pass;
+    }
+
+    /**
+     * Enregistre la dernière date de synchro pour le type passé
+     * @param string $type
+     */
+    public static function setSyncDate($type) {
+        $data = new Mage_Core_Model_Config();
+        $data->saveConfig('shopymind/configuration/lastsync_'.$type, date('Y-m-d H:i:s'));
+    }
+
     public function orderUpdateObserver(Varien_Event_Observer $observer)
     {
         try {
-            $order = $observer->getOrder();
-            if ($order->hasStatus()) {
-                ShopymindClient_Callback::checkNewOrder($order);
-                //ShopymindClient_Callback::saveOrder($order); // TODO : A remettre en service quand checkNewOrder sera dépréciée
+            $chk = self::checkSyncDate('order');
+            if($chk) {
+                $order = $observer->getOrder();
+                if ($order->hasStatus()) {
+                    //On vérifie que la commande n'est pas trop ancienne
+                    $date = new DateTime();
+                    $date->sub(new DateInterval('P3M'));
+                    if($date->format('Y-m-d H:i:s') > $order->created_at)
+                        return;
+
+                    ShopymindClient_Callback::saveOrder($order);
+                    self::setSyncDate('order');
+                }
             }
         } catch ( Exception $e ) {
             Mage::log($e->getMessage(), Zend_Log::ERR);
@@ -81,6 +122,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     public function isMultiStore()
     {
         $scope = SPM_ShopyMind_Model_Scope::fromMagentoCodes(null, null);
+
         $storeLangCodes = array_map(function (Mage_Core_Model_Store $store) {
             return $store->getConfig('general/locale/code');
         }, $scope->stores());
@@ -94,6 +136,12 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             return;
         }
 
+        if($scope->getId() == 0) {
+            $multishop = 0;
+        }
+        else {
+            $multishop = true/*$this->isMultiStore()*/;
+        }
         $locale = $scope->getConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE);
         $this->dispatchToShopyMind(
             (string) $scope->getConfig('shopymind/configuration/apiidentification'),
@@ -103,7 +151,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             (string) Mage::getUrl('contacts'),
             (string) $scope->getConfig('general/store_information/phone'),
             (string) $scope->getConfig('general/locale/timezone'),
-            (string) $this->isMultiStore(),
+            (string) $multishop,
             (string) $scope->shopyMindId()
         );
     }
@@ -131,7 +179,11 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function saveProduct(Varien_Event_Observer $observer)
     {
-        ShopymindClient_Bin_Notify::saveProduct($observer->getEvent()->getProduct()->getId());
+        $chk = self::checkSyncDate('product');
+        if($chk) {
+            ShopymindClient_Bin_Notify::saveProduct($observer->getEvent()->getProduct()->getId());
+            self::setSyncDate('product');
+        }
     }
 
     /**
@@ -148,11 +200,15 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function saveProductCategory(Varien_Event_Observer $observer)
     {
-        $category = $observer->getEvent()->getCategory();
-        if ($category->hasInitialSetupFlag()) {
-            return; // Prevent triggering notifications during the setup of a Magento store (or during tests setup). See magento_src/app/code/core/Mage/Catalog/data/catalog_setup/data-install-1.6.0.0.php:52
+        $chk = self::checkSyncDate('productCategory');
+        if($chk) {
+            $category = $observer->getEvent()->getCategory();
+            if ($category->hasInitialSetupFlag()) {
+                return; // Prevent triggering notifications during the setup of a Magento store (or during tests setup). See magento_src/app/code/core/Mage/Catalog/data/catalog_setup/data-install-1.6.0.0.php:52
+            }
+            ShopymindClient_Bin_Notify::saveProductCategory($category->getId());
+            self::setSyncDate('productCategory');
         }
-        ShopymindClient_Bin_Notify::saveProductCategory($category->getId());
     }
 
     /**
@@ -171,7 +227,11 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function saveCustomerAddress(Varien_Event_Observer $observer)
     {
-        ShopymindClient_Bin_Notify::saveCustomer($observer->getCustomerAddress()->getCustomerId());
+        $chk = self::checkSyncDate('customer');
+        if($chk) {
+            ShopymindClient_Bin_Notify::saveCustomer($observer->getCustomerAddress()->getCustomerId());
+            self::setSyncDate('customer');
+        }
     }
 
     /**
@@ -179,7 +239,11 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function saveCustomer(Varien_Event_Observer $observer)
     {
-        ShopymindClient_Bin_Notify::saveCustomer($observer->getEvent()->getCustomer()->getId());
+        $chk = self::checkSyncDate('customer');
+        if($chk) {
+            ShopymindClient_Bin_Notify::saveCustomer($observer->getEvent()->getCustomer()->getId());
+            self::setSyncDate('customer');
+        }
     }
 
     /**

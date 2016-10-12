@@ -30,7 +30,7 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getUrl($route, $params = array())
     {
-        return Mage::getUrl($route, $params);
+        return str_replace(array('call.php', 'testclient.php', 'checkCallback.php'), 'index.php', Mage::getUrl($route, $params));
     }
 
     public function productUrlOf(Mage_Catalog_Model_Product $product)
@@ -40,7 +40,7 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function productImageUrlOf(Mage_Catalog_Model_Product $product)
     {
-        return $product->getSmallImageUrl(200, 200);
+        return $product->getSmallImageUrl(600, 600);
     }
 
     public function manufacturerIdOf(Mage_Catalog_Model_Product $product)
@@ -86,6 +86,11 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 					$formatter,
 					iterator_to_array($childProducts->getIterator())
 				));
+				
+				// On met la première combinaison en défaut
+				if(is_array($combinations) && count($combinations > 0)) {
+					$combinations[0]['default'] = 1;
+				}
 			}
         }
         return $combinations;

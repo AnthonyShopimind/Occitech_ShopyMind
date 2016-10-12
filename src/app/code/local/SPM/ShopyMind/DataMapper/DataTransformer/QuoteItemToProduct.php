@@ -8,9 +8,11 @@ class SPM_ShopyMind_DataMapper_DataTransformer_QuoteItemToProduct
     {
         $combinations = $quoteItem->getChildren();
         $product = $quoteItem->getProduct();
+        $product->setData('quoteItem',$quoteItem);
         if (count($combinations)) {
            $product = $this->enrichWithAssociatedCombination($product, $combinations[0]);
         }
+
         return $product;
     }
 

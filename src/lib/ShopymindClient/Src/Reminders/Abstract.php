@@ -54,7 +54,7 @@ abstract class ShopymindClient_Src_Reminders_Abstract {
      * @param array $params
      * @return ShopymindClient_Src_Reminders_Abstract
      */
-    abstract public static function factory(array $params);
+    public static function factory(array $params);
 
     /**
      * Permet de récupérer les infos

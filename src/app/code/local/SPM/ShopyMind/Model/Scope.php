@@ -117,9 +117,11 @@ class SPM_ShopyMind_Model_Scope
 
     public function storeIds()
     {
-        return array_map(function($store) {
+        $storeIds = array_map(function($store) {
             return $store->getId();
         }, $this->stores());
+        //if ($this->scope == self::SCOPE_DEFAULT) $storeIds[] = 0;
+        return $storeIds;
     }
 
     public function getLang()

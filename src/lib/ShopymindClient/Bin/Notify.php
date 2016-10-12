@@ -83,6 +83,7 @@ class ShopymindClient_Bin_Notify {
         $requestServer = new ShopymindClient_Bin_RequestServer;
         $requestServer->setRestService('saveorder');
         $requestServer->addParam('order', array($id_order));
+
         if($requestServer->send() === true)
             return $requestServer->getResponse();
         return false;
@@ -98,6 +99,7 @@ class ShopymindClient_Bin_Notify {
         $requestServer = new ShopymindClient_Bin_RequestServer;
         $requestServer->setRestService('savecustomer');
 		$requestServer->addParam('customer', array($id_customer));
+
         if($requestServer->send() === true)
         	return $requestServer->getResponse();
         return false;

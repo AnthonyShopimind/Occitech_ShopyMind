@@ -83,14 +83,38 @@ class SPM_ShopyMind_DataMapper_Product
         $childAttributesFormatter = array($this, 'childAttributesFormatter');
         $formatter = function (Mage_Catalog_Model_Product $childProduct) use ($commonDataFormatter, $childAttributesFormatter, $parentSuperAttributes) {
             $stockItemModel = Mage::getModel('cataloginventory/stock_item');
+			
+			$arrayMerge = array(
+				'combination_name' => $childProduct->getName(),
+				'id_combination' => $childProduct->getId(),
+				'quantity_remaining' => $stockItemModel->loadByProduct($childProduct)->getQty(),
+				'values' => call_user_func($childAttributesFormatter, $childProduct, $parentSuperAttributes),
+				'default' => 0,
+			);
+			
+			// Si le produit n'est pas visible sur le site, on renvoie l'URL du parent
+			if(!$childProduct->isVisibleInSiteVisibility()) {
+				$rewrite = Mage::getModel('core/url_rewrite');
+				$params = array(
+        			'_current' => false,
+        			'_use_rewrite' => true,
+        			'_secure' => true,
+        			'_store_to_url' => false,
+        			'_nosid' => true
+        		);
+				$arrayOfParentIds = Mage::getSingleton("catalog/product_type_configurable")->getParentIdsByChild($childProduct->getId());
+				$parentId = (count($arrayOfParentIds) > 0 ? $arrayOfParentIds[0] : null);
+				$url = $childProduct->getProductUrl();
+				$idPath = 'product/'.$parentId;
+				$rewrite->loadByIdPath($idPath);
+				$parentUrl = Mage::getUrl($rewrite->getRequestPath(), $params);
+				$url = ($parentUrl ? $parentUrl : $url);
+				$arrayMerge['product_link'] = str_replace('.html/', '.html', $url);
+			}
+			
             return array_merge(
                 call_user_func($commonDataFormatter, $childProduct),
-                array(
-                    'combination_name' => $childProduct->getName(),
-                    'id_combination' => $childProduct->getId(),
-                    'quantity_remaining' => $stockItemModel->loadByProduct($childProduct)->getQty(),
-                    'values' => call_user_func($childAttributesFormatter, $childProduct, $parentSuperAttributes),
-                )
+                $arrayMerge
             );
         };
         return $this->helper->formatCombinationsOfProduct($product, $formatter, $attributeNames, $parentSuperAttributes);
@@ -98,13 +122,33 @@ class SPM_ShopyMind_DataMapper_Product
 
     public function formatProductCommonData(Mage_Catalog_Model_Product $product)
     {
-        return array(
+
+        $baseCurrency = Mage::app()->getStore()->getBaseCurrencyCode();
+        $storeCurrency = Mage::app()->getStore()->getCurrentCurrency()->getCode();
+        $price = $product->getPrice();
+        $price_discount = $product->getFinalPrice();
+        //Set price from quote currency rate
+        if($baseCurrency !== $storeCurrency) {
+            $price = Mage::helper('directory')->currencyConvert($product->getPrice(), $baseCurrency, $storeCurrency);
+            $price_discount = Mage::helper('directory')->currencyConvert($product->getFinalPrice(), $baseCurrency,$storeCurrency);
+            $product->setPrice($price);
+            $product->setFinalPrice($price_discount);
+        }
+
+        $return = array(
             'reference' => $product->getSku(),
             'product_link' => str_replace(array('call.php', 'testclient.php', 'checkCallback.php'), 'index.php', $this->helper->productUrlOf($product)),
             'image_link' => $this->helper->productImageUrlOf($product),
-            'price' => $product->getPrice(),
-            'price_discount' => $product->getFinalPrice(),
+            'price' => $price,
+            'price_discount' => $price_discount,
         );
+        //If quote data display quote price
+        if($quoteItem = $product->getData('quoteItem')) {
+            $return['price_discount'] = $quoteItem->getPriceInclTax();
+            $return['qty'] = $quoteItem->getQty();
+        }
+
+        return $return;
     }
 
     public function childAttributesFormatter(Mage_Catalog_Model_Product $product, $parentSuperAttributes)

@@ -16,6 +16,10 @@ class ShopymindClient_Src_Reminders_BirthdayClientsSignUp extends ShopymindClien
 
     protected $_timezones;
 
+    protected $_start = null;
+
+    protected $_limit = null;
+
     /**
      * Permet de construire une relance courante
      *
@@ -43,8 +47,8 @@ class ShopymindClient_Src_Reminders_BirthdayClientsSignUp extends ShopymindClien
      */
     public function get() {
         require_once dirname(__FILE__) . '/../../Callback.php';
-        if (method_exists('ShopymindClient_Callback', 'getBirthdayClients')) {
-            return ShopymindClient_Callback::getBirthdayClientsSignUp($this->getShopIdShop(), $this->getDateReference(), $this->getTimezones(), $this->getJustCount());
+        if (method_exists('ShopymindClient_Callback', 'getBirthdayClientsSignUp')) {
+            return ShopymindClient_Callback::getBirthdayClientsSignUp($this->getShopIdShop(), $this->getDateReference(), $this->getTimezones(), $this->getJustCount(), $this->getStart(), $this->getLimit());
         }
 
         return null;
@@ -87,6 +91,46 @@ class ShopymindClient_Src_Reminders_BirthdayClientsSignUp extends ShopymindClien
      */
     public function setTimezones(array $timezones) {
         $this->_timezones = $timezones;
+        return $this;
+    }
+
+    /**
+     * Permet de récupérer le start
+     *
+     * @return int
+     */
+    public function getStart() {
+        return $this->_start;
+    }
+
+    /**
+     * Permet de modifier le start
+     *
+     * @param int $start
+     * @return ShopymindClient_Src_Reminders_BirthdayClients
+     */
+    public function setStart($start) {
+        $this->_start = $start;
+        return $this;
+    }
+
+    /**
+     * Permet de récupérer la limite
+     *
+     * @return int
+     */
+    public function getLimit() {
+        return $this->_limit;
+    }
+
+    /**
+     * Permet de modifier la limite
+     *
+     * @param int $limit
+     * @return ShopymindClient_Src_Reminders_BirthdayClients
+     */
+    public function setLimit($limit) {
+        $this->_limit = $limit;
         return $this;
     }
 

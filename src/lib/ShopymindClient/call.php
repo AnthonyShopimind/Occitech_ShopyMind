@@ -52,7 +52,7 @@ try {
         } elseif ($server->getTypeRequest() === 'generateVouchers') {
             require_once dirname(__FILE__) . '/Callback.php';
             if (method_exists('ShopymindClient_Callback', 'generateVouchers')) {
-                $params = $server->retrieveParams();				
+                $params = $server->retrieveParams();
                 $server->sendResponse(array(
                     'vouchers' => ShopymindClient_Callback::generateVouchers(
                         $params['voucherInfos'],
@@ -228,7 +228,7 @@ try {
             $relaunch = $server->retrieveRelaunch();
             $params = $server->retrieveParams();
 
-            if ($relaunch !== null) {				
+            if ($relaunch !== null) {
                 if (file_exists(dirname(__FILE__) . '/Src/Reminders/' . ucfirst($relaunch) . '.php')) {
                     require_once dirname(__FILE__) . '/Src/Reminders/' . ucfirst($relaunch) . '.php';
                     $classRelaunch = 'ShopymindClient_Src_Reminders_' . ucfirst($relaunch);
@@ -238,7 +238,7 @@ try {
                     ), $params);
                     if ($relaunch !== null && ! is_string($relaunch)) {
                         $response = $relaunch->get();
-						
+
                         if ($response !== null && is_array($response)) {
                             $server->sendResponse(array(
                                 'clients' => $response
