@@ -163,7 +163,7 @@ try {
                 $params = $server->retrieveParams();
                 $server->sendResponse(array(
                     'lastUpdate' => date('Y-m-d H:i:s'),
-                    'products' => ShopymindClient_Callback::syncProducts((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
+                    'products' => ShopymindClient_Callback::syncProducts((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['idProduct']) ? $params['idProduct'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
                 ), true);
             }
         } elseif ($server->getTypeRequest() === 'syncProductsCategories') {
@@ -172,7 +172,7 @@ try {
                 $params = $server->retrieveParams();
                 $server->sendResponse(array(
                     'lastUpdate' => date('Y-m-d H:i:s'),
-                    'productsCategories' => ShopymindClient_Callback::syncProductsCategories((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
+                    'productsCategories' => ShopymindClient_Callback::syncProductsCategories((isset($params['shopIdShop']) ? $params['shopIdShop'] : false),(isset($params['start']) ? $params['start'] : false),(isset($params['limit']) ? $params['limit'] : false),(isset($params['lastUpdate']) ? $params['lastUpdate'] : false),(isset($params['idCategory']) ? $params['idCategory'] : false),(isset($params['justCount']) ? $params['justCount'] : false))
                 ), true);
             }
         } elseif ($server->getTypeRequest() === 'syncOrders') {

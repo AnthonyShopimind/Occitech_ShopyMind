@@ -59,7 +59,10 @@ class SPM_ShopyMind_Action_SyncProductCategories implements SPM_ShopyMind_Interf
         $this->params['scope']->restrictCategoryCollection($categoryCollection);
 
         $categoryCollection->addAttributeToSelect('*');
-        $categoryCollection->addAttributeToFilter('updated_at', array('gt' => $this->params['lastUpdate']));
+
+        if ($this->params['lastUpdate']) {
+			$categoryCollection->addFieldToFilter('updated_at', array('gt' => $this->params['lastUpdate']));
+		}
 
         if ($this->params['categoryId']) {
             $categoryCollection->addFieldToFilter('entity_id', array('in' => $this->params['categoryId']));

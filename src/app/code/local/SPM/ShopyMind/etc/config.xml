@@ -23,7 +23,7 @@
             </shopymind>
         </models>
         <events>
-            <sales_order_save_after>
+            <sales_order_save_commit_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
                         <type>singleton</type>
@@ -31,7 +31,7 @@
                         <method>orderUpdateObserver</method>
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
-            </sales_order_save_after>
+            </sales_order_save_commit_after>
             <admin_system_config_changed_section_shopymind_configuration>
                 <observers>
                     <spm_shopymind_model_observer>
@@ -49,7 +49,7 @@
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
             </phpunit_test_start_after>
-            <catalog_product_save_after>
+            <catalog_product_save_commit_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
                         <type>singleton</type>
@@ -57,7 +57,7 @@
                         <method>saveProduct</method>
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
-            </catalog_product_save_after>
+            </catalog_product_save_commit_after>
             <catalog_product_delete_after_done>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
@@ -67,7 +67,7 @@
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
             </catalog_product_delete_after_done>
-            <catalog_category_save_after>
+            <catalog_category_save_commit_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
                         <type>singleton</type>
@@ -75,7 +75,7 @@
                         <method>saveProductCategory</method>
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
-            </catalog_category_save_after>
+            </catalog_category_save_commit_after>
             <catalog_category_delete_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
@@ -85,7 +85,7 @@
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
             </catalog_category_delete_after>
-            <customer_save_after>
+            <customer_save_commit_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
                         <type>singleton</type>
@@ -93,7 +93,7 @@
                         <method>saveCustomer</method>
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
-            </customer_save_after>
+            </customer_save_commit_after>
             <customer_address_save_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
