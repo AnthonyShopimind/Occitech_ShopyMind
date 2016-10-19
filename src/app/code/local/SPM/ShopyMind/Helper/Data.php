@@ -57,7 +57,6 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $combinations = array();
         if ($product->getTypeId() === Mage_Catalog_Model_Product_Type_Configurable::TYPE_CODE) {
-
             $ids = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
             $childProducts = Mage::getModel('catalog/product')
                 ->getCollection()
@@ -66,7 +65,6 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
             $attributesToJoin = array();
             if (!empty($parentSuperAttributes)) {
                 $attributesToJoin = array_map(function($attribute) { return $attribute['attribute_code']; }, $parentSuperAttributes);
-
                 foreach($attributesToJoin as $attributeToJoin) {
                     $childProducts->joinAttribute($attributeToJoin, 'catalog_product/' . $attributeToJoin, 'entity_id', null, 'left');
                 }
@@ -81,17 +79,21 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
                 $childProducts->addAttributeToSelect($attributeNames);
             }
 
-			if(is_array($childProducts->getSelect()->getPart('where')) && array_key_exists(0, $childProducts->getSelect()->getPart('where')) && preg_match('#[a-zA-Z0-9]#', $childProducts->getSelect()->getPart('where')[0])) {
-				$combinations = array_values(array_map(
-					$formatter,
-					iterator_to_array($childProducts->getIterator())
-				));
-				
-				// On met la première combinaison en défaut
-				if(is_array($combinations) && count($combinations > 0)) {
-					$combinations[0]['default'] = 1;
-				}
-			}
+            if (
+                is_array($childProducts->getSelect()->getPart('where'))
+                && array_key_exists(0, $childProducts->getSelect()->getPart('where'))
+                && preg_match('#[a-zA-Z0-9]#', $childProducts->getSelect()->getPart('where')[0])
+            ) {
+                $combinations = array_values(array_map(
+                    $formatter,
+                    iterator_to_array($childProducts->getIterator())
+                ));
+
+                // On met la première combinaison en défaut
+                if (is_array($combinations) && count($combinations) > 0) {
+                    $combinations[0]['default'] = 1;
+                }
+            }
         }
         return $combinations;
     }
@@ -113,14 +115,12 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
     public function startEmulatingScope(SPM_ShopyMind_Model_Scope $scope, $storeId = null)
     {
         $appEmulation = Mage::getSingleton('core/app_emulation');
-
-		if ($storeId == null) {
-			$storeIds = $scope->storeIds();
-			return $appEmulation->startEnvironmentEmulation($storeIds[0]);
-		}
-		else {
-			return $appEmulation->startEnvironmentEmulation($storeId);
-		}
+        if (is_null($storeId)) {
+            $storeIds = $scope->storeIds();
+            return $appEmulation->startEnvironmentEmulation($storeIds[0]);
+        } else {
+            return $appEmulation->startEnvironmentEmulation($storeId);
+        }
     }
 
     public function stopEmulation($emulatedEnvironment)

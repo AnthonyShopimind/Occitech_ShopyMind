@@ -130,8 +130,9 @@ class SPM_ShopyMind_DataMapper_Product
         $storeCurrency = Mage::app()->getStore()->getCurrentCurrency()->getCode();
         $price = $product->getPrice();
         $price_discount = $product->getFinalPrice();
-        //Set price from quote currency rate
-        if($baseCurrency !== $storeCurrency) {
+
+        // Set price from quote currency rate
+        if ($baseCurrency !== $storeCurrency) {
             $price = Mage::helper('directory')->currencyConvert($product->getPrice(), $baseCurrency, $storeCurrency);
             $price_discount = Mage::helper('directory')->currencyConvert($product->getFinalPrice(), $baseCurrency,$storeCurrency);
             $product->setPrice($price);
@@ -145,8 +146,8 @@ class SPM_ShopyMind_DataMapper_Product
             'price' => $price,
             'price_discount' => $price_discount,
         );
-        //If quote data display quote price
-        if($quoteItem = $product->getData('quoteItem')) {
+        // If quote data display quote price
+        if ($quoteItem = $product->getData('quoteItem')) {
             $return['price_discount'] = $quoteItem->getPriceInclTax();
             $return['qty'] = $quoteItem->getQty();
         }
