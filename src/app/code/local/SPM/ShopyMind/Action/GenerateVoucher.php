@@ -8,14 +8,15 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
     {
         $baseCurrency = Mage::app()->getStore()->getBaseCurrencyCode();
 
-        if($baseCurrency && $amountCurrency && $baseCurrency !== $amountCurrency) {
-            //Set amount to tax rate
-            if ($type == 'amount')
+        if ($baseCurrency && $amountCurrency && $baseCurrency !== $amountCurrency) {
+            // Set amount to tax rate
+            if ($type == 'amount') {
                 $amount = Mage::helper('directory')->currencyConvert($amount, $amountCurrency, $baseCurrency);
-           if ($minimumOrder)
+            }
+            if ($minimumOrder) {
                $minimumOrder = Mage::helper('directory')->currencyConvert($minimumOrder, $amountCurrency, $baseCurrency);
+            }
         }
-
 
         $this->params['customerIdentifier'] = $id_customer;
         $this->params['type'] = $type;
@@ -112,14 +113,15 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
         }
         if (empty($this->params['duplicateCode'])) {
             $rule->setDiscountStep('0')
-            ->setApplyToShipping('0')
-            ->setTimesUsed('0')
-            ->setIsRss('0')
-            ->setCouponType('2')
-            ->setUsesPerCoupon(1)
-            ->setCustomerGroupIds($this->getAllCustomerGroupsIds());
+                ->setApplyToShipping('0')
+                ->setTimesUsed('0')
+                ->setIsRss('0')
+                ->setCouponType('2')
+                ->setUsesPerCoupon(1)
+                ->setCustomerGroupIds($this->getAllCustomerGroupsIds());
         }
-        $rule->setWebsiteIds($websiteId)
+        $rule
+            ->setWebsiteIds($websiteId)
             ->setCouponCode($coupon_code);
     }
 
