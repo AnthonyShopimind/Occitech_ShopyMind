@@ -84,7 +84,7 @@ class SPM_ShopyMind_DataMapper_Product
         $formatter = function (Mage_Catalog_Model_Product $childProduct) use ($commonDataFormatter, $childAttributesFormatter, $parentSuperAttributes) {
             $stockItemModel = Mage::getModel('cataloginventory/stock_item');
 
-            $arrayMerge = array(
+            $combinationData = array(
                 'combination_name' => $childProduct->getName(),
                 'id_combination' => $childProduct->getId(),
                 'quantity_remaining' => $stockItemModel->loadByProduct($childProduct)->getQty(),
@@ -92,32 +92,35 @@ class SPM_ShopyMind_DataMapper_Product
                 'default' => 0,
             );
 
-            // Si le produit n'est pas visible sur le site, on renvoie l'URL du parent
             if (!$childProduct->isVisibleInSiteVisibility()) {
-                $rewrite = Mage::getModel('core/url_rewrite');
-                $params = array(
-                    '_current' => false,
-                    '_use_rewrite' => true,
-                    '_secure' => true,
-                    '_store_to_url' => false,
-                    '_nosid' => true
-                );
-                $arrayOfParentIds = Mage::getSingleton("catalog/product_type_configurable")->getParentIdsByChild($childProduct->getId());
-                $parentId = (count($arrayOfParentIds) > 0 ? $arrayOfParentIds[0] : null);
-                $url = $childProduct->getProductUrl();
-                $idPath = 'product/'.$parentId;
-                $rewrite->loadByIdPath($idPath);
-                $parentUrl = Mage::getUrl($rewrite->getRequestPath(), $params);
-                $url = ($parentUrl ? $parentUrl : $url);
-                $arrayMerge['product_link'] = str_replace('.html/', '.html', $url);
+                $combinationData['product_link'] = str_replace('.html/', '.html', $this->getParentProductUrl($childProduct));
             }
 
             return array_merge(
                 call_user_func($commonDataFormatter, $childProduct),
-                $arrayMerge
+                $combinationData
             );
         };
         return $this->helper->formatCombinationsOfProduct($product, $formatter, $attributeNames, $parentSuperAttributes);
+    }
+
+    private function getParentProductUrl(Mage_Catalog_Model_Product $childProduct)
+    {
+        $rewrite = Mage::getModel('core/url_rewrite');
+        $params = [
+            '_current' => false,
+            '_use_rewrite' => true,
+            '_secure' => true,
+            '_store_to_url' => false,
+            '_nosid' => true
+        ];
+        $arrayOfParentIds = Mage::getSingleton("catalog/product_type_configurable")->getParentIdsByChild($childProduct->getId());
+        $parentId = (count($arrayOfParentIds) > 0 ? $arrayOfParentIds[0] : null);
+        $url = $childProduct->getProductUrl();
+        $rewrite->loadByIdPath('product/' . $parentId);
+        $parentUrl = Mage::getUrl($rewrite->getRequestPath(), $params);
+
+        return $parentUrl ? $parentUrl : $url;
     }
 
     public function formatProductCommonData(Mage_Catalog_Model_Product $product)
