@@ -40,7 +40,6 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
         foreach ($storeIds AS $storeId) {
             $initialScope = $this->params['scope'];
             $scope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-'.$storeId);
-            //echo $scope->getLang();
             $this->params['scope'] = $scope;
 
             $emulatedEnvironment = $appEmulation->startEnvironmentEmulation($storeId);
@@ -56,8 +55,10 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
             ));
             $currentReturn = $formatter->format(iterator_to_array($productCollection));
             foreach ($currentReturn as $product) {
-                $product_key = $product['id_product'].'-'.$product['lang'];
-                if(!isset($return[$product_key])) $return[$product_key] = $product;
+                $product_key = $product['id_product'] . '-' . $product['lang'];
+                if (!isset($return[$product_key])) {
+                    $return[$product_key] = $product;
+                }
             }
             $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
             $this->params['scope'] = $initialScope;
@@ -89,11 +90,9 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
         $limit = !empty($this->params['limit']) ? (int) $this->params['limit'] : null;
 
         $productCollection->getSelect()->limit($limit, $offset);
-        $newCollection = array();
-
-        if($storeId) {
+        if ($storeId) {
             foreach ($productCollection as $key=>$product) {
-                if(!in_array($storeId,$product->getStoreIds())){
+                if (!in_array($storeId, $product->getStoreIds())) {
                     $productCollection->removeItemByKey($key);
                 }
             }

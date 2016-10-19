@@ -29,10 +29,9 @@ class SPM_ShopyMind_Action_SyncOrders implements SPM_ShopyMind_Interface_Action
 
     public function retrieveOrders()
     {
-
         $orderCollection = Mage::getModel('sales/order')->getCollection()
             ->addFieldToFilter('updated_at', array('gt' => $this->params['lastUpdate']));
-        if($this->params['lastUpdate']) {
+        if ($this->params['lastUpdate']) {
             $date = new DateTime($this->params['lastUpdate']);
             $date->sub(new DateInterval('P3M'));
             $orderCollection->addFieldToFilter('created_at', array('gt' => $date->format('Y-m-d H:i:s')));

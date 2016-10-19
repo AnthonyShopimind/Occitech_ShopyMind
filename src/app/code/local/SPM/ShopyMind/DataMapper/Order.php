@@ -18,7 +18,7 @@ class SPM_ShopyMind_DataMapper_Order
             'date_cart' => $this->cartDateFor($order),
             'id_order' => $order->getId(),
             'amount' => $order->getBaseGrandTotal(),
-            'currency_rate' => $order->getBaseToOrderRate(), // AJOUT
+            'currency_rate' => $order->getBaseToOrderRate(),
             'tax_rate' => $order->getBaseToOrderRate(),
             'currency' => $order->getOrderCurrencyCode(),
             'date_order' => $order->getCreatedAt(),
@@ -27,7 +27,7 @@ class SPM_ShopyMind_DataMapper_Order
             'products' => $this->productsFor($order),
             'customer' => $customer,
             'shipping_number' => $shippingNumber,
-			'amount_without_tax' => $order->getBaseSubtotal(), // AJOUT
+            'amount_without_tax' => $order->getBaseSubtotal(),
         );
     }
 
