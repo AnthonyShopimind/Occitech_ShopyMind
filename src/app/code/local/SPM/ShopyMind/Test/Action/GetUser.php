@@ -39,6 +39,13 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetUser extends EcomDev_PH
         $this->assertEquals($this->aCustomer, $result);
     }
 
+    public function testItReturnsAListWhenInSyncContext()
+    {
+        $GetUser = new SPM_ShopyMind_Action_GetUser(1, false, true);
+        $result = $GetUser->process();
+        $this->assertEquals(array($this->aCustomer), $result);
+    }
+
     /**
      * @loadFixture userSubscribedToNewsletter
      */

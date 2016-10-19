@@ -9,7 +9,7 @@ class SPM_ShopyMind_Test_Action_SyncOrders extends EcomDev_PHPUnit_Test_Case
     public function testRetrieveOrdersWithoutRestrictions()
     {
         $actual = $this->actualOrdersIdsFromSyncOrders('', null, null, null, false, false);
-        $expected = array(1, 2, 3);
+        $expected = array(1, 2, 3, 4);
 
         $this->assertEquals($expected, $actual);
     }
@@ -22,7 +22,7 @@ class SPM_ShopyMind_Test_Action_SyncOrders extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals($expected, $actual);
     }
 
-    public function testRetrieveOrdersWithLastUpdate()
+    public function testRetrieveOrdersWithLastUpdateExcludesCreatedEarlierThan3Months()
     {
         $actual = $this->actualOrdersIdsFromSyncOrders('', null, null, '2015-12-09 00:00:00', false, false);
         $expected = array(1);
@@ -52,7 +52,7 @@ class SPM_ShopyMind_Test_Action_SyncOrders extends EcomDev_PHPUnit_Test_Case
         $SyncOrders = new SPM_ShopyMind_Action_SyncOrders($scope, null, null, null, false, true);
 
         $actual = $SyncOrders->process();
-        $expected = 3;
+        $expected = 4;
 
         $this->assertEquals($expected, $actual);
     }
@@ -64,7 +64,7 @@ class SPM_ShopyMind_Test_Action_SyncOrders extends EcomDev_PHPUnit_Test_Case
         $result = $SyncOrders->retrieveOrders();
 
         $actual = array();
-        foreach($result as $order) {
+        foreach ($result as $order) {
             $actual[] = $order->getId();
         }
 

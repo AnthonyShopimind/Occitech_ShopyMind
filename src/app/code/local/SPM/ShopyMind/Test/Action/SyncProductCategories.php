@@ -90,17 +90,19 @@ class SPM_ShopyMind_Test_Action_SyncProductCategories extends PHPUnit_Framework_
         $actual = $SyncCategories->process();
 
         $expected = array(
-            'shop_id_shop' => 1,
-            'id_category' => 6,
-            'id_parent_category' => 5,
-            'lang' => 'fr',
-            'name' => 'Hello world',
-            'description' => 'this is REALLY a test category',
-            'link' => 'http://shopymind.test/catalog/category/view/s/hello-world/id/6/',
-            'date_creation' => '2015-12-10 12:00:00',
-            'active' => '1',
+            '6-fr' => array(
+                'shop_id_shop' => 1,
+                'id_category' => 6,
+                'id_parent_category' => 5,
+                'lang' => 'fr',
+                'name' => 'Hello world',
+                'description' => 'this is REALLY a test category',
+                'link' => 'http://shopymind.test/catalog/category/view/s/hello-world/id/6/',
+                'date_creation' => '2015-12-10 12:00:00',
+                'active' => '1',
+            )
         );
 
-        $this->assertEquals($expected, $actual[0]);
+        $this->assertEquals($expected, $actual);
     }
 }

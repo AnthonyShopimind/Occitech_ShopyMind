@@ -167,4 +167,9 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
 
         $this->assertEquals($expected, $actual);
     }
+
+    public function testProcessCreateVoucherWillConvertCurrencyAmountAndMinimumOrderAmountInBaseCurrency()
+    {
+        $this->markTestIncomplete('TODO');
+    }
 }

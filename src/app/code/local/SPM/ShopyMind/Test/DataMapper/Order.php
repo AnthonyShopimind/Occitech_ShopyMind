@@ -29,6 +29,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'id_order' => 1,
             'lang' => 'fr',
             'amount' => 28.0300,
+            'currency_rate' => 1.0000,
             'tax_rate' => 1.0000,
             'currency' => 'EUR',
             'date_order' => '2015-12-09 11:53:06',
@@ -37,6 +38,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'products' => array(),
             'customer' => array(),
             'shipping_number' => array(),
+            'amount_without_tax' => null,
         );
 
         $actual = $this->SUT->format($order, array(), null);
@@ -62,6 +64,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'id_order' => 2,
             'lang' => 'fr',
             'amount' => 28.0300,
+            'currency_rate' => 1.0000,
             'tax_rate' => 1.0000,
             'currency' => 'EUR',
             'date_order' => '2015-12-09 11:53:06',
@@ -70,6 +73,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_DataMapper_Order extends EcomDev_PH
             'products' => array(),
             'customer' => array(),
             'shipping_number' => array(),
+            'amount_without_tax' => null,
         );
 
         $actual = $this->SUT->format($order, array(), null);

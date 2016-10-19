@@ -134,11 +134,11 @@ class SPM_ShopyMind_Test_Action_SyncProducts extends EcomDev_PHPUnit_Test_Case
         $SyncProducts = new SPM_ShopyMind_Action_SyncProducts($scope, null, null, null, 1, false);
         $SyncProducts->setProductDataMapper($MockedDataMapper);
 
-        $actual = $SyncProducts->process();
+        $result = $SyncProducts->process();
+        $actual = array_pop($result);
         $expectedKeys = array('shop_id_shop', 'lang', 'currency');
-
         foreach ($expectedKeys as $expectedKey) {
-            $this->assertArrayHasKey($expectedKey, $actual[1], 'The key : "' . $expectedKey . '" was not found');
+            $this->assertArrayHasKey($expectedKey, $actual, 'The key : "' . $expectedKey . '" was not found');
         }
     }
 }
