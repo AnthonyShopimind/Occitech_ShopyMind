@@ -3,6 +3,7 @@
 class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Action
 {
     private $params;
+    public $now = null;
 
     public function __construct($id_customer, $type, $amount, $amountCurrency, $minimumOrder, $nbDayValidate, $description, $idShop, $prefix = null, $duplicateCode = null)
     {
@@ -127,18 +128,16 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
 
     private function makeNewRule($couponCode)
     {
-        $now = date('Y-m-d H:i:s');
         $rule = Mage::getModel('salesrule/rule');
 
         $rule->setName($couponCode)
-            ->setFromDate($now)
-            ->setToDate((date('Y-m-d 23:59:59', mktime(date("H"), date("i"), date("s"), date("m"), date("d") + $this->params['nbDayValidate'], date("Y")))))
             ->setUsesPerCustomer('1')
             ->setIsActive('1')
             ->setStopRulesProcessing('0')
             ->setIsAdvanced('1')
             ->setProductIds(NULL)
             ->setSortOrder('0');
+        $this->startRuleValidityAsOfToday($rule);
 
         if ($this->params['type'] == 'percent') {
             $rule->setSimpleAction('by_percent')
@@ -148,7 +147,6 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
         }
 
         if ($this->params['type'] == 'amount') {
-
             $rule->setSimpleAction('cart_fixed')
                 ->setDiscountAmount($this->params['amount'])
                 ->setDiscountQty(NULL)
@@ -173,10 +171,23 @@ class SPM_ShopyMind_Action_GenerateVoucher implements SPM_ShopyMind_Interface_Ac
         $rule = Mage::getModel('salesrule/rule');
         $rule->setData($ruleData);
 
-        //Set date
-        $now = date('Y-m-d H:i:s');
-        $rule->setFromDate($now)
-        ->setToDate((date('Y-m-d 23:59:59', mktime(date("H"), date("i"), date("s"), date("m"), date("d") + $this->params['nbDayValidate'], date("Y")))));
+        $this->startRuleValidityAsOfToday($rule);
         return $rule;
+    }
+
+    private function getCurrentDateTime()
+    {
+        return is_null($this->now) ? date('Y-m-d H:i:s') : date('Y-m-d H:i:s', strtotime($this->now));
+    }
+
+    private function startRuleValidityAsOfToday($rule)
+    {
+        $now = $this->getCurrentDateTime();
+        $rule
+            ->setFromDate($now)
+            ->setToDate(date(
+                'Y-m-d 23:59:59',
+                strtotime($this->params['nbDayValidate'] . ' days', strtotime($now))
+            ));
     }
 }

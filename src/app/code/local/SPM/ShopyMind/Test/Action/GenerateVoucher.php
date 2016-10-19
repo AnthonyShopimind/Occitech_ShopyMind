@@ -73,13 +73,14 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
     /**
      * @loadFixture salesrule
      */
-    public function testProcessDuplicateExistingRule()
+    public function testProcessDuplicateExistingRuleWillDuplicateDataAndSetValidFromNow()
     {
         $this->mockShopymindHelper->expects($this->any())
             ->method('shortId')
             ->willReturn('test-3');
 
         $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, null, 10, null, null, null, 'ECPA2015');
+        $GenerateVoucher->now = '2016-01-25';
         $ruleName = $GenerateVoucher->process();
         $this->couponToCleanup = $ruleName;
         $ruleId = Mage::getModel('salesrule/coupon')->load($ruleName, 'code')->getRuleId();
@@ -100,8 +101,8 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
         $expected = array(
             'name' => 'Réduction 10%',
             'description' => 'Remise 10% catégorie sport',
-            'from_date' => '2015-01-21',
-            'to_date' => '2015-06-30',
+            'from_date' => '2016-01-25',
+            'to_date' => '2016-02-04',
             'uses_per_customer' => 100,
             'is_active' => 0,
             'conditions_serialized' => 'a:6:{s:4:"type";s:32:"salesrule/rule_condition_combine";s:9:"attribute";N;s:8:"operator";N;s:5:"value";b:1;s:18:"is_value_processed";N;s:10:"aggregator";s:3:"all";}',
@@ -154,7 +155,7 @@ class SPM_ShopyMind_Test_Action_GenerateVoucher extends EcomDev_PHPUnit_Test_Cas
             ->method('shortId')
             ->willReturn('test-6');
 
-        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, 'My new description', null, 'store-1');
+        $GenerateVoucher = new SPM_ShopyMind_Action_GenerateVoucher(null, 'percent', 20, null, 100, 10, 'My new description', 'store-1');
         $ruleName = $GenerateVoucher->process();
         $this->couponToCleanup = $ruleName;
         $ruleId = Mage::getModel('salesrule/coupon')->load($ruleName, 'code')->getRuleId();
