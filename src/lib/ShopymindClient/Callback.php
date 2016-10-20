@@ -1886,12 +1886,12 @@ class ShopymindClient_Callback {
         $results = array();
 
         foreach ($collection as $quote) {
-            if ($quote->getData()['store_id']) {
-                $currentScope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-'.$quote->getData()['store_id']);
+            if ($quote->getData('store_id')) {
+                $currentScope = SPM_ShopyMind_Model_Scope::fromShopymindId('store-'.$quote->getData('store_id'));
             } else {
                 $currentScope = $scope;
             }
-            $cartProducts = self::productsOfCart($currentScope, ($quote->getData()['store_id']) ? $quote->getData()['store_id'] : null, $quote->getId());
+            $cartProducts = self::productsOfCart($currentScope, ($quote->getData('store_id')) ? $quote->getData('store_id') : null, $quote->getId());
             $currency = ($quote->getQuoteCurrencyCode() !== null && $quote->getQuoteCurrencyCode() ? $quote->getQuoteCurrencyCode() : ($quote->getStoreCurrencyCode() !== null && $quote->getStoreCurrencyCode() ? $quote->getStoreCurrencyCode() : $quote->getBaseCurrencyCode()));
             $currency_rate = ($quote->getStoreToQuoteRate() ? $quote->getStoreToQuoteRate() : $quote->getStoreToBaseRate());
             $results[] = array(
@@ -1905,7 +1905,7 @@ class ShopymindClient_Callback {
                     '_current' => false,
                     '_use_rewrite' => true,
                     '_secure' => true,
-                    '_store' => ($quote->getData()['store_id']) ? $quote->getData()['store_id'] : null,
+                    '_store' => ($quote->getData('store_id')) ? $quote->getData('store_id') : null,
                     '_store_to_url' => false,
                     '_nosid' => true
                 )),
