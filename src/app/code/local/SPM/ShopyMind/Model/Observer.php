@@ -25,8 +25,8 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      * @param string $type
      */
     public static function checkSyncDate($type) {
-		return true;
-		
+        return true;
+
         $lastCall = Mage::getConfig()->getNode('shopymind/configuration/lastsync_'.$type);
         $pass = true;
 
@@ -54,13 +54,13 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
 
     public function orderPlaceObserver(Varien_Event_Observer $observer)
     {
-        try {		
-			$order = $observer->getEvent()->getData('order');
-			if ($order->hasStatus()) {
-				ShopymindClient_Callback::saveOrder($order);
-				self::setSyncDate('order');
-			}
-        } catch ( Exception $e ) {
+        try {
+            $order = $observer->getEvent()->getData('order');
+            if ($order->hasStatus()) {
+                ShopymindClient_Callback::saveOrder($order);
+                self::setSyncDate('order');
+            }
+        } catch (Exception $e) {
             Mage::log($e->getMessage(), Zend_Log::ERR);
         }
     }
@@ -69,7 +69,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     {
         try {
             $chk = self::checkSyncDate('order');
-            if($chk) {
+            if ($chk) {
                 $order = $observer->getOrder();
                 if ($order->hasStatus()) {
                     //On vérifie que la commande n'est pas trop ancienne
@@ -82,7 +82,7 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
                     self::setSyncDate('order');
                 }
             }
-        } catch ( Exception $e ) {
+        } catch (Exception $e) {
             Mage::log($e->getMessage(), Zend_Log::ERR);
         }
     }
@@ -149,11 +149,10 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
             return;
         }
 
-        if($scope->getId() == 0) {
+        if ($scope->getId() == 0) {
             $multishop = 0;
-        }
-        else {
-            $multishop = true/*$this->isMultiStore()*/;
+        } else {
+            $multishop = true;
         }
         $locale = $scope->getConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE);
         $this->dispatchToShopyMind(
@@ -192,16 +191,15 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function saveProduct(Varien_Event_Observer $observer)
     {
-		try {
-			$chk = self::checkSyncDate('product');
-			if($chk) {
-				ShopymindClient_Bin_Notify::saveProduct($observer->getEvent()->getProduct()->getId());
-				self::setSyncDate('product');
-			}
-		}
-		catch(Exception $e) {
-			
-		}
+        try {
+            $chk = self::checkSyncDate('product');
+            if ($chk) {
+                ShopymindClient_Bin_Notify::saveProduct($observer->getEvent()->getProduct()->getId());
+                self::setSyncDate('product');
+            }
+        } catch (Exception $e) {
+
+        }
     }
 
     /**
@@ -209,13 +207,12 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function deleteProduct(Varien_Event_Observer $observer)
     {
-		try {
-			$params = array('id_product' => $observer->getEvent()->getProduct()->getId());
-			ShopymindClient_Bin_Notify::deleteProduct($params);
-		}
-		catch(Exception $e) {
-			
-		}
+        try {
+            $params = array('id_product' => $observer->getEvent()->getProduct()->getId());
+            ShopymindClient_Bin_Notify::deleteProduct($params);
+        } catch (Exception $e) {
+
+        }
     }
 
     /**
@@ -223,20 +220,19 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function saveProductCategory(Varien_Event_Observer $observer)
     {
-		try {
-			$chk = self::checkSyncDate('productCategory');
-			if($chk) {
-				$category = $observer->getEvent()->getCategory();
-				if ($category->hasInitialSetupFlag()) {
-					return; // Prevent triggering notifications during the setup of a Magento store (or during tests setup). See magento_src/app/code/core/Mage/Catalog/data/catalog_setup/data-install-1.6.0.0.php:52
-				}
-				ShopymindClient_Bin_Notify::saveProductCategory($category->getId());
-				self::setSyncDate('productCategory');
-			}
-		}
-		catch(Exception $e) {
-			
-		}
+        try {
+            $chk = self::checkSyncDate('productCategory');
+            if ($chk) {
+                $category = $observer->getEvent()->getCategory();
+                if ($category->hasInitialSetupFlag()) {
+                    return; // Prevent triggering notifications during the setup of a Magento store (or during tests setup). See magento_src/app/code/core/Mage/Catalog/data/catalog_setup/data-install-1.6.0.0.php:52
+                }
+                ShopymindClient_Bin_Notify::saveProductCategory($category->getId());
+                self::setSyncDate('productCategory');
+            }
+        } catch (Exception $e) {
+
+        }
     }
 
     /**
@@ -244,15 +240,13 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function deleteProductCategory(Varien_Event_Observer $observer)
     {
-		try {
-			$params = array('id_category' => $observer->getEvent()->getCategory()->getId());
-			ShopymindClient_Bin_Notify::deleteProductCategory($params);
-		}
-		catch(Exception $e) {
-			
-		}
-    }
+        try {
+            $params = array('id_category' => $observer->getEvent()->getCategory()->getId());
+            ShopymindClient_Bin_Notify::deleteProductCategory($params);
+        } catch (Exception $e) {
 
+        }
+    }
 
     /**
      * @event customer_address_save_after
@@ -261,15 +255,14 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
     public function saveCustomerAddress(Varien_Event_Observer $observer)
     {
         try {
-			$chk = self::checkSyncDate('customer');
-			if($chk) {
-				ShopymindClient_Bin_Notify::saveCustomer($observer->getCustomerAddress()->getCustomerId());
-				self::setSyncDate('customer');
-			}
-		}
-		catch(Exception $e) {
-			
-		}
+            $chk = self::checkSyncDate('customer');
+            if ($chk) {
+                ShopymindClient_Bin_Notify::saveCustomer($observer->getCustomerAddress()->getCustomerId());
+                self::setSyncDate('customer');
+            }
+        } catch (Exception $e) {
+
+        }
     }
 
     /**
@@ -277,16 +270,15 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function saveCustomer(Varien_Event_Observer $observer)
     {
-		try {
-			$chk = self::checkSyncDate('customer');
-			if($chk) {
-				ShopymindClient_Bin_Notify::saveCustomer($observer->getEvent()->getCustomer()->getId());
-				self::setSyncDate('customer');
-			}
-		}
-		catch(Exception $e) {
-			
-		}
+        try {
+            $chk = self::checkSyncDate('customer');
+            if ($chk) {
+                ShopymindClient_Bin_Notify::saveCustomer($observer->getEvent()->getCustomer()->getId());
+                self::setSyncDate('customer');
+            }
+        } catch (Exception $e) {
+
+        }
     }
 
     /**
@@ -294,13 +286,12 @@ class SPM_ShopyMind_Model_Observer extends Varien_Event_Observer {
      */
     public function deleteCustomer(Varien_Event_Observer $observer)
     {
-		try {
-			$params = array('id_customer' => $observer->getEvent()->getCustomer()->getId());
-			ShopymindClient_Bin_Notify::deleteCustomer($params);
-		}
-		catch(Exception $e) {
-			
-		}
+        try {
+            $params = array('id_customer' => $observer->getEvent()->getCustomer()->getId());
+            ShopymindClient_Bin_Notify::deleteCustomer($params);
+        } catch (Exception $e) {
+
+        }
     }
 
     private function hasShopyMindClientConfiguration()
