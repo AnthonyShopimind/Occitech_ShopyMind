@@ -81,6 +81,9 @@ tables:
       status: processing
       order_currency_code: USD
       base_grand_total: 100.0000
+      grand_total: 100.0000
+      base_to_global_rate: 1.0000
+      base_to_quote_rate: 1.0000
 
   sales/order_address:
     - entity_id: 2

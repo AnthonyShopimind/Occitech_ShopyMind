@@ -6,7 +6,7 @@ class SPM_ShopyMind_Test_Config_Main extends EcomDev_PHPUnit_Test_Case_Config
     {
         $this->assertEventObserverDefined(
             'global',
-            'sales_order_save_after',
+            'sales_order_save_commit_after',
             'shopymind/observer',
             'orderUpdateObserver'
         );

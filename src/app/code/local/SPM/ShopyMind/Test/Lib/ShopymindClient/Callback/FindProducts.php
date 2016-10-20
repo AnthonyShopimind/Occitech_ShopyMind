@@ -103,7 +103,7 @@ QUERY
     /**
      * @loadFixture
      */
-    public function testConfigurableProductsHaveCorrectCombinations()
+    public function testConfigurableProductsHaveCorrectCombinationsWithTheFirstOneAsDefault()
     {
         $result = ShopymindClient_Callback::findProducts(false, false, 'configurable');
         $expectedConfigurableProduct = array(
@@ -112,7 +112,8 @@ QUERY
             'combinations' => array(
                 array(
                     'id' => 1,
-                    'name' => 'First simple product'
+                    'name' => 'First simple product',
+                    'default' => 1,
                 )
             )
         );

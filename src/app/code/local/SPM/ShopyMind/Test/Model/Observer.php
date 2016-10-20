@@ -104,7 +104,7 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case_Config
                 'http://magento.local/contacts/contacts/index',
                 '+33102030405',
                 'Europe/London',
-                true,
+                0,
                 'default-0'
             );
 
@@ -153,11 +153,11 @@ class SPM_ShopyMind_Test_Model_Observer extends EcomDev_PHPUnit_Test_Case_Config
     public function testNeededEventsAreListenedWithCorrectMethods()
     {
         $events = array(
-            'catalog_product_save_after' => 'saveProduct',
+            'catalog_product_save_commit_after' => 'saveProduct',
             'catalog_product_delete_after_done' => 'deleteProduct',
-            'catalog_category_save_after' => 'saveProductCategory',
+            'catalog_category_save_commit_after' => 'saveProductCategory',
             'catalog_category_delete_after' => 'deleteProductCategory',
-            'customer_save_after' => 'saveCustomer',
+            'customer_save_commit_after' => 'saveCustomer',
             'customer_address_save_after' => 'saveCustomerAddress',
             'customer_address_delete_after' => 'saveCustomerAddress',
             'customer_delete_after' => 'deleteCustomer',

@@ -185,9 +185,10 @@ class ShopymindClient_Callback {
         }
 
         if ($results && is_array($results) && sizeof($results)) {
-            foreach ( $results as $row ) {
-                if (! $row['entity_id'])
+            foreach ($results as $row) {
+                if (!$row['entity_id']) {
                     continue;
+                }
                 $return [] = array (
                     'customer' => self::getUser($row['entity_id'])
                 );
@@ -364,7 +365,6 @@ class ShopymindClient_Callback {
         }
 
         $DataTransformer = new SPM_ShopyMind_DataMapper_DataTransformer_QuoteItemToProduct();
-        //$DataTransformer2 = new SPM_ShopyMind_DataMapper_QuoteItem();
         $ProductMapper = new SPM_ShopyMind_DataMapper_Product();
         $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
             array($DataTransformer, 'transform'),

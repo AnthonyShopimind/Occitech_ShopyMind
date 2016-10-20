@@ -25,6 +25,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_GetCarts extends EcomDev_P
                 'id_product' => 1,
                 'id_manufacturer' => null,
                 'price' => '13.0000',
+                'qty' => 2,
                 'reference' => '14156575-XS-9394',
                 'combinations' => array(),
                 'product_link' => 'catalog/product/view/id/1/s/legging/',
@@ -126,6 +127,7 @@ QUERY
                 'date_upd' => '2014-01-31 13:45:46',
             )
         );
+        $anotherCart['products'][0]['qty'] = 1;
 
         $expectedResult = array(
             $this->_anExpectedCart,

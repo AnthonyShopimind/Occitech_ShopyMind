@@ -73,14 +73,14 @@ class SPM_ShopyMind_Test_Action_SyncCustomers extends EcomDev_PHPUnit_Test_Case
         $this->assertEquals($expected, $actual);
     }
 
-    public function testProcessReturnCustomerFormattedByGetUserMethod()
+    public function testProcessReturnCustomerFormattedByGetUserMethodAlwaysAsArray()
     {
         $scope = SPM_ShopyMind_Model_Scope::buildUnrestricted();
         $SyncCustomers = new SPM_ShopyMind_Action_SyncCustomers($scope, null, null, null, 2, false);
         $actual = $SyncCustomers->process();
 
         $GetUser = new SPM_ShopyMind_Action_GetUser(2);
-        $expected = $GetUser->process();
+        $expected = [$GetUser->process()];
 
         $this->assertEquals($expected, $actual);
     }

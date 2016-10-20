@@ -90,7 +90,8 @@ QUERY
             'quantity_remaining' => '100.0000',
             'date_creation' => '1970-01-01 00:00:00',
             'active' => false,
-            'shop_id_shop' => 0,
+            'shop_id_shop' => 1,
+            'qty' => 2,
             'lang' => 'en',
             'currency' => 'USD'
         );
