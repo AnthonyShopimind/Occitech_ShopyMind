@@ -13,6 +13,7 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
 
     public function testCanGetCustomersWithoutOrdersSinceThreeMonths()
     {
+        $this->markTestIncomplete('See https://github.com/occitech/Occitech_ShopyMind/issues/81');
         $expected = array(
             array(
                 'customer' => array(
@@ -66,6 +67,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
 
     public function testItCanCountResults()
     {
+        $this->markTestIncomplete('See https://github.com/occitech/Occitech_ShopyMind/issues/81');
+
         $actual = ShopymindClient_Callback::getInactiveClients('store-1', '2014-11-24', array(array('country' => 'US', 'region' => 'AL')), 1, false, true);
 
         $this->assertEquals(array('count' => 1), $actual);
@@ -73,6 +76,8 @@ class SPM_ShopyMind_Test_Lib_ShopymindClient_Callback_Get_Inactive_Clients exten
 
     public function testItCanRetrieveDataForMutlipleTimezones()
     {
+        $this->markTestIncomplete('See https://github.com/occitech/Occitech_ShopyMind/issues/81');
+
         $actual = ShopymindClient_Callback::getInactiveClients(
             'store-1',
             '2014-11-24',
