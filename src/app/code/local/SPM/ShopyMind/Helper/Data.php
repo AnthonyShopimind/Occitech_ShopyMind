@@ -35,7 +35,11 @@ class SPM_ShopyMind_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function productUrlOf(Mage_Catalog_Model_Product $product)
     {
-        return $product->getProductUrl(false);
+        return str_replace(
+            array('call.php', 'testclient.php', 'checkCallback.php'),
+            'index.php',
+            $product->getProductUrl(false)
+        );
     }
 
     public function productImageUrlOf(Mage_Catalog_Model_Product $product)
