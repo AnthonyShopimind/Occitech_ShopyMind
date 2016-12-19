@@ -179,6 +179,7 @@ class ShopymindClient_Callback {
         WHERE  DATE_FORMAT(`customer_birth_table`.`value`,"%m-%d") = "' . $birthDate . '" AND ' . $timezonesWhere . ' AND `customer_primary_table`.`is_active` = 1
         AND `customer_primary_table`.`store_id` IN ("' . implode('","', $scope->storeIds()) . '")
         GROUP BY `customer_primary_table`.`entity_id`';
+        $results = $readConnection->fetchAll($query);
 
         if (!is_null($start) && !is_null($limit)) {
             $query .= 'LIMIT '.$start.', '.$limit;
