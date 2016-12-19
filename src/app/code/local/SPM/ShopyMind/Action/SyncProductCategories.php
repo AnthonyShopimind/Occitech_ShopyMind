@@ -29,15 +29,15 @@ class SPM_ShopyMind_Action_SyncProductCategories implements SPM_ShopyMind_Interf
 
             $categories = $this->retrieveCategories($storeId);
             if ($this->params['justCount']) {
-                return $categories->count();
-            }
-
-            $Formatter = new SPM_ShopyMind_DataMapper_Category($this->params['scope']);
-            $currentReturn = array_values(array_map(array($Formatter, 'format'), iterator_to_array($categories->getIterator())));
-            foreach ($currentReturn as $category) {
-                $category_key = $category['id_category'] . '-' . $category['lang'];
-                if (!isset($return[$category_key])) {
-                    $return[$category_key] = $category;
+                $return[$storeId] = $categories->count();
+            } else {
+                $Formatter = new SPM_ShopyMind_DataMapper_Category($this->params['scope']);
+                $currentReturn = array_values(array_map(array($Formatter, 'format'), iterator_to_array($categories->getIterator())));
+                foreach ($currentReturn as $category) {
+                    $category_key = $category['id_category'] . '-' . $category['lang'];
+                    if (!isset($return[$category_key])) {
+                        $return[$category_key] = $category;
+                    }
                 }
             }
 

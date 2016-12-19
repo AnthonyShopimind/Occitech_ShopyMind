@@ -46,20 +46,21 @@ class SPM_ShopyMind_Action_SyncProducts implements SPM_ShopyMind_Interface_Actio
 
             $productCollection = $this->retrieveProducts($storeId);
             if ($this->params['justCount']) {
-                return $productCollection->count();
-            }
-
-            $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
-                array($this->getProductDataMapper(), 'format'),
-                SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($this->params['scope']),
-            ));
-            $currentReturn = $formatter->format(iterator_to_array($productCollection));
-            foreach ($currentReturn as $product) {
-                $product_key = $product['id_product'] . '-' . $product['lang'];
-                if (!isset($return[$product_key])) {
-                    $return[$product_key] = $product;
+                $return[$storeId] = $productCollection->count();
+            } else {
+                $formatter = new SPM_ShopyMind_DataMapper_Pipeline(array(
+                    array($this->getProductDataMapper(), 'format'),
+                    SPM_ShopyMind_DataMapper_Scope::makeScopeEnricher($this->params['scope']),
+                ));
+                $currentReturn = $formatter->format(iterator_to_array($productCollection));
+                foreach ($currentReturn as $product) {
+                    $product_key = $product['id_product'] . '-' . $product['lang'];
+                    if (!isset($return[$product_key])) {
+                        $return[$product_key] = $product;
+                    }
                 }
             }
+
             $appEmulation->stopEnvironmentEmulation($emulatedEnvironment);
             $this->params['scope'] = $initialScope;
         }

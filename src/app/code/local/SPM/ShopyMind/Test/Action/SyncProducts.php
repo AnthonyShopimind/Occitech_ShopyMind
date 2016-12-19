@@ -102,7 +102,10 @@ class SPM_ShopyMind_Test_Action_SyncProducts extends EcomDev_PHPUnit_Test_Case
         $SyncProducts = new SPM_ShopyMind_Action_SyncProducts($scope, null, null, "2015-12-16 10:30:00", false, true);
 
         $actual = $SyncProducts->process();
-        $expected = 2;
+        $expected = array(
+            2 => 2,
+            1 => 2
+        );
 
         $this->assertEquals($expected, $actual);
     }

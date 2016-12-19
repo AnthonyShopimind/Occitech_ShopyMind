@@ -77,7 +77,10 @@ class SPM_ShopyMind_Test_Action_SyncProductCategories extends PHPUnit_Framework_
         $SyncCategories = new SPM_ShopyMind_Action_SyncProductCategories($scope, null, null, null, false, true);
 
         $actual = $SyncCategories->process();
-        $expected = 6;
+        $expected = array(
+            2 => 5,
+            1 => 2
+        );
 
         $this->assertEquals($expected, $actual);
     }
