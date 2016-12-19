@@ -94,7 +94,7 @@
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
             </customer_save_commit_after>
-            <customer_address_save_after>
+            <customer_address_save_commit_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
                         <type>singleton</type>
@@ -102,7 +102,7 @@
                         <method>saveCustomerAddress</method>
                     </SPM_ShopyMind_Model_Observer>
                 </observers>
-            </customer_address_save_after>
+            </customer_address_save_commit_after>
             <customer_address_delete_after>
                 <observers>
                     <SPM_ShopyMind_Model_Observer>
