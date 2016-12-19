@@ -1410,41 +1410,6 @@ class ShopymindClient_Callback {
         return $cart_id;
     }
 
-    /**
-     * Remontée des ventes vers ShopyMind
-     *
-     * @param array $order
-     */
-    /*public static function checkNewOrder($order) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-
-        self::sendOrderToSPM($order);
-    }*/
-
-    /**
-     * Envoi des ventes générées suite à une relance à ShopyMind
-     *
-     * @param Mage_Sales_Model_Order $order
-     */
-    /*public static function sendOrderToSPM($order) {
-        if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__)) {
-            return call_user_func_array(array (
-                    'ShopymindClient_CallbackOverride',
-                    __FUNCTION__
-            ), func_get_args());
-        }
-        self::startStoreEmulationByStoreId($order->getStoreId());
-
-        include_once (Mage::getBaseDir('base') . '/lib/ShopymindClient/Bin/Notify.php');
-        $params = self::formatOrderData($order);
-        ShopymindClient_Bin_Notify::newOrder($params);
-        self::stopStoreEmulation();
-    }*/
-
     public static function saveOrder($order)
     {
         if (class_exists('ShopymindClient_CallbackOverride', false) && method_exists('ShopymindClient_CallbackOverride', __FUNCTION__))
@@ -1858,7 +1823,6 @@ class ShopymindClient_Callback {
 
         return $categories;
     }
-
 
     /**
      * Returns the details of the requested cart(s)
